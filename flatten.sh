@@ -5,17 +5,14 @@ DESTINO="./flattened"
 CARPETAS=(
     "./assets"
     "./src"
-    "./includes"
+    "./views"
 )
 
 # Archivos específicos del root que quieres incluir
 ARCHIVOS_ROOT=(
-    "./package.json"
-    "./mobypress.php"
     "./composer.json"
-    "./build-deploy.sh"
     "./flatten.sh"
-    "./README.md"
+    "./CONTRACT.md"
 )
 
 EXTENSIONES_TEXTO=(
