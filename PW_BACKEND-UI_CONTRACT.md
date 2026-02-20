@@ -36,6 +36,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 | Método | Parámetros | Retorna | Descripción |
 |--------|------------|---------|-------------|
 | `init()` | `array $config` | `self` | Inicializa el design system (singleton) |
+| `playground()` | `array $options` | `void` | Registra una página de admin con todos los componentes renderizados. Solo para desarrollo. |
 | `ui()` | — | `ComponentRenderer` | Accede al renderer de componentes individuales |
 | `config()` | `?string $key` | `mixed` | Obtiene toda la config o un valor específico |
 | `render_page()` | `array $page` | `void` | Renderiza una página completa con layout, header, tabs, sidebar y footer |
@@ -81,6 +82,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 | Hook | Tipo | Prioridad | Descripción |
 |------|------|-----------|-------------|
 | `admin_enqueue_scripts` | action | 10 | Carga Tailwind CDN, CSS y JS del design system |
+| `admin_menu` | action | 10 | Registra la página de admin del playground (solo si se llama `playground()`) |
 
 ### Hooks que expone para que el plugin extienda
 
@@ -123,10 +125,68 @@ add_action( 'plugins_loaded', function() {
 
 ---
 
+## Playground
+
+El playground es una página de admin incluida en el package que renderiza todos los componentes disponibles con sus variantes y estados. Sirve como referencia visual y para verificar que los assets cargan correctamente en un entorno nuevo.
+
+### Activar el playground
+
+Llamar `BackendUI::playground()` después de `init()`. El método registra su propia página de admin y agrega automáticamente su screen a la lista de screens que cargan assets — no hace falta modificar la config de `init()`.
+
+```php
+add_action( 'plugins_loaded', function() {
+    BackendUI::init([
+        'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
+        'screens'    => [ 'toplevel_page_mi-plugin' ],
+    ]);
+
+    if ( defined('WP_DEBUG') && WP_DEBUG ) {
+        BackendUI::playground();
+    }
+});
+```
+
+Aparece en el menú de WP Admin como **"PW Playground"** con el ícono de paleta de colores.
+
+### Opciones de `playground()`
+
+```php
+BackendUI::playground([
+    'capability' => 'manage_options', // capability mínima para ver la página. Default: 'manage_options'
+    'menu_order' => 99,               // posición en el menú de admin. Default: 99
+]);
+```
+
+### Qué muestra el playground
+
+Está organizado en 4 tabs:
+
+| Tab | Contenido |
+|-----|-----------|
+| **Buttons & Badges** | Todas las variantes de `button()` (primary, secondary, outline, ghost, danger), tamaños (sm, md, lg), estado disabled, con ícono. Todas las variantes de `badge()` en tamaños sm y md. |
+| **Forms** | `input()` con estados normal, requerido, error y disabled. `textarea()` normal y con error. `select()` normal y con error. `checkbox()` y `toggle()` en estados sin marcar, marcado y disabled. |
+| **Cards & Notices** | Los 4 tipos de `notice()` (info, success, warning, danger) y la variante dismissible. `card()` con descripción y footer. `card()` sin padding. |
+| **Typography & Nav** | `heading()` niveles h1–h6. `paragraph()` en variantes default, muted y small. `link()` en variantes default, muted y danger. `separator()`. |
+
+La sidebar muestra el listado de componentes disponibles y un snippet del comando de activación.
+
+### Detalles de implementación
+
+- **Idempotente** — llamar `playground()` múltiples veces no registra la página dos veces.
+- **Screen auto-registrada** — `AssetsManager` recibe `$config` por referencia, por lo que agregar la screen del playground después del `boot()` es transparente, sin necesidad de re-registrar hooks.
+- **Slug fijo** — la página siempre usa el slug `pw-bui-playground` (constante `BackendUI::PLAYGROUND_SLUG`). La URL de admin queda en `/wp-admin/admin.php?page=pw-bui-playground`.
+- **`reset()` limpia el flag** — al llamar `BackendUI::reset()` en tests, el flag `$playground` también se resetea.
+
+### Advertencia
+
+No activar en producción. El playground expone información interna del package (versión, componentes, estructura) y agrega una entrada visible en el menú de admin. Protegerlo siempre con `WP_DEBUG` u otra condición de entorno.
+
+---
+
 ## Restricciones y advertencias
 
 - El package **NO** persiste datos — solo renderiza UI. El plugin es responsable de guardar/recuperar settings.
-- El package **NO** registra páginas de admin — el plugin crea las páginas via `add_menu_page` / `add_submenu_page` y usa el design system para renderizar el contenido.
+- El package **NO** registra páginas de admin — el plugin crea las páginas via `add_menu_page` / `add_submenu_page` y usa el design system para renderizar el contenido. (Excepción: la página del playground, que el package registra internamente.)
 - Tailwind CSS se carga via CDN (`cdn.tailwindcss.com`). Esto es adecuado para admin backend pero **NO** para frontend.
 - Todas las clases Tailwind llevan el prefijo `pw-` para evitar conflictos con los estilos del admin de WordPress.
 - `screens` vacío = assets NO se cargan en ninguna pantalla (opt-in explícito).
@@ -153,6 +213,10 @@ add_action( 'plugins_loaded', function() {
             'logo_url' => plugin_dir_url(__FILE__) . 'assets/logo.svg',
         ],
     ]);
+
+    if ( defined('WP_DEBUG') && WP_DEBUG ) {
+        BackendUI::playground();
+    }
 });
 
 // 2. Registrar la página de admin

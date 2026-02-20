@@ -132,7 +132,7 @@ class BackendUI
 	{
 		$bui = self::init(); // returns existing singleton
 		// The view uses $this (BackendUI instance) — bind it via a closure
-		$render = Closure::bind(
+		$render = \Closure::bind(
 			static function () {
 				include __DIR__ . "/../views/playground/playground.php";
 			},
