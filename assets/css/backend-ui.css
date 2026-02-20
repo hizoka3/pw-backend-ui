@@ -1,0 +1,123 @@
+/* assets/css/backend-ui.css */
+
+/**
+ * pw/backend-ui — Custom styles & WordPress admin resets.
+ *
+ * Tailwind CSS 4 handles the design tokens and utilities.
+ * This file provides:
+ *   1. WP admin scope resets (so Tailwind classes work correctly)
+ *   2. Component-specific styles that can't be expressed as utilities
+ *   3. Transition / animation helpers
+ */
+
+/* =========================================================================
+   1. WP ADMIN SCOPE RESETS
+   ========================================================================= */
+
+/**
+ * WordPress admin applies its own box-sizing, margins, and font stacks.
+ * We reset inside our wrapper so Tailwind utilities behave predictably.
+ */
+#pw-backend-ui-app,
+#pw-backend-ui-app *,
+#pw-backend-ui-app *::before,
+#pw-backend-ui-app *::after {
+    box-sizing: border-box;
+}
+
+#pw-backend-ui-app {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove WP default heading styles inside our wrapper */
+#pw-backend-ui-app h1,
+#pw-backend-ui-app h2,
+#pw-backend-ui-app h3,
+#pw-backend-ui-app h4,
+#pw-backend-ui-app h5,
+#pw-backend-ui-app h6 {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+}
+
+/* Remove WP default form element styles */
+#pw-backend-ui-app input[type="text"],
+#pw-backend-ui-app input[type="email"],
+#pw-backend-ui-app input[type="url"],
+#pw-backend-ui-app input[type="password"],
+#pw-backend-ui-app input[type="number"],
+#pw-backend-ui-app textarea,
+#pw-backend-ui-app select {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+}
+
+/* Remove WP button resets */
+#pw-backend-ui-app button {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* =========================================================================
+   2. COMPONENT-SPECIFIC STYLES
+   ========================================================================= */
+
+/* Toggle switch transition */
+.pw-bui-toggle {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.pw-bui-toggle span {
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Dismiss animation for notices */
+[data-pw-dismissible].pw-bui-dismissing {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+/* Tab underline transition */
+.pw-bui-tab {
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Select custom arrow */
+#pw-backend-ui-app select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* =========================================================================
+   3. UTILITY HELPERS
+   ========================================================================= */
+
+/* Fade-in for tab panels */
+.pw-bui-tab-panel:not(.pw-hidden) {
+    animation: pwBuiFadeIn 0.15s ease-out;
+}
+
+@keyframes pwBuiFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
