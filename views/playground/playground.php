@@ -15,7 +15,7 @@ $icon_check =
 $icon_plus =
 	'<svg xmlns="http://www.w3.org/2000/svg" class="pw-h-4 pw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>';
 
-$this->render_page([
+$bui->render_page([
 	"title" => "PW Backend UI — Playground",
 	"description" =>
 		"Vista de referencia de todos los componentes del design system.",
