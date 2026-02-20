@@ -29,3 +29,6 @@ npm-debug.log*
 *.temp
 test_verify_*
 temp_build_*
+
+# others
+composer.lock
