@@ -1,188 +1,277 @@
 // assets/js/backend-ui.js
 
 /**
- * pw/backend-ui — Interactive behaviors for the design system.
+ * pw/backend-ui — Interactive behaviors for the PW Design System.
  *
  * Handles:
+ *   - Theme toggle (dark / light) with localStorage persistence
  *   - Tab navigation (click + keyboard)
  *   - Toggle switch state
- *   - Dismissible notices
+ *   - Segmented control
+ *   - Dismissible notices / banners
+ *   - Tooltip (CSS-driven, JS for dynamic positioning)
  *
  * No dependencies. Vanilla JS. Scoped to #pw-backend-ui-app.
  */
 
-( function () {
-    'use strict';
+(function () {
+	"use strict";
 
-    const SCOPE = '#pw-backend-ui-app';
+	const SCOPE = "#pw-backend-ui-app";
+	const STORAGE_KEY = "pw-bui-theme";
+	const DARK_CLASS = "dark";
+	const ATTR_THEME = "data-pw-theme";
 
-    // =========================================================================
-    // HELPERS
-    // =========================================================================
+	// =========================================================================
+	// HELPERS
+	// =========================================================================
 
-    /**
-     * Safe querySelectorAll scoped to the design system wrapper.
-     *
-     * @param {string} selector
-     * @returns {Element[]}
-     */
-    function $$ ( selector ) {
-        const root = document.querySelector( SCOPE );
-        return root ? Array.from( root.querySelectorAll( selector ) ) : [];
-    }
+	function scope() {
+		return document.querySelector(SCOPE);
+	}
 
-    /**
-     * Delegate event listener within scope.
-     *
-     * @param {string}   event
-     * @param {string}   selector
-     * @param {Function} handler
-     */
-    function delegate ( event, selector, handler ) {
-        const root = document.querySelector( SCOPE );
-        if ( ! root ) return;
+	function $$(selector) {
+		const root = scope();
+		return root ? Array.from(root.querySelectorAll(selector)) : [];
+	}
 
-        root.addEventListener( event, function ( e ) {
-            const target = e.target.closest( selector );
-            if ( target && root.contains( target ) ) {
-                handler.call( target, e );
-            }
-        } );
-    }
+	function delegate(event, selector, handler) {
+		const root = scope();
+		if (!root) return;
 
-    // =========================================================================
-    // TABS
-    // =========================================================================
+		root.addEventListener(event, function (e) {
+			const target = e.target.closest(selector);
+			if (target && root.contains(target)) {
+				handler.call(target, e);
+			}
+		});
+	}
 
-    function initTabs () {
-        delegate( 'click', '[data-pw-tab]', function () {
-            const slug   = this.getAttribute( 'data-pw-tab' );
-            const tabNav = this.closest( '[role="tablist"]' );
-            if ( ! tabNav ) return;
+	// =========================================================================
+	// THEME
+	// =========================================================================
 
-            // Deactivate all tabs in the same nav
-            tabNav.querySelectorAll( '[data-pw-tab]' ).forEach( function ( tab ) {
-                tab.classList.remove( 'pw-border-brand-600', 'pw-text-brand-600' );
-                tab.classList.add( 'pw-border-transparent', 'pw-text-surface-500' );
-                tab.setAttribute( 'aria-selected', 'false' );
-            } );
+	function getTheme() {
+		try {
+			return localStorage.getItem(STORAGE_KEY) || "dark";
+		} catch (e) {
+			return "dark";
+		}
+	}
 
-            // Activate clicked tab
-            this.classList.remove( 'pw-border-transparent', 'pw-text-surface-500' );
-            this.classList.add( 'pw-border-brand-600', 'pw-text-brand-600' );
-            this.setAttribute( 'aria-selected', 'true' );
+	function setTheme(theme) {
+		const root = scope();
+		if (!root) return;
 
-            // Show/hide panels
-            $$( '[data-pw-tab-panel]' ).forEach( function ( panel ) {
-                if ( panel.getAttribute( 'data-pw-tab-panel' ) === slug ) {
-                    panel.classList.remove( 'pw-hidden' );
-                    panel.removeAttribute( 'aria-hidden' );
-                } else {
-                    panel.classList.add( 'pw-hidden' );
-                    panel.setAttribute( 'aria-hidden', 'true' );
-                }
-            } );
+		root.setAttribute(ATTR_THEME, theme);
 
-            // Dispatch custom event for plugins to listen to
-            document.dispatchEvent( new CustomEvent( 'pw-bui:tab-changed', {
-                detail: { slug: slug }
-            } ) );
-        } );
+		try {
+			localStorage.setItem(STORAGE_KEY, theme);
+		} catch (e) {
+			/* ignore */
+		}
 
-        // Keyboard navigation (left/right arrows)
-        delegate( 'keydown', '[data-pw-tab]', function ( e ) {
-            if ( e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' ) return;
+		// Update toggle icon + aria-label
+		const toggleBtn = root.querySelector("[data-pw-theme-toggle]");
+		if (toggleBtn) {
+			toggleBtn.setAttribute(
+				"aria-label",
+				theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+			);
+			toggleBtn.setAttribute(
+				"title",
+				theme === "dark" ? "Light mode" : "Dark mode",
+			);
 
-            const tabs = Array.from(
-                this.closest( '[role="tablist"]' ).querySelectorAll( '[data-pw-tab]' )
-            );
-            const idx     = tabs.indexOf( this );
-            const nextIdx = e.key === 'ArrowRight'
-                ? ( idx + 1 ) % tabs.length
-                : ( idx - 1 + tabs.length ) % tabs.length;
+			const iconDark = toggleBtn.querySelector(".pw-bui-icon-moon");
+			const iconLight = toggleBtn.querySelector(".pw-bui-icon-sun");
 
-            tabs[ nextIdx ].focus();
-            tabs[ nextIdx ].click();
-        } );
-    }
+			if (iconDark) iconDark.style.display = theme === "dark" ? "none" : "";
+			if (iconLight) iconLight.style.display = theme === "light" ? "none" : "";
+		}
 
-    // =========================================================================
-    // TOGGLE SWITCH
-    // =========================================================================
+		document.dispatchEvent(
+			new CustomEvent("pw-bui:theme-changed", {
+				detail: { theme },
+			}),
+		);
+	}
 
-    function initToggles () {
-        delegate( 'click', '.pw-bui-toggle', function () {
-            if ( this.hasAttribute( 'disabled' ) ) return;
+	function applyInitialTheme() {
+		const root = scope();
+		if (!root) return;
 
-            const isChecked = this.getAttribute( 'aria-checked' ) === 'true';
-            const newState  = ! isChecked;
-            const name      = this.getAttribute( 'data-name' );
-            const value     = this.getAttribute( 'data-value' );
-            const knob      = this.querySelector( 'span' );
+		const saved = getTheme();
+		// If theme was already set server-side via data-pw-theme attr, respect it on first load.
+		// Otherwise apply saved preference.
+		const current = root.getAttribute(ATTR_THEME);
+		setTheme(current || saved);
+	}
 
-            // Update visual state
-            this.setAttribute( 'aria-checked', newState.toString() );
+	function initThemeToggle() {
+		applyInitialTheme();
 
-            if ( newState ) {
-                this.classList.remove( 'pw-bg-surface-200' );
-                this.classList.add( 'pw-bg-brand-600' );
-                knob.classList.remove( 'pw-translate-x-0' );
-                knob.classList.add( 'pw-translate-x-5' );
-            } else {
-                this.classList.remove( 'pw-bg-brand-600' );
-                this.classList.add( 'pw-bg-surface-200' );
-                knob.classList.remove( 'pw-translate-x-5' );
-                knob.classList.add( 'pw-translate-x-0' );
-            }
+		delegate("click", "[data-pw-theme-toggle]", function () {
+			const root = scope();
+			const current = root ? root.getAttribute(ATTR_THEME) : "dark";
+			setTheme(current === "dark" ? "light" : "dark");
+		});
+	}
 
-            // Update hidden input
-            var input = this.parentElement.querySelector( 'input[name="' + name + '"]' );
-            if ( input ) {
-                input.value = newState ? value : '';
-            }
+	// =========================================================================
+	// TABS
+	// =========================================================================
 
-            // Dispatch custom event
-            document.dispatchEvent( new CustomEvent( 'pw-bui:toggle-changed', {
-                detail: { name: name, checked: newState, value: value }
-            } ) );
-        } );
-    }
+	function initTabs() {
+		delegate("click", "[data-pw-tab]", function (e) {
+			e.preventDefault();
+			const slug = this.getAttribute("data-pw-tab");
+			const tabNav = this.closest('[role="tablist"]');
+			if (!tabNav) return;
 
-    // =========================================================================
-    // DISMISSIBLE NOTICES
-    // =========================================================================
+			tabNav.querySelectorAll("[data-pw-tab]").forEach(function (tab) {
+				tab.classList.remove("pw-bui-active");
+				tab.setAttribute("aria-selected", "false");
+				tab.removeAttribute("tabindex");
+			});
 
-    function initDismissible () {
-        delegate( 'click', '.pw-bui-dismiss', function () {
-            var notice = this.closest( '[data-pw-dismissible]' );
-            if ( ! notice ) return;
+			this.classList.add("pw-bui-active");
+			this.setAttribute("aria-selected", "true");
+			this.setAttribute("tabindex", "0");
 
-            notice.classList.add( 'pw-bui-dismissing' );
+			$$("[data-pw-tab-panel]").forEach(function (panel) {
+				if (panel.getAttribute("data-pw-tab-panel") === slug) {
+					panel.classList.remove("pw-bui-hidden");
+					panel.removeAttribute("aria-hidden");
+				} else {
+					panel.classList.add("pw-bui-hidden");
+					panel.setAttribute("aria-hidden", "true");
+				}
+			});
 
-            // Remove from DOM after animation
-            setTimeout( function () {
-                notice.remove();
-            }, 200 );
-        } );
-    }
+			document.dispatchEvent(
+				new CustomEvent("pw-bui:tab-changed", {
+					detail: { slug },
+				}),
+			);
+		});
 
-    // =========================================================================
-    // INIT
-    // =========================================================================
+		// Keyboard: left / right arrows
+		delegate("keydown", "[data-pw-tab]", function (e) {
+			if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
 
-    function init () {
-        initTabs();
-        initToggles();
-        initDismissible();
+			const tabs = Array.from(
+				this.closest('[role="tablist"]').querySelectorAll("[data-pw-tab]"),
+			);
+			const idx = tabs.indexOf(this);
+			const nextIdx =
+				e.key === "ArrowRight"
+					? (idx + 1) % tabs.length
+					: (idx - 1 + tabs.length) % tabs.length;
 
-        document.dispatchEvent( new CustomEvent( 'pw-bui:ready' ) );
-    }
+			tabs[nextIdx].focus();
+			tabs[nextIdx].click();
+		});
+	}
 
-    // Run when DOM is ready
-    if ( document.readyState === 'loading' ) {
-        document.addEventListener( 'DOMContentLoaded', init );
-    } else {
-        init();
-    }
+	// =========================================================================
+	// TOGGLE SWITCH
+	// =========================================================================
 
-} )();
+	function initToggles() {
+		delegate("click", ".pw-bui-toggle-btn", function () {
+			if (this.hasAttribute("disabled")) return;
+
+			const isChecked = this.getAttribute("aria-checked") === "true";
+			const newState = !isChecked;
+			const name = this.getAttribute("data-name");
+			const value = this.getAttribute("data-value");
+
+			this.setAttribute("aria-checked", newState.toString());
+
+			const input = this.parentElement.querySelector(
+				'input[type="hidden"][name="' + name + '"]',
+			);
+			if (input) {
+				input.value = newState ? value : "";
+			}
+
+			document.dispatchEvent(
+				new CustomEvent("pw-bui:toggle-changed", {
+					detail: { name, checked: newState, value },
+				}),
+			);
+		});
+	}
+
+	// =========================================================================
+	// SEGMENTED CONTROL
+	// =========================================================================
+
+	function initSegmented() {
+		delegate("click", ".pw-bui-segmented-item", function () {
+			const group = this.closest(".pw-bui-segmented");
+			if (!group) return;
+
+			group.querySelectorAll(".pw-bui-segmented-item").forEach(function (item) {
+				item.setAttribute("aria-pressed", "false");
+			});
+
+			this.setAttribute("aria-pressed", "true");
+
+			const name = group.getAttribute("data-name");
+			const value = this.getAttribute("data-value");
+
+			// Update hidden input if present
+			const input = group.parentElement
+				? group.parentElement.querySelector(
+						'input[type="hidden"][name="' + name + '"]',
+					)
+				: null;
+			if (input) input.value = value;
+
+			document.dispatchEvent(
+				new CustomEvent("pw-bui:segmented-changed", {
+					detail: { name, value },
+				}),
+			);
+		});
+	}
+
+	// =========================================================================
+	// DISMISSIBLE (notices, banners)
+	// =========================================================================
+
+	function initDismissible() {
+		delegate("click", ".pw-bui-dismiss, .pw-bui-banner-dismiss", function () {
+			const notice = this.closest("[data-pw-dismissible]");
+			if (!notice) return;
+
+			notice.classList.add("pw-bui-dismissing");
+
+			setTimeout(function () {
+				notice.remove();
+			}, 220);
+		});
+	}
+
+	// =========================================================================
+	// INIT
+	// =========================================================================
+
+	function init() {
+		initThemeToggle();
+		initTabs();
+		initToggles();
+		initSegmented();
+		initDismissible();
+
+		document.dispatchEvent(new CustomEvent("pw-bui:ready"));
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", init);
+	} else {
+		init();
+	}
+})();

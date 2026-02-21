@@ -1,8 +1,8 @@
 # Package: pw/backend-ui
 
-**Versión:** 1.0.0
+**Versión:** 2.0.0
 **Namespace:** `PW\BackendUI`
-**Propósito:** Sistema de diseño compartido para el backend (admin) de plugins WordPress del ecosistema PW — layout, tipografía, botones, inputs, cards, tabs, notices y más. Basado en Tailwind CSS 4.
+**Propósito:** Sistema de diseño para el backend (admin) de plugins WordPress del ecosistema PW. Token-based, dark/light theme, inspirado en GitHub Primer. Sin Tailwind CDN — CSS propio con custom properties.
 
 ---
 
@@ -10,18 +10,15 @@
 
 ```json
 "require": {
-    "pw/backend-ui": "^1.0"
+    "pw/backend-ui": "^2.0"
 }
 ```
-
-> Requiere que el plugin llame `BackendUI::init($config)` en el hook `plugins_loaded` o posterior.
-> Package público en Packagist. No necesita repositorio VCS manual.
 
 ---
 
 ## Lo que el package expone
 
-### Clase principal / Entry point
+### Entry point
 
 ```php
 use PW\BackendUI\BackendUI;
@@ -29,171 +26,260 @@ use PW\BackendUI\BackendUI;
 $bui = BackendUI::init( array $config );
 ```
 
-Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
+Singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 
-### Métodos públicos disponibles
+### Métodos públicos de BackendUI
 
 | Método | Parámetros | Retorna | Descripción |
 |--------|------------|---------|-------------|
 | `init()` | `array $config` | `self` | Inicializa el design system (singleton) |
-| `playground()` | `array $options` | `void` | Registra una página de admin con todos los componentes renderizados. Solo para desarrollo. |
-| `ui()` | — | `ComponentRenderer` | Accede al renderer de componentes individuales |
-| `config()` | `?string $key` | `mixed` | Obtiene toda la config o un valor específico |
-| `render_page()` | `array $page` | `void` | Renderiza una página completa con layout, header, tabs, sidebar y footer |
-| `reset()` | — | `void` | Resetea el singleton (para testing) |
+| `ui()` | — | `ComponentRenderer` | Accede al renderer de componentes |
+| `config()` | `?string $key` | `mixed` | Obtiene la config o un valor específico |
+| `render_page()` | `array $page` | `void` | Renderiza una página completa con layout |
+| `playground()` | `array $options` | `void` | (static) Registra la página de playground |
+| `reset()` | — | `void` | Resetea el singleton — solo para testing |
 
-### Componentes disponibles via `ui()`
-
-| Método | Descripción |
-|--------|-------------|
-| `button()` | Botón con variantes: primary, secondary, outline, ghost, danger |
-| `input()` | Input de texto con label, help text, estado de error |
-| `textarea()` | Textarea con label y validación |
-| `select()` | Dropdown select con opciones normalizadas |
-| `checkbox()` | Checkbox con label y help text |
-| `toggle()` | Switch on/off interactivo |
-| `card()` | Contenedor card con título, body y footer |
-| `notice()` | Alerta/notificación: info, success, warning, danger |
-| `badge()` | Badge/tag con variantes de color |
-| `heading()` | Títulos h1-h6 con estilos consistentes |
-| `paragraph()` | Párrafos con variantes: default, muted, small |
-| `link()` | Enlaces con variantes: default, muted, danger |
-| `separator()` | Línea divisoria horizontal |
-| `tabs()` | Navegación por pestañas |
-| `tab_panel()` | Panel de contenido asociado a un tab |
-
-### Config esperada en `init()`
+### Config en `init()`
 
 ```php
-[
+BackendUI::init([
     'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/', // requerido
-    'version'    => '1.0.0',                // opcional, default: '1.0.0'
-    'screens'    => ['toplevel_page_mi-plugin'], // requerido — screen IDs de WP donde cargar assets
-    'slug'       => 'pw-backend-ui',         // opcional — prefijo para handles de assets
-    'brand'      => [                        // opcional
+    'version'    => '2.0.0',
+    'screens'    => [ 'toplevel_page_mi-plugin' ],  // requerido
+    'slug'       => 'pw-backend-ui',
+    'theme'      => 'dark',   // 'dark' (default) | 'light'
+    'brand'      => [
         'name'     => 'Mi Plugin',
-        'logo_url' => 'https://...',
+        'logo_url' => '',     // opcional — si vacío se usa solo el logomark rojo PW
     ],
-]
+]);
 ```
-
-### Hooks de WordPress que registra internamente
-
-| Hook | Tipo | Prioridad | Descripción |
-|------|------|-----------|-------------|
-| `admin_enqueue_scripts` | action | 10 | Carga Tailwind CDN, CSS y JS del design system |
-| `admin_menu` | action | 10 | Registra la página de admin del playground (solo si se llama `playground()`) |
-
-### Hooks que expone para que el plugin extienda
-
-| Hook | Tipo | Parámetros | Descripción |
-|------|------|------------|-------------|
-| `pw_bui/page_config` | filter | `array $page` | Modificar la config de página antes de renderizar |
-| `pw_bui/tailwind_config` | filter | `array $config` | Personalizar la configuración de Tailwind (colores, prefix, etc.) |
-| `pw_bui/enqueue_assets` | action | `string $hook, string $url, string $version` | Encolar assets adicionales junto al design system |
-| `pw_bui/header_right` | action | `array $page` | Inyectar contenido a la derecha del header |
-
-### Eventos JS disponibles
-
-| Evento | `detail` | Descripción |
-|--------|----------|-------------|
-| `pw-bui:ready` | — | El design system JS se ha inicializado |
-| `pw-bui:tab-changed` | `{ slug }` | Se cambió de pestaña |
-| `pw-bui:toggle-changed` | `{ name, checked, value }` | Se cambió un toggle switch |
 
 ---
 
-## Lo que el package necesita del plugin
+## Componentes disponibles via `ui()`
 
-### Interfaces que el plugin debe implementar
+### Botones y acciones
 
-Ninguna obligatoria. Existe `PageConfigInterface` como contrato opcional para estructurar la config de página.
+| Método | Descripción |
+|--------|-------------|
+| `button()` | Botón: primary, default, ghost, danger, invisible. Soporta icon + label. |
+| `tooltip()` | Wrapper con tooltip CSS-driven (top/bottom). |
 
-### Lo mínimo que el plugin debe hacer
+### Formularios
+
+| Método | Descripción |
+|--------|-------------|
+| `input()` | Input texto / email / password / number / url con label, help, error. |
+| `date_input()` | Input date / datetime-local / time. |
+| `textarea()` | Textarea con label y validación. |
+| `select()` | Dropdown select con opciones normalizadas. |
+| `checkbox()` | Checkbox individual. |
+| `checkbox_group()` | Grupo de checkboxes (name[]). |
+| `radio()` | Radio button individual. |
+| `radio_group()` | Grupo de radio buttons (fieldset). |
+| `toggle()` | Switch on/off interactivo. |
+| `segmented_control()` | Selector de opción única tipo SegmentedControl de Primer. |
+
+### Layout y contenedores
+
+| Método | Descripción |
+|--------|-------------|
+| `card()` | Contenedor card con header (title + description + header_right), body y footer. |
+
+### Feedback y estado
+
+| Método | Descripción |
+|--------|-------------|
+| `banner()` | Mensaje destacado full-width con título opcional. info/success/warning/danger. |
+| `notice()` | Alerta inline con borde izquierdo. info/success/warning/danger. |
+| `badge()` | Badge/tag con variantes de color y dot opcional. |
+| `spinner()` | Indicador de carga (sm/md/lg). |
+| `progress_bar()` | Barra de progreso 0-100% con variantes de color. |
+
+### Navegación
+
+| Método | Descripción |
+|--------|-------------|
+| `breadcrumbs()` | Navegación breadcrumb tipo Primer. |
+| `pagination()` | Paginación con rango de páginas y gaps. Link-based o button-based. |
+| `tabs()` | Barra de tabs standalone (dentro de content). |
+| `tab_panel()` | Panel de contenido de un tab. |
+
+### Tipografía
+
+| Método | Descripción |
+|--------|-------------|
+| `heading()` | Headings h1-h6 con estilos consistentes. |
+| `paragraph()` | Párrafos: default, muted, small. |
+| `link()` | Enlace: default, muted. |
+| `separator()` | Línea divisoria horizontal. |
+
+---
+
+## Tema dark / light
+
+El sistema soporta dos temas: **dark** (por defecto) y **light**.
+
+### Configuración del tema por defecto
 
 ```php
-// 1. Inicializar en plugins_loaded
-add_action( 'plugins_loaded', function() {
-    BackendUI::init([
-        'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'screens'    => [ 'toplevel_page_mi-plugin-settings' ],
-    ]);
-});
-
-// 2. Usar render_page() o componentes individuales via ui()
+BackendUI::init([ 'theme' => 'dark' ]);  // o 'light'
 ```
+
+### Toggle en runtime
+
+El header del plugin incluye un botón ☀️/🌙 que el usuario final puede usar para cambiar el tema en su sesión. La preferencia se persiste en `localStorage` bajo la clave `pw-bui-theme`.
+
+### Implementación
+
+Los temas se implementan con **CSS custom properties** en `backend-ui.css`. El atributo `data-pw-theme="dark|light"` en `#pw-backend-ui-app` activa el set de tokens correspondiente.
+
+```css
+/* Dark (default) */
+:root, [data-pw-theme="dark"] {
+    --pw-bg-canvas: #000000;
+    --pw-fg-default: #fafafa;
+    ...
+}
+
+/* Light */
+[data-pw-theme="light"] {
+    --pw-bg-canvas: #ffffff;
+    --pw-fg-default: #1f2328;
+    ...
+}
+```
+
+### Tokens disponibles
+
+| Token | Uso |
+|-------|-----|
+| `--pw-bg-canvas` | Fondo de página |
+| `--pw-bg-default` | Fondo base |
+| `--pw-bg-subtle` | Fondo sutil (sidebar, card header bg) |
+| `--pw-bg-component` | Fondo de componentes/cards |
+| `--pw-bg-input` | Fondo de inputs |
+| `--pw-bg-button` | Fondo de botones default |
+| `--pw-fg-default` | Texto principal |
+| `--pw-fg-muted` | Texto secundario |
+| `--pw-fg-subtle` | Texto muy sutil |
+| `--pw-border-default` | Borde estándar |
+| `--pw-border-input` | Borde de inputs |
+| `--pw-border-input-focus` | Borde focus (= accent = rojo) |
+| `--pw-accent` | Color de marca = #ff0000 |
+| `--pw-accent-hover` | #cc0000 |
+| `--pw-radius` | Border radius global = 2px |
+| `--pw-success-fg/bg/border` | Semántico success |
+| `--pw-warning-fg/bg/border` | Semántico warning |
+| `--pw-danger-fg/bg/border` | Semántico danger |
+| `--pw-info-fg/bg/border` | Semántico info |
+
+---
+
+## Layout
+
+El layout es **full-bleed, sin border-radius**. Se monta directamente sobre el área de contenido de WP admin sin márgenes laterales propios.
+
+```
+┌────────────────────────────────────────────────┐
+│  HEADER (negro #000)  [logo PW]   [slot] [☀️]  │  sticky top: 32px
+├────────────────────────────────────────────────┤
+│  TABS (underline nav style)                    │  opcional
+├────────────────────────────────────────────────┤
+│  BODY                                          │
+│  ┌─────────────────────┐  ┌──────────────┐     │
+│  │  MAIN CONTENT       │  │  SIDEBAR     │     │  opcional
+│  └─────────────────────┘  └──────────────┘     │
+├────────────────────────────────────────────────┤
+│  FOOTER  [left]                     [right]    │  opcional
+└────────────────────────────────────────────────┘
+```
+
+### Header
+
+- Siempre negro (`#000000`) en ambos temas.
+- Logo PW: cuadrado rojo `#ff0000` con letra P en blanco.
+- Si `brand.name` está definido, se muestra junto al logo.
+- Si `page.title` está definido, aparece junto al brand con separador `/`.
+- Slot derecho: hook `pw_bui/header_right` + botón de tema.
+
+### render_page() — opciones
+
+```php
+$bui->render_page([
+    'title'       => 'Page title',
+    'description' => 'Short description',
+    'tabs'        => [
+        [ 'slug' => 'general', 'label' => 'General', 'active' => true ],
+        [ 'slug' => 'advanced','label' => 'Advanced', 'count' => 3 ],
+    ],
+    'content' => function( $bui ) { /* ... */ },
+    'sidebar' => [
+        'title'   => 'Sidebar heading',
+        'content' => function( $bui ) { /* ... */ },
+    ],
+    'footer' => [
+        'left'  => function( $bui ) { /* ... */ },
+        'right' => function( $bui ) { /* ... */ },
+    ],
+]);
+```
+
+---
+
+## Hooks de WordPress
+
+### Hooks internos (registrados por el package)
+
+| Hook | Tipo | Descripción |
+|------|------|-------------|
+| `admin_enqueue_scripts` | action / 10 | Carga CSS y JS del design system |
+
+### Hooks expuestos (para el plugin consumidor)
+
+| Hook | Tipo | Parámetros | Descripción |
+|------|------|------------|-------------|
+| `pw_bui/page_config` | filter | `array $page` | Modificar config de página antes de renderizar |
+| `pw_bui/enqueue_assets` | action | `$hook, $url, $version` | Encolar assets adicionales |
+| `pw_bui/header_right` | action | `array $page` | Inyectar contenido al slot derecho del header |
+
+---
+
+## Eventos JS
+
+| Evento | `detail` | Descripción |
+|--------|----------|-------------|
+| `pw-bui:ready` | — | Design system JS inicializado |
+| `pw-bui:theme-changed` | `{ theme }` | Se cambió el tema |
+| `pw-bui:tab-changed` | `{ slug }` | Se cambió de pestaña |
+| `pw-bui:toggle-changed` | `{ name, checked, value }` | Se cambió un toggle |
+| `pw-bui:segmented-changed` | `{ name, value }` | Se cambió un segmented control |
 
 ---
 
 ## Playground
 
-El playground es una página de admin incluida en el package que renderiza todos los componentes disponibles con sus variantes y estados. Sirve como referencia visual y para verificar que los assets cargan correctamente en un entorno nuevo.
-
-### Activar el playground
-
-Llamar `BackendUI::playground()` después de `init()`. El método registra su propia página de admin y agrega automáticamente su screen a la lista de screens que cargan assets — no hace falta modificar la config de `init()`.
-
 ```php
-add_action( 'plugins_loaded', function() {
-    BackendUI::init([
-        'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'screens'    => [ 'toplevel_page_mi-plugin' ],
-    ]);
-
-    if ( defined('WP_DEBUG') && WP_DEBUG ) {
-        BackendUI::playground();
-    }
-});
+// Solo en desarrollo
+if ( defined('WP_DEBUG') && WP_DEBUG ) {
+    BackendUI::playground();
+}
 ```
 
-Aparece en el menú de WP Admin como **"PW Playground"** con el ícono de paleta de colores.
-
-### Opciones de `playground()`
-
-```php
-BackendUI::playground([
-    'capability' => 'manage_options', // capability mínima para ver la página. Default: 'manage_options'
-    'menu_order' => 99,               // posición en el menú de admin. Default: 99
-]);
-```
-
-### Qué muestra el playground
-
-Está organizado en 4 tabs:
-
-| Tab | Contenido |
-|-----|-----------|
-| **Buttons & Badges** | Todas las variantes de `button()` (primary, secondary, outline, ghost, danger), tamaños (sm, md, lg), estado disabled, con ícono. Todas las variantes de `badge()` en tamaños sm y md. |
-| **Forms** | `input()` con estados normal, requerido, error y disabled. `textarea()` normal y con error. `select()` normal y con error. `checkbox()` y `toggle()` en estados sin marcar, marcado y disabled. |
-| **Cards & Notices** | Los 4 tipos de `notice()` (info, success, warning, danger) y la variante dismissible. `card()` con descripción y footer. `card()` sin padding. |
-| **Typography & Nav** | `heading()` niveles h1–h6. `paragraph()` en variantes default, muted y small. `link()` en variantes default, muted y danger. `separator()`. |
-
-La sidebar muestra el listado de componentes disponibles y un snippet del comando de activación.
-
-### Detalles de implementación
-
-- **Idempotente** — llamar `playground()` múltiples veces no registra la página dos veces.
-- **Screen auto-registrada** — `AssetsManager` recibe `$config` por referencia, por lo que agregar la screen del playground después del `boot()` es transparente, sin necesidad de re-registrar hooks.
-- **Slug fijo** — la página siempre usa el slug `pw-bui-playground` (constante `BackendUI::PLAYGROUND_SLUG`). La URL de admin queda en `/wp-admin/admin.php?page=pw-bui-playground`.
-- **`reset()` limpia el flag** — al llamar `BackendUI::reset()` en tests, el flag `$playground` también se resetea.
-
-### Advertencia
-
-No activar en producción. El playground expone información interna del package (versión, componentes, estructura) y agrega una entrada visible en el menú de admin. Protegerlo siempre con `WP_DEBUG` u otra condición de entorno.
+Registra la página admin `pw-bui-playground` con todos los componentes en una interfaz interactiva. Assets se cargan automáticamente. Tabs: Buttons & Badges, Forms, Feedback, Navigation, Typography.
 
 ---
 
-## Restricciones y advertencias
+## Restricciones
 
-- El package **NO** persiste datos — solo renderiza UI. El plugin es responsable de guardar/recuperar settings.
-- El package **NO** registra páginas de admin — el plugin crea las páginas via `add_menu_page` / `add_submenu_page` y usa el design system para renderizar el contenido. (Excepción: la página del playground, que el package registra internamente.)
-- Tailwind CSS se carga via CDN (`cdn.tailwindcss.com`). Esto es adecuado para admin backend pero **NO** para frontend.
-- Todas las clases Tailwind llevan el prefijo `pw-` para evitar conflictos con los estilos del admin de WordPress.
-- `screens` vacío = assets NO se cargan en ninguna pantalla (opt-in explícito).
-- No tiene dependencias de otros packages del ecosistema `pw`.
-- Versión mínima de PHP: `8.0`
-- Versión mínima de WordPress: `6.0`
-- Sin dependencia de jQuery.
+- El package **NO** persiste datos — solo renderiza UI.
+- El package **NO** registra páginas de admin del plugin.
+- Sin Tailwind CDN — los estilos son CSS custom properties en `backend-ui.css`.
+- `screens` vacío = assets NO se cargan (opt-in explícito).
+- El header **siempre es negro** en ambos temas — es la identidad PW.
+- Layout y header sin `border-radius`.
+- PHP 8.0+ / WordPress 6.0+. Sin jQuery.
 
 ---
 
@@ -202,124 +288,76 @@ No activar en producción. El playground expone información interna del package
 ```php
 use PW\BackendUI\BackendUI;
 
-// 1. Inicializar en plugins_loaded
 add_action( 'plugins_loaded', function() {
     BackendUI::init([
         'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'version'    => '1.0.0',
+        'version'    => '2.0.0',
         'screens'    => [ 'toplevel_page_mi-plugin' ],
-        'brand'      => [
-            'name'     => 'Mi Plugin Pro',
-            'logo_url' => plugin_dir_url(__FILE__) . 'assets/logo.svg',
-        ],
+        'theme'      => 'dark',
+        'brand'      => [ 'name' => 'Mi Plugin Pro' ],
     ]);
-
-    if ( defined('WP_DEBUG') && WP_DEBUG ) {
-        BackendUI::playground();
-    }
 });
 
-// 2. Registrar la página de admin
 add_action( 'admin_menu', function() {
-    add_menu_page(
-        'Mi Plugin',
-        'Mi Plugin',
-        'manage_options',
-        'mi-plugin',
-        'mi_plugin_render_page',
-        'dashicons-admin-generic',
-        80
-    );
+    add_menu_page( 'Mi Plugin', 'Mi Plugin', 'manage_options', 'mi-plugin',
+        'mi_plugin_render_page', 'dashicons-admin-generic', 80 );
 });
 
-// 3. Renderizar la página usando el design system
 function mi_plugin_render_page() {
     $bui = BackendUI::init();
+    $ui  = $bui->ui();
 
     $bui->render_page([
-        'title'       => 'Configuración',
-        'description' => 'Ajustes generales del plugin.',
-        'tabs'        => [
+        'title' => 'Settings',
+        'tabs'  => [
             [ 'slug' => 'general',  'label' => 'General',  'active' => true ],
-            [ 'slug' => 'advanced', 'label' => 'Avanzado' ],
+            [ 'slug' => 'advanced', 'label' => 'Advanced' ],
         ],
-        'content' => function( $bui ) {
-            $ui = $bui->ui();
+        'content' => function( $bui ) use ( $ui ) {
 
-            // Tab: General
             $ui->tab_panel([
                 'slug'   => 'general',
                 'active' => true,
                 'content' => function() use ( $ui ) {
                     $ui->card([
-                        'title'   => 'Ajustes básicos',
+                        'title'   => 'Basic settings',
                         'content' => function() use ( $ui ) {
                             $ui->input([
                                 'name'  => 'site_name',
-                                'label' => 'Nombre del sitio',
+                                'label' => 'Site name',
                                 'value' => get_option( 'mi_plugin_site_name', '' ),
-                                'help'  => 'Se mostrará en el header.',
                             ]);
                             $ui->toggle([
                                 'name'    => 'enabled',
-                                'label'   => 'Activar funcionalidad',
-                                'checked' => (bool) get_option( 'mi_plugin_enabled', false ),
-                                'help'    => 'Habilita o deshabilita el plugin globalmente.',
+                                'label'   => 'Enable plugin',
+                                'checked' => (bool) get_option( 'mi_plugin_enabled' ),
                             ]);
                         },
                         'footer' => function() use ( $ui ) {
-                            $ui->button([
-                                'label'   => 'Guardar cambios',
-                                'type'    => 'submit',
-                                'variant' => 'primary',
-                            ]);
+                            $ui->button([ 'label' => 'Save', 'type' => 'submit', 'variant' => 'primary' ]);
                         },
                     ]);
                 },
             ]);
 
-            // Tab: Advanced
             $ui->tab_panel([
-                'slug'   => 'advanced',
+                'slug'    => 'advanced',
                 'content' => function() use ( $ui ) {
-                    $ui->notice([
-                        'type'    => 'warning',
-                        'message' => 'Estos ajustes son para usuarios avanzados.',
-                    ]);
+                    $ui->banner([ 'type' => 'warning', 'message' => 'Advanced settings — proceed with care.' ]);
                     $ui->card([
-                        'title'   => 'Configuración avanzada',
+                        'title'   => 'Cache settings',
                         'content' => function() use ( $ui ) {
                             $ui->select([
                                 'name'    => 'cache_ttl',
-                                'label'   => 'Tiempo de caché',
+                                'label'   => 'Cache TTL',
                                 'value'   => get_option( 'mi_plugin_cache_ttl', '3600' ),
-                                'options' => [
-                                    '0'     => 'Sin caché',
-                                    '3600'  => '1 hora',
-                                    '86400' => '24 horas',
-                                ],
+                                'options' => [ '0' => 'Off', '3600' => '1 hour', '86400' => '24 hours' ],
                             ]);
                         },
                     ]);
                 },
             ]);
         },
-        'sidebar' => [
-            'title'   => 'Información',
-            'content' => function( $bui ) {
-                $ui = $bui->ui();
-                $ui->card([
-                    'content' => function() use ( $ui ) {
-                        $ui->paragraph([ 'text' => 'Mi Plugin Pro v1.0.0' ]);
-                        $ui->link([
-                            'label'  => 'Documentación',
-                            'href'   => 'https://docs.miplugin.com',
-                            'target' => '_blank',
-                        ]);
-                    },
-                ]);
-            },
-        ],
     ]);
 }
 ```

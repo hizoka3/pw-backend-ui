@@ -2,178 +2,253 @@
 // views/playground/playground.php
 
 /**
- * Playground view — renders all available components for visual testing.
- * Loaded internally by BackendUI::playground().
+ * PW Backend UI — Component Playground
+ * Showcases every component in the design system with all variants.
  *
- * @var \PW\BackendUI\BackendUI $this
+ * @var \PW\BackendUI\BackendUI $bui
  */
 
 defined("ABSPATH") || exit();
 
-$icon_check =
-	'<svg xmlns="http://www.w3.org/2000/svg" class="pw-h-4 pw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
-$icon_plus =
-	'<svg xmlns="http://www.w3.org/2000/svg" class="pw-h-4 pw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>';
+$ui = $bui->ui();
 
 $bui->render_page([
-	"title" => "PW Backend UI — Playground",
-	"description" =>
-		"Vista de referencia de todos los componentes del design system.",
+	"title" => "Component Playground",
 	"tabs" => [
-		[
-			"slug" => "pg-buttons",
-			"label" => "Buttons & Badges",
-			"active" => true,
-		],
-		["slug" => "pg-forms", "label" => "Forms"],
-		["slug" => "pg-layout", "label" => "Cards & Notices"],
-		["slug" => "pg-typography", "label" => "Typography & Nav"],
+		["slug" => "buttons", "label" => "Buttons & Badges", "active" => true],
+		["slug" => "forms", "label" => "Forms"],
+		["slug" => "feedback", "label" => "Feedback"],
+		["slug" => "navigation", "label" => "Navigation"],
+		["slug" => "typography", "label" => "Typography"],
 	],
-	"content" => function ($bui) use ($icon_check, $icon_plus) {
-		$ui = $bui->ui();
-
-		// ── TAB: BUTTONS & BADGES ─────────────────────────────────────────────
+	"content" => function ($bui) use ($ui) {
+		// =====================================================================
+		// TAB: BUTTONS & BADGES
+		// =====================================================================
 		$ui->tab_panel([
-			"slug" => "pg-buttons",
+			"slug" => "buttons",
 			"active" => true,
-			"content" => function () use ($ui, $icon_check, $icon_plus) {
+			"content" => function () use ($ui) {
+				// — Buttons —
 				$ui->card([
-					"title" => "Button — variantes",
+					"title" => "Button variants",
 					"content" => function () use ($ui) {
-						echo '<div class="pw-flex pw-flex-wrap pw-gap-3 pw-items-center">';
-						foreach (
-							[
-								"primary",
-								"secondary",
-								"outline",
-								"ghost",
-								"danger",
-							]
-							as $v
-						) {
-							$ui->button([
-								"label" => ucfirst($v),
-								"variant" => $v,
-							]);
-						}
-						echo "</div>";
-					},
-				]);
-
-				$ui->card([
-					"title" => "Button — tamaños",
-					"content" => function () use ($ui) {
-						echo '<div class="pw-flex pw-flex-wrap pw-gap-3 pw-items-center">';
-						foreach (
-							["sm" => "Small", "md" => "Medium", "lg" => "Large"]
-							as $s => $label
-						) {
-							$ui->button(["label" => $label, "size" => $s]);
-						}
+						echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
+						$ui->button([
+							"label" => "Primary",
+							"variant" => "primary",
+						]);
+						$ui->button([
+							"label" => "Default",
+							"variant" => "default",
+						]);
+						$ui->button(["label" => "Ghost", "variant" => "ghost"]);
+						$ui->button([
+							"label" => "Danger",
+							"variant" => "danger",
+						]);
+						$ui->button([
+							"label" => "Invisible",
+							"variant" => "invisible",
+						]);
 						$ui->button([
 							"label" => "Disabled",
+							"variant" => "primary",
 							"disabled" => true,
 						]);
 						echo "</div>";
 					},
 				]);
 
+				// — Button sizes —
 				$ui->card([
-					"title" => "Button — con ícono",
+					"title" => "Button sizes",
+					"content" => function () use ($ui) {
+						echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
+						$ui->button(["label" => "Small", "size" => "sm"]);
+						$ui->button(["label" => "Medium", "size" => "md"]);
+						$ui->button(["label" => "Large", "size" => "lg"]);
+						echo "</div>";
+					},
+				]);
+
+				// — Buttons with icons —
+				$save_icon =
+					'<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M14.354 2.353a.5.5 0 00-.707 0L6 10l-3.646-3.646a.5.5 0 00-.707.707l4 4a.5.5 0 00.707 0l8-8a.5.5 0 000-.708z"/></svg>';
+				$plus_icon =
+					'<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>';
+				$trash_icon =
+					'<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 10-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"/></svg>';
+
+				$ui->card([
+					"title" => "Buttons with icons",
 					"content" => function () use (
 						$ui,
-						$icon_check,
-						$icon_plus,
+						$save_icon,
+						$plus_icon,
+						$trash_icon,
 					) {
-						echo '<div class="pw-flex pw-flex-wrap pw-gap-3 pw-items-center">';
+						echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
 						$ui->button([
-							"label" => "Guardar",
-							"icon" => $icon_check,
+							"label" => "Save",
+							"icon" => $save_icon,
+							"variant" => "primary",
 						]);
 						$ui->button([
-							"label" => "Agregar",
-							"icon" => $icon_plus,
-							"variant" => "outline",
+							"label" => "New item",
+							"icon" => $plus_icon,
+							"variant" => "default",
 						]);
 						$ui->button([
-							"label" => "Peligro",
-							"icon" => $icon_check,
+							"label" => "Delete",
+							"icon" => $trash_icon,
 							"variant" => "danger",
-							"size" => "sm",
 						]);
 						$ui->button([
-							"label" => "Sutil",
-							"icon" => $icon_plus,
-							"variant" => "ghost",
-							"size" => "sm",
+							"icon" => $plus_icon,
+							"variant" => "default",
+							"attrs" => ["title" => "Add"],
 						]);
 						echo "</div>";
 					},
 				]);
 
+				// — Badges —
 				$ui->card([
-					"title" => "Badge — variantes y tamaños",
+					"title" => "Badge variants",
 					"content" => function () use ($ui) {
-						echo '<div class="pw-flex pw-flex-wrap pw-gap-3 pw-items-center">';
-						foreach (
-							[
-								"default",
-								"primary",
-								"success",
-								"warning",
-								"danger",
-							]
-							as $v
-						) {
-							$ui->badge([
-								"label" => ucfirst($v),
-								"variant" => $v,
-							]);
-							$ui->badge([
-								"label" => ucfirst($v) . " sm",
-								"variant" => $v,
-								"size" => "sm",
-							]);
-						}
+						echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
+						$ui->badge(["label" => "Default"]);
+						$ui->badge([
+							"label" => "Primary",
+							"variant" => "primary",
+						]);
+						$ui->badge([
+							"label" => "Success",
+							"variant" => "success",
+						]);
+						$ui->badge([
+							"label" => "Warning",
+							"variant" => "warning",
+						]);
+						$ui->badge([
+							"label" => "Danger",
+							"variant" => "danger",
+						]);
+						$ui->badge(["label" => "Info", "variant" => "info"]);
+						echo "</div>";
+						echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;">';
+						$ui->badge([
+							"label" => "With dot",
+							"variant" => "success",
+							"dot" => true,
+						]);
+						$ui->badge([
+							"label" => "Active",
+							"variant" => "primary",
+							"dot" => true,
+						]);
+						$ui->badge([
+							"label" => "Offline",
+							"variant" => "danger",
+							"dot" => true,
+						]);
+						echo "</div>";
+					},
+				]);
+
+				// — Tooltip —
+				$ui->card([
+					"title" => "Tooltip",
+					"content" => function () use ($ui) {
+						echo '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;padding:16px 0;">';
+						$ui->tooltip([
+							"text" => "This is a tooltip on top",
+							"trigger" => function () use ($ui) {
+								$ui->button(["label" => "Hover me (top)"]);
+							},
+						]);
+						$ui->tooltip([
+							"text" => "Tooltip on bottom",
+							"position" => "bottom",
+							"trigger" => function () use ($ui) {
+								$ui->button([
+									"label" => "Hover me (bottom)",
+									"variant" => "ghost",
+								]);
+							},
+						]);
 						echo "</div>";
 					},
 				]);
 			},
 		]);
 
-		// ── TAB: FORMS ────────────────────────────────────────────────────────
+		// =====================================================================
+		// TAB: FORMS
+		// =====================================================================
 		$ui->tab_panel([
-			"slug" => "pg-forms",
+			"slug" => "forms",
 			"content" => function () use ($ui) {
 				$ui->card([
-					"title" => "Input",
+					"title" => "Text inputs",
 					"content" => function () use ($ui) {
 						$ui->input([
-							"name" => "pg_text",
-							"label" => "Texto normal",
-							"placeholder" => "Escribe algo...",
-							"help" => "Help text descriptivo del campo.",
+							"name" => "f_default",
+							"label" => "Default input",
+							"placeholder" => "Placeholder text",
 						]);
 						$ui->input([
-							"name" => "pg_email",
-							"label" => "Email (requerido)",
-							"type" => "email",
+							"name" => "f_required",
+							"label" => "Required field",
 							"required" => true,
-							"value" => "usuario@ejemplo.com",
+							"help" => "This field is required.",
 						]);
 						$ui->input([
-							"name" => "pg_error",
-							"label" => "Con estado de error",
-							"value" => "valor inválido",
-							"error" =>
-								"Este campo contiene un valor no permitido.",
+							"name" => "f_error",
+							"label" => "With error",
+							"value" => "bad-value",
+							"error" => "This value is not valid.",
 						]);
 						$ui->input([
-							"name" => "pg_disabled",
+							"name" => "f_disabled",
 							"label" => "Disabled",
-							"value" => "No editable",
+							"value" => 'Can\'t edit this',
 							"disabled" => true,
-							"help" => "Este campo está deshabilitado.",
+						]);
+						$ui->input([
+							"name" => "f_email",
+							"label" => "Email",
+							"type" => "email",
+							"placeholder" => "name@example.com",
+						]);
+						$ui->input([
+							"name" => "f_password",
+							"label" => "Password",
+							"type" => "password",
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Date inputs",
+					"content" => function () use ($ui) {
+						$ui->date_input([
+							"name" => "d_date",
+							"label" => "Date",
+							"type" => "date",
+						]);
+						$ui->date_input([
+							"name" => "d_datetime",
+							"label" => "Date & Time",
+							"type" => "datetime-local",
+							"max_width" => "280px",
+						]);
+						$ui->date_input([
+							"name" => "d_time",
+							"label" => "Time",
+							"type" => "time",
+							"max_width" => "160px",
 						]);
 					},
 				]);
@@ -182,18 +257,15 @@ $bui->render_page([
 					"title" => "Textarea",
 					"content" => function () use ($ui) {
 						$ui->textarea([
-							"name" => "pg_textarea",
-							"label" => "Descripción",
-							"placeholder" => "Escribe aquí...",
-							"help" => "Máximo 500 caracteres.",
-							"rows" => 3,
+							"name" => "ta_default",
+							"label" => "Message",
+							"placeholder" => "Write something…",
+							"help" => "Max 500 characters.",
 						]);
 						$ui->textarea([
-							"name" => "pg_textarea_error",
-							"label" => "Con error",
-							"value" => "contenido no válido",
-							"error" => "El contenido ingresado no es válido.",
-							"rows" => 2,
+							"name" => "ta_error",
+							"label" => "With error",
+							"error" => "This field is required.",
 						]);
 					},
 				]);
@@ -202,199 +274,477 @@ $bui->render_page([
 					"title" => "Select",
 					"content" => function () use ($ui) {
 						$ui->select([
-							"name" => "pg_select",
-							"label" => "Elige una opción",
-							"value" => "2",
-							"help" => "Selecciona la opción que corresponda.",
+							"name" => "s_default",
+							"label" => "Choose an option",
+							"placeholder" => "— Select —",
 							"options" => [
-								"1" => "Opción uno",
-								"2" => "Opción dos",
-								"3" => "Opción tres",
+								"option_a" => "Option A",
+								"option_b" => "Option B",
+								"option_c" => "Option C",
 							],
+							"help" => "Pick one from the list.",
 						]);
 						$ui->select([
-							"name" => "pg_select_error",
-							"label" => "Select con error",
-							"options" => ["1" => "Opción A", "2" => "Opción B"],
-							"error" => "Debes seleccionar una opción válida.",
+							"name" => "s_error",
+							"label" => "With error",
+							"options" => ["a" => "A", "b" => "B"],
+							"error" => "Please select a valid option.",
 						]);
 					},
 				]);
 
 				$ui->card([
-					"title" => "Checkbox",
+					"title" => "Checkbox & CheckboxGroup",
 					"content" => function () use ($ui) {
 						$ui->checkbox([
-							"name" => "pg_check_1",
-							"label" => "Sin marcar",
-							"help" => "Help text del checkbox.",
+							"name" => "cb_simple",
+							"label" => "Single checkbox",
 						]);
 						$ui->checkbox([
-							"name" => "pg_check_2",
-							"label" => "Marcado",
+							"name" => "cb_checked",
+							"label" => "Checked by default",
 							"checked" => true,
+							"help" => "This is enabled.",
 						]);
 						$ui->checkbox([
-							"name" => "pg_check_3",
-							"label" => "Disabled marcado",
-							"checked" => true,
-							"disabled" => true,
-						]);
-					},
-				]);
-
-				$ui->card([
-					"title" => "Toggle",
-					"content" => function () use ($ui) {
-						$ui->toggle([
-							"name" => "pg_toggle_1",
-							"label" => "Apagado",
-							"help" => "Help text del toggle.",
-						]);
-						$ui->toggle([
-							"name" => "pg_toggle_2",
-							"label" => "Encendido",
-							"checked" => true,
-						]);
-						$ui->toggle([
-							"name" => "pg_toggle_3",
+							"name" => "cb_disabled",
 							"label" => "Disabled",
+							"disabled" => true,
+						]);
+
+						$ui->separator();
+
+						$ui->checkbox_group([
+							"name" => "cbg_features",
+							"label" => "Select features",
+							"value" => ["cache", "minify"],
+							"options" => [
+								[
+									"value" => "cache",
+									"label" => "Enable cache",
+									"help" => "Speeds up page load.",
+								],
+								[
+									"value" => "minify",
+									"label" => "Minify assets",
+									"help" => "Compresses CSS and JS.",
+								],
+								[
+									"value" => "lazy",
+									"label" => "Lazy load images",
+								],
+								[
+									"value" => "cdn",
+									"label" => "CDN integration",
+									"disabled" => true,
+								],
+							],
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Radio & RadioGroup",
+					"content" => function () use ($ui) {
+						$ui->radio_group([
+							"name" => "rg_plan",
+							"label" => "Choose a plan",
+							"value" => "pro",
+							"options" => [
+								[
+									"value" => "free",
+									"label" => "Free",
+									"help" => "Up to 5 items.",
+								],
+								[
+									"value" => "pro",
+									"label" => "Pro",
+									"help" =>
+										"Unlimited items + priority support.",
+								],
+								[
+									"value" => "enterprise",
+									"label" => "Enterprise",
+									"help" => "Custom SLA.",
+									"disabled" => true,
+								],
+							],
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Toggle switch",
+					"content" => function () use ($ui) {
+						$ui->toggle([
+							"name" => "tog_off",
+							"label" => "Notifications",
+							"help" => "Send email notifications.",
+							"checked" => false,
+						]);
+						$ui->toggle([
+							"name" => "tog_on",
+							"label" => "Auto-publish",
+							"help" => "Publish automatically on save.",
 							"checked" => true,
+						]);
+						$ui->toggle([
+							"name" => "tog_dis",
+							"label" => "Disabled",
 							"disabled" => true,
 						]);
 					},
-					"footer" => function () use ($ui) {
-						echo '<div class="pw-flex pw-gap-3">';
-						$ui->button([
-							"label" => "Guardar cambios",
-							"type" => "submit",
+				]);
+
+				$ui->card([
+					"title" => "Segmented control",
+					"content" => function () use ($ui) {
+						$ui->segmented_control([
+							"name" => "sc_view",
+							"label" => "View mode",
+							"value" => "list",
+							"options" => [
+								["value" => "grid", "label" => "Grid"],
+								["value" => "list", "label" => "List"],
+								["value" => "compact", "label" => "Compact"],
+							],
 						]);
-						$ui->button([
-							"label" => "Cancelar",
-							"variant" => "ghost",
+						echo "<br>";
+						$ui->segmented_control([
+							"name" => "sc_range",
+							"label" => "Date range",
+							"value" => "7d",
+							"options" => [
+								["value" => "24h", "label" => "24h"],
+								["value" => "7d", "label" => "7 days"],
+								["value" => "30d", "label" => "30 days"],
+								["value" => "90d", "label" => "90 days"],
+							],
+						]);
+					},
+				]);
+			},
+		]);
+
+		// =====================================================================
+		// TAB: FEEDBACK
+		// =====================================================================
+		$ui->tab_panel([
+			"slug" => "feedback",
+			"content" => function () use ($ui) {
+				$ui->card([
+					"title" => "Banner — full-width messages",
+					"content" => function () use ($ui) {
+						$ui->banner([
+							"type" => "info",
+							"title" => "Info",
+							"message" =>
+								"This is an informational message for the user.",
+						]);
+						echo "<br>";
+						$ui->banner([
+							"type" => "success",
+							"title" => "Success",
+							"message" =>
+								"Your settings have been saved successfully.",
+						]);
+						echo "<br>";
+						$ui->banner([
+							"type" => "warning",
+							"title" => "Warning",
+							"message" =>
+								"This action cannot be undone. Please proceed with caution.",
+						]);
+						echo "<br>";
+						$ui->banner([
+							"type" => "danger",
+							"title" => "Error",
+							"message" =>
+								"Something went wrong. Please try again.",
+						]);
+						echo "<br>";
+						$ui->banner([
+							"type" => "success",
+							"title" => "Dismissible",
+							"message" => "Click × to close this banner.",
+							"dismissible" => true,
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Notice — inline alerts",
+					"content" => function () use ($ui) {
+						$ui->notice([
+							"type" => "info",
+							"message" => "Your API key will expire in 7 days.",
+						]);
+						echo "<br>";
+						$ui->notice([
+							"type" => "success",
+							"message" => "Plugin activated successfully.",
+						]);
+						echo "<br>";
+						$ui->notice([
+							"type" => "warning",
+							"message" =>
+								'Cache is stale. <a href="#">Clear cache</a> to refresh.',
+						]);
+						echo "<br>";
+						$ui->notice([
+							"type" => "danger",
+							"message" => "Could not connect to the remote API.",
+						]);
+						echo "<br>";
+						$ui->notice([
+							"type" => "info",
+							"message" =>
+								"Dismissible notice — click × to close.",
+							"dismissible" => true,
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Spinner",
+					"content" => function () use ($ui) {
+						echo '<div style="display:flex;align-items:center;gap:20px;">';
+						$ui->spinner([
+							"size" => "sm",
+							"label" => "Loading (sm)",
+						]);
+						$ui->spinner([
+							"size" => "md",
+							"label" => "Loading (md)",
+						]);
+						$ui->spinner([
+							"size" => "lg",
+							"label" => "Loading (lg)",
+						]);
+						echo "</div>";
+						echo '<div style="display:flex;align-items:center;gap:8px;margin-top:16px;">';
+						$ui->spinner([
+							"size" => "sm",
+							"label" => "Saving changes…",
+							"show_label" => true,
 						]);
 						echo "</div>";
 					},
 				]);
-			},
-		]);
 
-		// ── TAB: CARDS & NOTICES ──────────────────────────────────────────────
-		$ui->tab_panel([
-			"slug" => "pg-layout",
-			"content" => function () use ($ui) {
 				$ui->card([
-					"title" => "Notices — todos los tipos",
+					"title" => "Progress bar",
 					"content" => function () use ($ui) {
-						foreach (
-							["info", "success", "warning", "danger"]
-							as $type
-						) {
-							$ui->notice([
-								"type" => $type,
-								"message" =>
-									"Este es un notice de tipo <strong>" .
-									$type .
-									"</strong>. Úsalo para comunicar estados al usuario.",
-							]);
-						}
-					},
-				]);
-
-				$ui->card([
-					"title" => "Notice dismissible",
-					"content" => function () use ($ui) {
-						$ui->notice([
-							"type" => "success",
-							"message" =>
-								"Este notice se puede cerrar. Haz clic en la X.",
-							"dismissible" => true,
+						$ui->progress_bar([
+							"value" => 25,
+							"label" => "Uploading…",
+							"show_value" => true,
 						]);
-						$ui->notice([
-							"type" => "warning",
-							"message" => "Este también es dismissible.",
-							"dismissible" => true,
+						echo "<br>";
+						$ui->progress_bar([
+							"value" => 60,
+							"label" => "Processing",
+							"show_value" => true,
 						]);
-					},
-				]);
-
-				$ui->card([
-					"title" => "Card con descripción y footer",
-					"description" =>
-						"Esta es la descripción de la card, visible bajo el título.",
-					"content" => function () use ($ui) {
-						$ui->paragraph([
-							"text" =>
-								"Contenido principal de la card. Puede contener cualquier componente o HTML.",
+						echo "<br>";
+						$ui->progress_bar([
+							"value" => 90,
+							"label" => "Almost done",
+							"show_value" => true,
+							"variant" => "success",
 						]);
-					},
-					"footer" => function () use ($ui) {
-						$ui->link([
-							"label" => "Ver documentación",
-							"href" => "#",
-							"target" => "_blank",
+						echo "<br>";
+						$ui->progress_bar([
+							"value" => 45,
+							"label" => "Warning",
+							"show_value" => true,
+							"variant" => "warning",
 						]);
-					},
-				]);
-
-				$ui->card([
-					"title" => "Card sin padding",
-					"padded" => false,
-					"content" => function () {
-						echo '<div class="pw-px-4 pw-py-2 pw-bg-surface-50 pw-border-b pw-border-surface-100 pw-text-xs pw-text-surface-500">Fila 1 — sin padding en el wrapper</div>';
-						echo '<div class="pw-px-4 pw-py-2 pw-bg-white pw-border-b pw-border-surface-100 pw-text-xs pw-text-surface-500">Fila 2</div>';
-						echo '<div class="pw-px-4 pw-py-2 pw-bg-surface-50 pw-text-xs pw-text-surface-500">Fila 3</div>';
+						echo "<br>";
+						$ui->progress_bar([
+							"value" => 15,
+							"label" => "Critical",
+							"show_value" => true,
+							"variant" => "danger",
+						]);
 					},
 				]);
 			},
 		]);
 
-		// ── TAB: TYPOGRAPHY & NAV ─────────────────────────────────────────────
+		// =====================================================================
+		// TAB: NAVIGATION
+		// =====================================================================
 		$ui->tab_panel([
-			"slug" => "pg-typography",
+			"slug" => "navigation",
 			"content" => function () use ($ui) {
 				$ui->card([
-					"title" => "Headings — h1 a h6",
+					"title" => "Breadcrumbs",
 					"content" => function () use ($ui) {
-						foreach (range(1, 6) as $level) {
-							$ui->heading([
-								"text" =>
-									"Heading nivel " .
-									$level .
-									" (h" .
-									$level .
-									")",
-								"level" => $level,
-							]);
-							echo '<div class="pw-mb-3"></div>';
-						}
+						$ui->breadcrumbs([
+							"items" => [
+								["label" => "Dashboard", "href" => "#"],
+								["label" => "Settings", "href" => "#"],
+								["label" => "General"],
+							],
+						]);
+						echo "<br>";
+						$ui->breadcrumbs([
+							"items" => [
+								["label" => "Plugins", "href" => "#"],
+								["label" => "My Plugin", "href" => "#"],
+								["label" => "Advanced", "href" => "#"],
+								["label" => "Webhooks"],
+							],
+						]);
 					},
 				]);
 
 				$ui->card([
-					"title" => "Paragraph — variantes",
+					"title" => "Pagination",
+					"content" => function () use ($ui) {
+						$ui->pagination([
+							"current" => 3,
+							"total" => 12,
+						]);
+						echo "<br>";
+						$ui->pagination([
+							"current" => 1,
+							"total" => 5,
+						]);
+						echo "<br>";
+						$ui->pagination([
+							"current" => 10,
+							"total" => 10,
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Tabs (standalone, within content)",
+					"content" => function () use ($ui) {
+						$ui->tabs([
+							"tabs" => [
+								[
+									"slug" => "inner_a",
+									"label" => "Overview",
+									"active" => true,
+								],
+								[
+									"slug" => "inner_b",
+									"label" => "Details",
+									"count" => 4,
+								],
+								["slug" => "inner_c", "label" => "History"],
+							],
+						]);
+						$ui->tab_panel([
+							"slug" => "inner_a",
+							"active" => true,
+							"content" => function () use ($ui) {
+								echo '<div style="padding: 16px 0;">';
+								$ui->paragraph([
+									"text" =>
+										"This is the Overview tab panel content.",
+								]);
+								echo "</div>";
+							},
+						]);
+						$ui->tab_panel([
+							"slug" => "inner_b",
+							"content" => function () use ($ui) {
+								echo '<div style="padding: 16px 0;">';
+								$ui->paragraph([
+									"text" =>
+										"Details tab content with 4 items.",
+									"variant" => "muted",
+								]);
+								echo "</div>";
+							},
+						]);
+						$ui->tab_panel([
+							"slug" => "inner_c",
+							"content" => function () use ($ui) {
+								echo '<div style="padding: 16px 0;">';
+								$ui->paragraph([
+									"text" => "History tab content.",
+									"variant" => "muted",
+								]);
+								echo "</div>";
+							},
+						]);
+					},
+				]);
+			},
+		]);
+
+		// =====================================================================
+		// TAB: TYPOGRAPHY
+		// =====================================================================
+		$ui->tab_panel([
+			"slug" => "typography",
+			"content" => function () use ($ui) {
+				$ui->card([
+					"title" => "Headings h1 – h6",
+					"content" => function () use ($ui) {
+						$ui->heading([
+							"text" => "Heading 1 — Page title",
+							"level" => 1,
+						]);
+						$ui->separator();
+						$ui->heading([
+							"text" => "Heading 2 — Section title",
+							"level" => 2,
+						]);
+						$ui->separator();
+						$ui->heading([
+							"text" => "Heading 3 — Card title",
+							"level" => 3,
+						]);
+						$ui->separator();
+						$ui->heading([
+							"text" => "Heading 4 — Subsection",
+							"level" => 4,
+						]);
+						$ui->separator();
+						$ui->heading([
+							"text" => "Heading 5 — Label",
+							"level" => 5,
+						]);
+						$ui->separator();
+						$ui->heading([
+							"text" => "Heading 6 — Overline",
+							"level" => 6,
+						]);
+					},
+				]);
+
+				$ui->card([
+					"title" => "Paragraph variants",
 					"content" => function () use ($ui) {
 						$ui->paragraph([
 							"text" =>
-								"Default — Texto de párrafo estándar usado para contenido principal.",
+								"Default — Use this for primary body text. Ideal for descriptions and explanatory content.",
 						]);
+						echo "<br>";
 						$ui->paragraph([
 							"text" =>
-								"Muted — Texto secundario, menos prominente, para información de apoyo.",
+								"Muted — Use for secondary information, captions, or supporting text.",
 							"variant" => "muted",
 						]);
+						echo "<br>";
 						$ui->paragraph([
 							"text" =>
-								"Small — Texto pequeño para notas, metadatos o ayuda contextual.",
+								"Small — Use for fine print, metadata, or timestamps.",
 							"variant" => "small",
 						]);
 					},
 				]);
 
 				$ui->card([
-					"title" => "Links — variantes",
+					"title" => "Links",
 					"content" => function () use ($ui) {
-						echo '<div class="pw-flex pw-flex-wrap pw-gap-4 pw-items-center">';
+						echo '<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;">';
 						$ui->link(["label" => "Default link", "href" => "#"]);
 						$ui->link([
 							"label" => "Muted link",
@@ -402,13 +752,8 @@ $bui->render_page([
 							"variant" => "muted",
 						]);
 						$ui->link([
-							"label" => "Danger link",
-							"href" => "#",
-							"variant" => "danger",
-						]);
-						$ui->link([
-							"label" => "External ↗",
-							"href" => "#",
+							"label" => "External link",
+							"href" => "https://pezweb.cl",
 							"target" => "_blank",
 						]);
 						echo "</div>";
@@ -419,22 +764,46 @@ $bui->render_page([
 					"title" => "Separator",
 					"content" => function () use ($ui) {
 						$ui->paragraph([
-							"text" => "Contenido antes del separator.",
+							"text" => "Content above the separator.",
 						]);
 						$ui->separator();
 						$ui->paragraph([
-							"text" => "Contenido después del separator.",
+							"text" => "Content below the separator.",
+							"variant" => "muted",
 						]);
 					},
 				]);
 
 				$ui->card([
-					"title" => "Tabs anidados",
+					"title" => "Card variations",
 					"content" => function () use ($ui) {
-						$ui->notice([
-							"type" => "info",
-							"message" =>
-								"Los tabs de esta página son el ejemplo real de navegación. El componente tab_panel se usa junto a tabs() para mostrar/ocultar contenido.",
+						$ui->card([
+							"title" => "Card with header right slot",
+							"description" =>
+								"A card that has a badge or action in the top-right corner.",
+							"header_right" => function () use ($ui) {
+								$ui->badge([
+									"label" => "Active",
+									"variant" => "success",
+									"dot" => true,
+								]);
+							},
+							"content" => function () use ($ui) {
+								$ui->paragraph([
+									"text" => "Card body content goes here.",
+								]);
+							},
+							"footer" => function () use ($ui) {
+								$ui->button([
+									"label" => "Save",
+									"variant" => "primary",
+									"type" => "submit",
+								]);
+								$ui->button([
+									"label" => "Cancel",
+									"variant" => "ghost",
+								]);
+							},
 						]);
 					},
 				]);
@@ -443,88 +812,67 @@ $bui->render_page([
 	},
 
 	"sidebar" => [
-		"title" => "Info del package",
-		"content" => function ($bui) {
-			$ui = $bui->ui();
-
+		"title" => "Package info",
+		"content" => function ($bui) use ($ui) {
 			$ui->card([
 				"content" => function () use ($ui) {
-					$ui->heading(["text" => "pw/backend-ui", "level" => 4]);
-					echo '<div class="pw-mt-2 pw-space-y-1">';
+					$ui->badge(["label" => "v2.0.0", "variant" => "primary"]);
+					echo '<div style="margin-top: 8px;">';
 					$ui->paragraph([
-						"text" => "Versión 1.0.0",
+						"text" => "pw/backend-ui",
 						"variant" => "muted",
 					]);
 					$ui->paragraph([
-						"text" => "Tailwind CSS 4 · Vanilla JS · PHP 8.0+",
+						"text" =>
+							"PW Design System for WordPress admin. Inspired by GitHub Primer.",
 						"variant" => "small",
 					]);
 					echo "</div>";
-
 					$ui->separator();
-
-					$ui->paragraph([
-						"text" => "Componentes disponibles",
-						"variant" => "small",
+					$ui->link([
+						"label" => "GitHub repo",
+						"href" => "https://github.com/pez-web/backend-ui",
+						"target" => "_blank",
 					]);
+				},
+			]);
+
+			$ui->card([
+				"title" => "Components",
+				"content" => function () use ($ui) {
 					$components = [
 						"button",
+						"badge",
+						"tooltip",
 						"input",
+						"date_input",
 						"textarea",
 						"select",
 						"checkbox",
+						"checkbox_group",
+						"radio",
+						"radio_group",
 						"toggle",
+						"segmented_control",
 						"card",
+						"banner",
 						"notice",
-						"badge",
+						"spinner",
+						"progress_bar",
+						"breadcrumbs",
+						"pagination",
+						"tabs",
 						"heading",
 						"paragraph",
 						"link",
 						"separator",
-						"tabs",
-						"tab_panel",
 					];
-					echo '<div class="pw-flex pw-flex-wrap pw-gap-1 pw-mt-1">';
+					echo '<div style="display:flex;flex-direction:column;gap:4px;">';
 					foreach ($components as $c) {
-						$ui->badge([
-							"label" => $c,
-							"variant" => "default",
-							"size" => "sm",
-						]);
+						$ui->badge(["label" => $c, "variant" => "default"]);
 					}
 					echo "</div>";
 				},
-			]);
-
-			$ui->card([
-				"content" => function () use ($ui) {
-					$ui->heading(["text" => "Uso rápido", "level" => 5]);
-					echo '<div class="pw-mt-2">';
-					$ui->paragraph([
-						"text" =>
-							"Llama playground() para activar esta página:",
-						"variant" => "small",
-					]);
-					echo "</div>";
-					// code block simple
-					echo '<pre class="pw-mt-2 pw-p-3 pw-bg-surface-900 pw-text-surface-100 pw-rounded-lg pw-text-xs pw-overflow-auto pw-leading-relaxed pw-m-0">BackendUI::playground();</pre>';
-					echo '<div class="pw-mt-2">';
-					$ui->paragraph([
-						"text" =>
-							"Llama solo en entornos de desarrollo. No exponer en producción.",
-						"variant" => "muted",
-					]);
-					echo "</div>";
-				},
-			]);
-		},
-	],
-
-	"footer" => [
-		"left" => function ($bui) {
-			$bui->ui()->paragraph([
-				"text" => "pw/backend-ui Playground — solo para desarrollo",
-				"variant" => "muted",
 			]);
 		},
 	],
