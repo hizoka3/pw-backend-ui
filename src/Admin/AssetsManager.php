@@ -4,22 +4,30 @@
 namespace PW\BackendUI\Admin;
 
 /**
- * Enqueues design system assets (CSS, JS) only on configured admin screens.
- *
- * v2: Token-based design system — no Tailwind CDN dependency.
- * Styles live entirely in backend-ui.css (CSS variables + component styles).
+ * Enqueues design system assets (CSS, JS) only on the configured admin screens.
+ * The PW design system uses plain CSS variables — no Tailwind CDN required.
  */
 class AssetsManager
 {
 	private array $config;
 
-	public function __construct(array &$config)
+	public function __construct(array $config)
 	{
-		$this->config = &$config; // reference — playground can add screens after boot
+		$this->config = $config;
+	}
+
+	/**
+	 * Update the internal config (used by BackendUI to add screens dynamically,
+	 * e.g. when playground() is called after init()).
+	 */
+	public function update_config(array $config): void
+	{
+		$this->config = $config;
 	}
 
 	/**
 	 * Hooked to admin_enqueue_scripts.
+	 * Only loads assets on screens listed in config['screens'].
 	 */
 	public function enqueue(string $hook_suffix): void
 	{
@@ -31,7 +39,7 @@ class AssetsManager
 		$version = $this->config["version"];
 		$slug = $this->config["slug"];
 
-		// Package stylesheet
+		// Package stylesheet (CSS variables + all component styles)
 		wp_enqueue_style(
 			$slug . "-styles",
 			$url . "css/backend-ui.css",
@@ -39,7 +47,7 @@ class AssetsManager
 			$version,
 		);
 
-		// Package JS
+		// Package JS (theme toggle, tabs, toggles, segmented, tooltips, dismiss)
 		wp_enqueue_script(
 			$slug . "-scripts",
 			$url . "js/backend-ui.js",

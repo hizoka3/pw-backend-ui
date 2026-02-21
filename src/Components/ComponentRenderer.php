@@ -4,26 +4,18 @@
 namespace PW\BackendUI\Components;
 
 /**
- * Renders individual UI components.
+ * Renders individual UI components — PW Design System.
  *
- * Each method echoes the component HTML directly.
- * All methods accept an $atts array; unrecognised keys are ignored.
+ * Each method outputs HTML directly. All methods accept an $atts array.
+ * Components use CSS variables defined in backend-ui.css (no Tailwind utilities).
  */
 class ComponentRenderer
 {
 	private array $config;
-	private string $views_dir;
 
 	public function __construct(array $config)
 	{
 		$this->config = $config;
-		$this->views_dir = dirname(__DIR__, 2) . "/views/components/";
-	}
-
-	/** @internal */
-	private function render(string $template, array $atts): void
-	{
-		include $this->views_dir . $template;
 	}
 
 	// =========================================================================
@@ -34,14 +26,14 @@ class ComponentRenderer
 	 * Render a button.
 	 *
 	 * @param array $atts {
-	 *     @type string  $label    Button text.
-	 *     @type string  $type     'button' | 'submit' | 'reset'.
-	 *     @type string  $variant  'primary' | 'default' | 'ghost' | 'danger' | 'invisible'.
-	 *     @type string  $size     'sm' | 'md' | 'lg'.
-	 *     @type string  $icon     Optional SVG/HTML prepended to label.
-	 *     @type bool    $disabled Whether button is disabled.
-	 *     @type string  $class    Additional CSS classes.
-	 *     @type array   $attrs    Extra HTML attributes.
+	 *     @type string $label    Button text.
+	 *     @type string $type     'button' | 'submit' | 'reset'. Default: 'button'.
+	 *     @type string $variant  'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'invisible'. Default: 'primary'.
+	 *     @type string $size     'sm' | 'md' | 'lg'. Default: 'md'.
+	 *     @type string $icon     Optional icon SVG HTML (prepended to label).
+	 *     @type bool   $disabled Whether button is disabled.
+	 *     @type string $class    Additional CSS classes.
+	 *     @type array  $attrs    Extra HTML attributes. E.g. ['data-action' => 'save'].
 	 * }
 	 */
 	public function button(array $atts = []): void
@@ -49,14 +41,14 @@ class ComponentRenderer
 		$atts = wp_parse_args($atts, [
 			"label" => "Button",
 			"type" => "button",
-			"variant" => "default",
+			"variant" => "primary",
 			"size" => "md",
 			"icon" => "",
 			"disabled" => false,
 			"class" => "",
 			"attrs" => [],
 		]);
-		$this->render("button.php", $atts);
+		include __DIR__ . "/../../views/components/button.php";
 	}
 
 	// =========================================================================
@@ -64,19 +56,21 @@ class ComponentRenderer
 	// =========================================================================
 
 	/**
-	 * Render a text / email / password / number / URL input.
+	 * Render a text input with label.
 	 *
 	 * @param array $atts {
-	 *     @type string  $name         Input name.
-	 *     @type string  $label        Label text.
-	 *     @type string  $value        Current value.
-	 *     @type string  $placeholder  Placeholder text.
-	 *     @type string  $type         Input type. Default: 'text'.
-	 *     @type string  $help         Help text.
-	 *     @type string  $error        Error message (triggers error state).
-	 *     @type bool    $required     Whether field is required.
-	 *     @type bool    $disabled     Whether field is disabled.
-	 *     @type string  $class        Additional CSS classes.
+	 *     @type string $name        Input name attribute.
+	 *     @type string $label       Label text.
+	 *     @type string $value       Current value.
+	 *     @type string $placeholder Placeholder text.
+	 *     @type string $type        'text' | 'email' | 'password' | 'url' | 'number' | 'date' | 'search'. Default: 'text'.
+	 *     @type string $min         Min value (for number/date).
+	 *     @type string $max         Max value (for number/date).
+	 *     @type string $help        Help text shown below input.
+	 *     @type string $error       Error message (shows error state).
+	 *     @type bool   $required    Whether field is required.
+	 *     @type bool   $disabled    Whether field is disabled.
+	 *     @type string $class       Additional CSS classes.
 	 * }
 	 */
 	public function input(array $atts = []): void
@@ -87,67 +81,31 @@ class ComponentRenderer
 			"value" => "",
 			"placeholder" => "",
 			"type" => "text",
-			"help" => "",
-			"error" => "",
-			"required" => false,
-			"disabled" => false,
-			"class" => "",
-			"id" => "",
-		]);
-		$this->render("input.php", $atts);
-	}
-
-	/**
-	 * Render a date / datetime-local / time input.
-	 *
-	 * @param array $atts {
-	 *     @type string  $name       Input name.
-	 *     @type string  $label      Label text.
-	 *     @type string  $value      Current value (Y-m-d for date, etc.).
-	 *     @type string  $type       'date' | 'datetime-local' | 'time'. Default: 'date'.
-	 *     @type string  $min        Min date/time string.
-	 *     @type string  $max        Max date/time string.
-	 *     @type string  $help       Help text.
-	 *     @type string  $error      Error message.
-	 *     @type bool    $required   Whether required.
-	 *     @type bool    $disabled   Whether disabled.
-	 *     @type string  $max_width  CSS max-width for the input. Default: '240px'.
-	 *     @type string  $class      Additional CSS classes.
-	 * }
-	 */
-	public function date_input(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"name" => "",
-			"label" => "",
-			"value" => "",
-			"type" => "date",
 			"min" => "",
 			"max" => "",
 			"help" => "",
 			"error" => "",
 			"required" => false,
 			"disabled" => false,
-			"max_width" => "240px",
 			"class" => "",
 		]);
-		$this->render("date-input.php", $atts);
+		include __DIR__ . "/../../views/components/input.php";
 	}
 
 	/**
-	 * Render a textarea.
+	 * Render a textarea with label.
 	 *
 	 * @param array $atts {
-	 *     @type string  $name         Input name.
-	 *     @type string  $label        Label text.
-	 *     @type string  $value        Current value.
-	 *     @type string  $placeholder  Placeholder text.
-	 *     @type int     $rows         Number of rows. Default: 4.
-	 *     @type string  $help         Help text.
-	 *     @type string  $error        Error message.
-	 *     @type bool    $required     Whether required.
-	 *     @type bool    $disabled     Whether disabled.
-	 *     @type string  $class        Additional CSS classes.
+	 *     @type string $name        Input name attribute.
+	 *     @type string $label       Label text.
+	 *     @type string $value       Current value.
+	 *     @type string $placeholder Placeholder text.
+	 *     @type int    $rows        Number of rows. Default: 4.
+	 *     @type string $help        Help text.
+	 *     @type string $error       Error message.
+	 *     @type bool   $required    Whether field is required.
+	 *     @type bool   $disabled    Whether field is disabled.
+	 *     @type string $class       Additional CSS classes.
 	 * }
 	 */
 	public function textarea(array $atts = []): void
@@ -164,23 +122,23 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 		]);
-		$this->render("textarea.php", $atts);
+		include __DIR__ . "/../../views/components/textarea.php";
 	}
 
 	/**
-	 * Render a select dropdown.
+	 * Render a select dropdown with label.
 	 *
 	 * @param array $atts {
-	 *     @type string  $name         Input name.
-	 *     @type string  $label        Label text.
-	 *     @type string  $value        Currently selected value.
-	 *     @type array   $options      ['value' => 'Label'] or [['value','label','disabled']].
-	 *     @type string  $placeholder  Empty option text.
-	 *     @type string  $help         Help text.
-	 *     @type string  $error        Error message.
-	 *     @type bool    $required     Whether required.
-	 *     @type bool    $disabled     Whether disabled.
-	 *     @type string  $class        Additional CSS classes.
+	 *     @type string $name        Input name attribute.
+	 *     @type string $label       Label text.
+	 *     @type string $value       Currently selected value.
+	 *     @type array  $options     [ 'value' => 'Label', ... ] or [ [ 'value' => '', 'label' => '', 'disabled' => false ], ... ]
+	 *     @type string $placeholder Placeholder option (empty value). Default: '— Seleccionar —'.
+	 *     @type string $help        Help text.
+	 *     @type string $error       Error message.
+	 *     @type bool   $required    Whether field is required.
+	 *     @type bool   $disabled    Whether field is disabled.
+	 *     @type string $class       Additional CSS classes.
 	 * }
 	 */
 	public function select(array $atts = []): void
@@ -190,27 +148,27 @@ class ComponentRenderer
 			"label" => "",
 			"value" => "",
 			"options" => [],
-			"placeholder" => "",
+			"placeholder" => "— Seleccionar —",
 			"help" => "",
 			"error" => "",
 			"required" => false,
 			"disabled" => false,
 			"class" => "",
 		]);
-		$this->render("select.php", $atts);
+		include __DIR__ . "/../../views/components/select.php";
 	}
 
 	/**
-	 * Render a single checkbox.
+	 * Render a checkbox.
 	 *
 	 * @param array $atts {
-	 *     @type string  $name     Input name.
-	 *     @type string  $label    Label text.
-	 *     @type bool    $checked  Whether checked.
-	 *     @type string  $value    Input value. Default: '1'.
-	 *     @type string  $help     Help text.
-	 *     @type bool    $disabled Whether disabled.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $name     Input name attribute.
+	 *     @type string $label    Label text next to checkbox.
+	 *     @type bool   $checked  Whether checked.
+	 *     @type string $value    Input value. Default: '1'.
+	 *     @type string $help     Help text.
+	 *     @type bool   $disabled Whether disabled.
+	 *     @type string $class    Additional CSS classes.
 	 * }
 	 */
 	public function checkbox(array $atts = []): void
@@ -224,109 +182,20 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 		]);
-		$this->render("checkbox.php", $atts);
+		include __DIR__ . "/../../views/components/checkbox.php";
 	}
 
 	/**
-	 * Render a group of checkboxes.
+	 * Render a toggle switch.
 	 *
 	 * @param array $atts {
-	 *     @type string  $name     Input name (will submit as name[]).
-	 *     @type string  $label    Group label (legend).
-	 *     @type array   $value    Array of currently selected values.
-	 *     @type array   $options  [['value','label','help','disabled'], ...].
-	 *     @type string  $help     Group-level help text.
-	 *     @type string  $error    Error message.
-	 *     @type bool    $required Whether required.
-	 *     @type bool    $disabled Whether all disabled.
-	 *     @type string  $class    Additional CSS classes.
-	 * }
-	 */
-	public function checkbox_group(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"name" => "",
-			"label" => "",
-			"value" => [],
-			"options" => [],
-			"help" => "",
-			"error" => "",
-			"required" => false,
-			"disabled" => false,
-			"class" => "",
-		]);
-		$this->render("checkbox-group.php", $atts);
-	}
-
-	/**
-	 * Render a single radio button.
-	 *
-	 * @param array $atts {
-	 *     @type string  $name     Input name (shared across radio group).
-	 *     @type string  $label    Label text.
-	 *     @type string  $value    Input value.
-	 *     @type bool    $checked  Whether this radio is selected.
-	 *     @type string  $help     Help text.
-	 *     @type bool    $disabled Whether disabled.
-	 *     @type string  $class    Additional CSS classes.
-	 * }
-	 */
-	public function radio(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"name" => "",
-			"label" => "",
-			"value" => "",
-			"checked" => false,
-			"help" => "",
-			"disabled" => false,
-			"class" => "",
-		]);
-		$this->render("radio.php", $atts);
-	}
-
-	/**
-	 * Render a group of radio buttons.
-	 *
-	 * @param array $atts {
-	 *     @type string  $name     Input name.
-	 *     @type string  $label    Group label (legend).
-	 *     @type string  $value    Currently selected value.
-	 *     @type array   $options  [['value','label','help','disabled'], ...].
-	 *     @type string  $help     Group-level help text.
-	 *     @type string  $error    Error message.
-	 *     @type bool    $required Whether required.
-	 *     @type bool    $disabled Whether all disabled.
-	 *     @type string  $class    Additional CSS classes.
-	 * }
-	 */
-	public function radio_group(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"name" => "",
-			"label" => "",
-			"value" => "",
-			"options" => [],
-			"help" => "",
-			"error" => "",
-			"required" => false,
-			"disabled" => false,
-			"class" => "",
-		]);
-		$this->render("radio-group.php", $atts);
-	}
-
-	/**
-	 * Render an on/off toggle switch.
-	 *
-	 * @param array $atts {
-	 *     @type string  $name     Input name.
-	 *     @type string  $label    Label text.
-	 *     @type bool    $checked  Whether toggled on.
-	 *     @type string  $value    Value sent when on. Default: '1'.
-	 *     @type string  $help     Help text.
-	 *     @type bool    $disabled Whether disabled.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $name     Input name attribute.
+	 *     @type string $label    Label text.
+	 *     @type bool   $checked  Whether toggled on.
+	 *     @type string $value    Input value. Default: '1'.
+	 *     @type string $help     Help text.
+	 *     @type bool   $disabled Whether disabled.
+	 *     @type string $class    Additional CSS classes.
 	 * }
 	 */
 	public function toggle(array $atts = []): void
@@ -340,21 +209,97 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 		]);
-		$this->render("toggle.php", $atts);
+		include __DIR__ . "/../../views/components/toggle.php";
 	}
 
 	/**
-	 * Render a segmented control — pick one from a small set of options.
-	 * Primer equivalent: SegmentedControl.
+	 * Render a radio button (standalone). For groups, use radio_group().
 	 *
 	 * @param array $atts {
-	 *     @type string  $name     Input name (hidden input).
-	 *     @type string  $label    Label text shown above.
-	 *     @type string  $value    Currently selected value.
-	 *     @type array   $options  [['value','label','icon','disabled'], ...].
-	 *     @type string  $help     Help text.
-	 *     @type bool    $disabled Whether all options disabled.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $name     Input name attribute.
+	 *     @type string $label    Label text.
+	 *     @type string $value    Input value.
+	 *     @type bool   $checked  Whether selected.
+	 *     @type string $help     Help text.
+	 *     @type bool   $disabled Whether disabled.
+	 *     @type string $class    Additional CSS classes.
+	 * }
+	 */
+	public function radio(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"name" => "",
+			"label" => "",
+			"value" => "",
+			"checked" => false,
+			"help" => "",
+			"disabled" => false,
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/radio.php";
+	}
+
+	/**
+	 * Render a radio button group with label.
+	 *
+	 * @param array $atts {
+	 *     @type string $name    Input name (shared by all radios in the group).
+	 *     @type string $label   Group label (rendered as <legend>).
+	 *     @type string $value   Currently selected value.
+	 *     @type array  $options [ [ 'value' => '', 'label' => '', 'help' => '', 'disabled' => false ], ... ]
+	 *     @type string $help    Group-level help text.
+	 *     @type string $error   Error message.
+	 *     @type string $class   Additional CSS classes.
+	 * }
+	 */
+	public function radio_group(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"name" => "",
+			"label" => "",
+			"value" => "",
+			"options" => [],
+			"help" => "",
+			"error" => "",
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/radio-group.php";
+	}
+
+	/**
+	 * Render a date input.
+	 * Alias de input() con type='date' y opciones específicas de fecha.
+	 *
+	 * @param array $atts {
+	 *     @type string $name     Input name.
+	 *     @type string $label    Label text.
+	 *     @type string $value    Current date value (Y-m-d).
+	 *     @type string $min      Minimum date (Y-m-d).
+	 *     @type string $max      Maximum date (Y-m-d).
+	 *     @type string $help     Help text.
+	 *     @type string $error    Error message.
+	 *     @type bool   $required Whether required.
+	 *     @type bool   $disabled Whether disabled.
+	 *     @type string $class    Additional CSS classes.
+	 * }
+	 */
+	public function date_input(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, ["type" => "date"]);
+		$atts["type"] = "date";
+		$this->input($atts);
+	}
+
+	/**
+	 * Render a segmented control (mutually exclusive options).
+	 *
+	 * @param array $atts {
+	 *     @type string $name    Input name (for the hidden input).
+	 *     @type string $label   Label shown above the control.
+	 *     @type string $value   Currently selected value.
+	 *     @type array  $options [ [ 'value' => '', 'label' => '', 'icon' => '', 'disabled' => false ], ... ]
+	 *     @type string $help    Help text.
+	 *     @type string $class   Additional CSS classes.
 	 * }
 	 */
 	public function segmented_control(array $atts = []): void
@@ -365,27 +310,25 @@ class ComponentRenderer
 			"value" => "",
 			"options" => [],
 			"help" => "",
-			"disabled" => false,
 			"class" => "",
 		]);
-		$this->render("segmented-control.php", $atts);
+		include __DIR__ . "/../../views/components/segmented-control.php";
 	}
 
 	// =========================================================================
-	// LAYOUT & CONTAINERS
+	// LAYOUT & STRUCTURE
 	// =========================================================================
 
 	/**
 	 * Render a card container.
 	 *
 	 * @param array $atts {
-	 *     @type string    $title        Card title.
-	 *     @type string    $description  Card subtitle/description.
-	 *     @type callable  $header_right Callable for right side of header.
-	 *     @type callable  $content      Callable for card body.
-	 *     @type callable  $footer       Callable for card footer.
-	 *     @type bool      $padded       Whether body has padding. Default: true.
-	 *     @type string    $class        Additional CSS classes.
+	 *     @type string   $title       Card title (optional).
+	 *     @type string   $description Card subtitle/description (optional).
+	 *     @type callable $content     Function that outputs the card body.
+	 *     @type callable $footer      Function that outputs the card footer.
+	 *     @type bool     $padded      Whether to add padding to the body. Default: true.
+	 *     @type string   $class       Additional CSS classes.
 	 * }
 	 */
 	public function card(array $atts = []): void
@@ -393,53 +336,26 @@ class ComponentRenderer
 		$atts = wp_parse_args($atts, [
 			"title" => "",
 			"description" => "",
-			"header_right" => null,
 			"content" => null,
 			"footer" => null,
 			"padded" => true,
 			"class" => "",
 		]);
-		$this->render("card.php", $atts);
+		include __DIR__ . "/../../views/components/card.php";
 	}
 
-	// =========================================================================
-	// FEEDBACK & STATUS
-	// =========================================================================
-
 	/**
-	 * Render a notice / inline alert.
+	 * Render a notice/alert/banner.
 	 *
 	 * @param array $atts {
-	 *     @type string  $message      Notice text (HTML allowed via wp_kses_post).
-	 *     @type string  $type         'info' | 'success' | 'warning' | 'danger'.
-	 *     @type bool    $dismissible  Whether notice can be closed.
-	 *     @type string  $class        Additional CSS classes.
+	 *     @type string $title       Optional bold title above the message.
+	 *     @type string $message     Notice text (supports basic HTML via wp_kses_post).
+	 *     @type string $type        'info' | 'success' | 'warning' | 'danger'. Default: 'info'.
+	 *     @type bool   $dismissible Whether notice can be dismissed. Default: false.
+	 *     @type string $class       Additional CSS classes.
 	 * }
 	 */
 	public function notice(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"message" => "",
-			"type" => "info",
-			"dismissible" => false,
-			"class" => "",
-		]);
-		$this->render("notice.php", $atts);
-	}
-
-	/**
-	 * Render a full-width banner for important messages.
-	 * Primer equivalent: Banner.
-	 *
-	 * @param array $atts {
-	 *     @type string  $title        Bold banner title (optional).
-	 *     @type string  $message      Message text (HTML allowed via wp_kses_post).
-	 *     @type string  $type         'info' | 'success' | 'warning' | 'danger'.
-	 *     @type bool    $dismissible  Whether banner can be closed.
-	 *     @type string  $class        Additional CSS classes.
-	 * }
-	 */
-	public function banner(array $atts = []): void
 	{
 		$atts = wp_parse_args($atts, [
 			"title" => "",
@@ -448,17 +364,17 @@ class ComponentRenderer
 			"dismissible" => false,
 			"class" => "",
 		]);
-		$this->render("banner.php", $atts);
+		include __DIR__ . "/../../views/components/notice.php";
 	}
 
 	/**
-	 * Render a badge / label tag.
+	 * Render a badge/tag/label.
 	 *
 	 * @param array $atts {
-	 *     @type string  $label    Badge text.
-	 *     @type string  $variant  'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'.
-	 *     @type bool    $dot      Whether to show a colored dot before the label.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $label   Badge text.
+	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'. Default: 'default'.
+	 *     @type string $size    'sm' | 'md'. Default: 'md'.
+	 *     @type string $class   Additional CSS classes.
 	 * }
 	 */
 	public function badge(array $atts = []): void
@@ -466,44 +382,42 @@ class ComponentRenderer
 		$atts = wp_parse_args($atts, [
 			"label" => "",
 			"variant" => "default",
-			"dot" => false,
+			"size" => "md",
 			"class" => "",
 		]);
-		$this->render("badge.php", $atts);
+		include __DIR__ . "/../../views/components/badge.php";
 	}
 
 	/**
-	 * Render a loading spinner.
-	 * Primer equivalent: Spinner.
+	 * Render a spinner (indeterminate loading indicator).
 	 *
 	 * @param array $atts {
-	 *     @type string  $size        'sm' | 'md' | 'lg'. Default: 'md'.
-	 *     @type string  $label       Accessible label text.
-	 *     @type bool    $show_label  Whether to show visible label text. Default: false.
-	 *     @type string  $class       Additional CSS classes.
+	 *     @type string $size  'sm' | 'md' | 'lg'. Default: 'md'.
+	 *     @type string $label Accessible label. Default: 'Cargando...'.
+	 *     @type string $class Additional CSS classes.
 	 * }
 	 */
 	public function spinner(array $atts = []): void
 	{
 		$atts = wp_parse_args($atts, [
 			"size" => "md",
-			"label" => "Loading…",
-			"show_label" => false,
+			"label" => "Cargando...",
 			"class" => "",
 		]);
-		$this->render("spinner.php", $atts);
+		include __DIR__ . "/../../views/components/spinner.php";
 	}
 
 	/**
 	 * Render a progress bar.
-	 * Primer equivalent: ProgressBar.
 	 *
 	 * @param array $atts {
-	 *     @type int     $value       Percentage 0-100.
-	 *     @type string  $label       Label shown above the bar.
-	 *     @type bool    $show_value  Whether to show % value next to label. Default: false.
-	 *     @type string  $variant     '' | 'success' | 'warning' | 'danger'. Default: ''.
-	 *     @type string  $class       Additional CSS classes.
+	 *     @type int    $value      Current value (0-100).
+	 *     @type string $label      Optional label shown above the bar.
+	 *     @type bool   $show_value Show numeric percentage next to label. Default: false.
+	 *     @type string $variant    'default' | 'success' | 'warning' | 'danger' | 'info'. Default: 'default'.
+	 *     @type string $size       'sm' | 'md' | 'lg'. Default: 'sm'.
+	 *     @type string $help       Help text.
+	 *     @type string $class      Additional CSS classes.
 	 * }
 	 */
 	public function progress_bar(array $atts = []): void
@@ -512,48 +426,20 @@ class ComponentRenderer
 			"value" => 0,
 			"label" => "",
 			"show_value" => false,
-			"variant" => "",
+			"variant" => "default",
+			"size" => "sm",
+			"help" => "",
 			"class" => "",
 		]);
-		$this->render("progress-bar.php", $atts);
-	}
-
-	// =========================================================================
-	// NAVIGATION
-	// =========================================================================
-
-	/**
-	 * Render a pagination component.
-	 * Primer equivalent: Pagination.
-	 *
-	 * @param array $atts {
-	 *     @type int     $current     Current page number.
-	 *     @type int     $total       Total number of pages.
-	 *     @type string  $base_url    URL for link-based pagination (optional).
-	 *                                If empty, renders <button> elements with data-pw-page attr.
-	 *     @type int     $show_pages  Number of page buttons around current. Default: 2.
-	 *     @type string  $class       Additional CSS classes.
-	 * }
-	 */
-	public function pagination(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"current" => 1,
-			"total" => 1,
-			"base_url" => "",
-			"show_pages" => 2,
-			"class" => "",
-		]);
-		$this->render("pagination.php", $atts);
+		include __DIR__ . "/../../views/components/progress-bar.php";
 	}
 
 	/**
 	 * Render breadcrumbs navigation.
-	 * Primer equivalent: Breadcrumbs.
 	 *
 	 * @param array $atts {
-	 *     @type array   $items  [ ['label' => 'Home', 'href' => '/'], ... ] — last item = current.
-	 *     @type string  $class  Additional CSS classes.
+	 *     @type array  $items  [ [ 'label' => '', 'href' => '' ], ... ] — last item = current page (no href needed).
+	 *     @type string $class  Additional CSS classes.
 	 * }
 	 */
 	public function breadcrumbs(array $atts = []): void
@@ -562,67 +448,79 @@ class ComponentRenderer
 			"items" => [],
 			"class" => "",
 		]);
-		$this->render("breadcrumbs.php", $atts);
+		include __DIR__ . "/../../views/components/breadcrumbs.php";
 	}
 
 	/**
-	 * Render a tabs navigation bar.
+	 * Render a pagination control.
 	 *
 	 * @param array $atts {
-	 *     @type array   $tabs   [ ['slug','label','active','count'], ... ]
-	 *     @type string  $class  Additional CSS classes.
+	 *     @type int    $current   Current page number.
+	 *     @type int    $total     Total number of pages.
+	 *     @type string $base_url  Base URL for page links. Default: current URL.
+	 *     @type string $param     Query parameter name for the page. Default: 'paged'.
+	 *     @type int    $window    Pages to show around current page. Default: 2.
+	 *     @type string $class     Additional CSS classes.
 	 * }
 	 */
-	public function tabs(array $atts = []): void
+	public function pagination(array $atts = []): void
 	{
 		$atts = wp_parse_args($atts, [
-			"tabs" => [],
+			"current" => 1,
+			"total" => 1,
+			"base_url" => remove_query_arg("paged"),
+			"param" => "paged",
+			"window" => 2,
 			"class" => "",
 		]);
-		$this->render("tabs.php", $atts);
+		include __DIR__ . "/../../views/components/pagination.php";
 	}
 
 	/**
-	 * Render a tab panel content wrapper.
+	 * Render a tooltip wrapper.
+	 * The trigger content must be passed as a callable or raw HTML.
 	 *
 	 * @param array $atts {
-	 *     @type string    $slug     Tab slug — must match a tab's slug.
-	 *     @type bool      $active   Whether this panel is visible initially.
-	 *     @type callable  $content  Callable that outputs panel content.
-	 *     @type string    $class    Additional CSS classes.
-	 * }
-	 */
-	public function tab_panel(array $atts = []): void
-	{
-		$atts = wp_parse_args($atts, [
-			"slug" => "",
-			"active" => false,
-			"content" => null,
-			"class" => "",
-		]);
-		$this->render("tab-panel.php", $atts);
-	}
-
-	/**
-	 * Render a tooltip wrapper around a trigger element.
-	 * Primer equivalent: Tooltip.
-	 *
-	 * @param array $atts {
-	 *     @type string          $text      Tooltip text shown on hover/focus.
-	 *     @type string|callable $trigger   HTML string or callable that outputs the trigger element.
-	 *     @type string          $position  'top' (default) | 'bottom'.
-	 *     @type string          $class     Additional CSS classes for the wrapper.
+	 *     @type string        $text         Tooltip text.
+	 *     @type callable|null $trigger      Callable that outputs the trigger element.
+	 *     @type string        $trigger_html Raw HTML for the trigger (used if $trigger is null).
+	 *     @type string        $position     'top' | 'bottom'. Default: 'top'.
+	 *     @type string        $class        Additional CSS classes on the wrapper.
 	 * }
 	 */
 	public function tooltip(array $atts = []): void
 	{
 		$atts = wp_parse_args($atts, [
 			"text" => "",
-			"trigger" => "",
+			"trigger" => null,
+			"trigger_html" => "",
 			"position" => "top",
 			"class" => "",
 		]);
-		$this->render("tooltip.php", $atts);
+		include __DIR__ . "/../../views/components/tooltip.php";
+	}
+
+	/**
+	 * Render a skeleton loading placeholder.
+	 *
+	 * @param array $atts {
+	 *     @type string $type   'text' | 'title' | 'box' | 'avatar'. Default: 'text'.
+	 *     @type int    $lines  Number of text lines (only for type='text'). Default: 1.
+	 *     @type string $width  CSS width. Default: '100%'.
+	 *     @type string $height CSS height (for box/avatar types).
+	 *     @type string $class  Additional CSS classes.
+	 * }
+	 */
+	public function skeleton(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"type" => "text",
+			"lines" => 1,
+			"width" => "100%",
+			"height" => null,
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/skeleton.php";
 	}
 
 	// =========================================================================
@@ -630,12 +528,12 @@ class ComponentRenderer
 	// =========================================================================
 
 	/**
-	 * Render a heading h1-h6.
+	 * Render a heading (h1-h6).
 	 *
 	 * @param array $atts {
-	 *     @type string  $text   Heading text.
-	 *     @type int     $level  1-6. Default: 2.
-	 *     @type string  $class  Additional CSS classes.
+	 *     @type string $text  Heading text.
+	 *     @type int    $level 1-6 for h1-h6. Default: 2.
+	 *     @type string $class Additional CSS classes.
 	 * }
 	 */
 	public function heading(array $atts = []): void
@@ -645,16 +543,16 @@ class ComponentRenderer
 			"level" => 2,
 			"class" => "",
 		]);
-		$this->render("heading.php", $atts);
+		include __DIR__ . "/../../views/components/heading.php";
 	}
 
 	/**
 	 * Render a paragraph.
 	 *
 	 * @param array $atts {
-	 *     @type string  $text     Paragraph text (HTML allowed via wp_kses_post).
-	 *     @type string  $variant  'default' | 'muted' | 'small'.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $text    Paragraph text (supports basic HTML).
+	 *     @type string $variant 'default' | 'muted' | 'small'. Default: 'default'.
+	 *     @type string $class   Additional CSS classes.
 	 * }
 	 */
 	public function paragraph(array $atts = []): void
@@ -664,18 +562,18 @@ class ComponentRenderer
 			"variant" => "default",
 			"class" => "",
 		]);
-		$this->render("paragraph.php", $atts);
+		include __DIR__ . "/../../views/components/paragraph.php";
 	}
 
 	/**
-	 * Render an anchor link.
+	 * Render a link.
 	 *
 	 * @param array $atts {
-	 *     @type string  $label    Link text.
-	 *     @type string  $href     URL.
-	 *     @type string  $target   '_self' | '_blank'. Default: '_self'.
-	 *     @type string  $variant  'default' | 'muted'. Default: 'default'.
-	 *     @type string  $class    Additional CSS classes.
+	 *     @type string $label   Link text.
+	 *     @type string $href    URL. Default: '#'.
+	 *     @type string $target  '_self' | '_blank'. Default: '_self'.
+	 *     @type string $variant 'default' | 'muted' | 'danger'. Default: 'default'.
+	 *     @type string $class   Additional CSS classes.
 	 * }
 	 */
 	public function link(array $atts = []): void
@@ -687,19 +585,72 @@ class ComponentRenderer
 			"variant" => "default",
 			"class" => "",
 		]);
-		$this->render("link.php", $atts);
+		include __DIR__ . "/../../views/components/link.php";
 	}
 
 	/**
 	 * Render a horizontal separator.
 	 *
 	 * @param array $atts {
-	 *     @type string  $class  Additional CSS classes.
+	 *     @type string $class Additional CSS classes.
 	 * }
 	 */
 	public function separator(array $atts = []): void
 	{
 		$atts = wp_parse_args($atts, ["class" => ""]);
-		$this->render("separator.php", $atts);
+		include __DIR__ . "/../../views/components/separator.php";
+	}
+
+	// =========================================================================
+	// NAVIGATION
+	// =========================================================================
+
+	/**
+	 * Render a tabs navigation (UnderlineNav style, Primer-inspired).
+	 *
+	 * @param array $atts {
+	 *     @type array  $tabs  [ [ 'slug' => '', 'label' => '', 'active' => false, 'count' => null ], ... ]
+	 *     @type string $class Additional CSS classes.
+	 * }
+	 */
+	public function tabs(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"tabs" => [],
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/tabs.php";
+	}
+
+	/**
+	 * Render a tab panel content wrapper.
+	 *
+	 * @param array $atts {
+	 *     @type string   $slug    Tab slug matching the tabs() definition.
+	 *     @type bool     $active  Whether this panel is visible initially. Default: false.
+	 *     @type callable $content Function that outputs the panel content.
+	 *     @type string   $class   Additional CSS classes.
+	 * }
+	 */
+	public function tab_panel(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"slug" => "",
+			"active" => false,
+			"content" => null,
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/tab-panel.php";
+	}
+
+	/**
+	 * Render breadcrumbs navigation.
+	 * Alias kept here for discoverability — delegates to breadcrumbs().
+	 *
+	 * @see self::breadcrumbs()
+	 */
+	public function breadcrumb(array $atts = []): void
+	{
+		$this->breadcrumbs($atts);
 	}
 }

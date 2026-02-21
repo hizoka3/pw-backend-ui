@@ -2,151 +2,148 @@
 // views/layout/page-wrapper.php
 
 /**
- * Main page layout — full-bleed, no border-radius, flush with WP admin menu.
+ * Main page wrapper layout — PW Design System.
  *
- * @var array                       $page
- * @var \PW\BackendUI\BackendUI     $this
+ * No border-radius on layout elements. No extra margin/padding vs WP menu.
+ * Header includes the PW logo (red square) + theme toggle + right slot.
+ *
+ * @var array                       $page  Page config array.
+ * @var \PW\BackendUI\BackendUI     $bui   BackendUI instance (passed from render_page / _render_playground).
  */
 
 defined("ABSPATH") || exit();
 
-$brand = $this->config("brand");
-$theme = $this->config("theme") ?: "dark";
+$brand = $bui->config("brand");
 $has_sidebar = !empty($page["sidebar"]);
 ?>
-<div
-    id="pw-backend-ui-app"
-    class="pw-bui-layout"
-    data-pw-theme="<?php echo esc_attr($theme); ?>"
->
+
+<div id="pw-backend-ui-app" data-pw-theme="dark">
+
     <?php
-/* ── HEADER ─────────────────────────────────────────────── */
+// ── HEADER ─────────────────────────────────────────────────────────
 ?>
     <header class="pw-bui-header">
+        <div class="pw-bui-header__inner">
 
-        <div class="pw-bui-header-left">
             <?php
-/* Logo PW — siempre visible */
+// Logo PW
 ?>
-            <a class="pw-bui-logo" href="#" aria-label="PW Backend UI">
-                <span class="pw-bui-logo-mark">
-                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M3 2h4.5a3.5 3.5 0 0 1 0 7H5v5H3V2zm2 5h2.5a1.5 1.5 0 0 0 0-3H5v3z"/>
+            <a href="<?php echo esc_url(admin_url()); ?>" class="pw-bui-logo">
+                <span class="pw-bui-logo__mark" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 2h4a3 3 0 0 1 0 6H5v4H3V2zm2 4h2a1 1 0 0 0 0-2H5v2zM9.5 2H12l2.5 10H12.5L12 9.5H10L9.5 12H7.5L9.5 2zm1 5.5h1L11 4l-.5 3.5z" fill="white"/>
                     </svg>
                 </span>
                 <?php if (!empty($brand["name"])): ?>
-                    <span class="pw-bui-logo-text"><?php echo esc_html(
+                    <span class="pw-bui-logo__name"><?php echo esc_html(
                     	$brand["name"],
                     ); ?></span>
                 <?php endif; ?>
             </a>
 
-            <?php if (!empty($page["title"])): ?>
-                <span style="color: var(--pw-fg-subtle); font-size: 14px; margin: 0 2px;">/</span>
-                <h1 style="font-size: var(--pw-text-sm); font-weight: 500; color: var(--pw-header-fg); margin: 0; padding: 0;">
+            <?php
+// Page title en el header cuando no hay logo name
+?>
+            <?php if (!empty($page["title"]) && empty($brand["name"])): ?>
+                <h1 style="font-size:14px;font-weight:600;color:var(--pw-color-fg-default);margin:0;">
                     <?php echo esc_html($page["title"]); ?>
                 </h1>
             <?php endif; ?>
-        </div>
-
-        <div class="pw-bui-header-right">
-            <?php
-/* Plugin-defined content (hook) */
-?>
-            <?php do_action("pw_bui/header_right", $page); ?>
 
             <?php
-/* Theme toggle — sun/moon */
+// Header right slot
 ?>
-            <button
-                class="pw-bui-theme-toggle"
-                data-pw-theme-toggle
-                type="button"
-                aria-label="Switch to light mode"
-                title="Light mode"
-            >
+            <div class="pw-bui-header__right">
+                <?php do_action("pw_bui/header_right", $page); ?>
+
                 <?php
-/* Sun icon — shown when in dark mode (click → light) */
+// Theme toggle button
 ?>
-                <svg class="pw-bui-icon-moon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z"/>
-                </svg>
-                <?php
-/* Moon icon — shown when in light mode (click → dark) */
+                <button
+                    type="button"
+                    class="pw-bui-theme-toggle"
+                    aria-label="<?php esc_attr_e(
+                    	"Cambiar tema",
+                    	"pw-backend-ui",
+                    ); ?>"
+                    title="<?php esc_attr_e(
+                    	"Cambiar tema claro / oscuro",
+                    	"pw-backend-ui",
+                    ); ?>"
+                >
+                    <?php
+// Moon icon (visible en dark mode)
 ?>
-                <svg class="pw-bui-icon-sun" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none">
-                    <path fill-rule="evenodd" d="M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.061-1.06a.75.75 0 010-1.061zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM0 8a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H.75A.75.75 0 010 8zm13 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 0113 8zM2.343 13.657a.75.75 0 010-1.06l1.061-1.061a.75.75 0 011.06 1.06l-1.06 1.061a.75.75 0 01-1.061 0zm9.193-9.193a.75.75 0 010-1.06l1.06-1.061a.75.75 0 111.061 1.06l-1.06 1.061a.75.75 0 01-1.061 0z"/>
-                </svg>
-            </button>
+                    <svg class="pw-bui-icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Z"/>
+                    </svg>
+                    <?php
+// Sun icon (visible en light mode)
+?>
+                    <svg class="pw-bui-icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm.25-9.25v-1.5a.25.25 0 0 0-.5 0v1.5a.25.25 0 0 0 .5 0Zm0 10v1.5a.25.25 0 0 0-.5 0v-1.5a.25.25 0 0 0 .5 0ZM2.75 8a.25.25 0 0 0 0-.5h-1.5a.25.25 0 0 0 0 .5ZM14 7.75a.25.25 0 0 0 0-.5h-1.5a.25.25 0 0 0 0 .5ZM4.11 4.64a.25.25 0 0 0 .35-.35l-1.06-1.06a.25.25 0 0 0-.35.35Zm7.79 7.79a.25.25 0 0 0 .35-.35l-1.06-1.06a.25.25 0 0 0-.35.35Zm.35-9.21a.25.25 0 0 0-.35-.35L10.83 4.03a.25.25 0 0 0 .35.35Zm-7.79 7.79a.25.25 0 0 0-.35-.35L3.11 11.88a.25.25 0 0 0 .35.35Z"/>
+                    </svg>
+                </button>
+            </div>
+
         </div>
+
+        <?php
+// ── TABS (dentro del header, estilo Primer UnderlineNav) ──
+?>
+        <?php if (!empty($page["tabs"])): ?>
+            <div class="pw-bui-tabs-nav">
+                <?php $bui->ui()->tabs(["tabs" => $page["tabs"]]); ?>
+            </div>
+        <?php endif; ?>
     </header>
 
     <?php
-/* ── TABS (underline nav style) ────────────────────────── */
+// ── MAIN ───────────────────────────────────────────────────────────
 ?>
-    <?php if (!empty($page["tabs"])): ?>
-        <nav class="pw-bui-tabnav" role="tablist" aria-label="Page sections">
-            <?php foreach ($page["tabs"] as $tab):
+    <div class="pw-bui-main">
 
-            	$slug = $tab["slug"] ?? "";
-            	$label = $tab["label"] ?? "";
-            	$active = !empty($tab["active"]);
-            	$count = $tab["count"] ?? null;
-            	?>
-                <button
-                    type="button"
-                    role="tab"
-                    class="pw-bui-tabnav-item<?php echo $active
-                    	? " pw-bui-active"
-                    	: ""; ?>"
-                    data-pw-tab="<?php echo esc_attr($slug); ?>"
-                    aria-selected="<?php echo $active ? "true" : "false"; ?>"
-                    aria-controls="pw-tab-panel-<?php echo esc_attr($slug); ?>"
-                    <?php echo $active ? 'tabindex="0"' : 'tabindex="-1"'; ?>
-                >
-                    <?php echo esc_html($label); ?>
-                    <?php if ($count !== null): ?>
-                        <span class="pw-bui-counter"><?php echo esc_html(
-                        	$count,
-                        ); ?></span>
-                    <?php endif; ?>
-                </button>
-            <?php
-            endforeach; ?>
-        </nav>
-    <?php endif; ?>
-
-    <?php
-/* ── BODY ─────────────────────────────────────────────── */
+        <?php
+// Page title / description cuando hay brand name (va en el body, no en el header)
 ?>
-    <div class="pw-bui-body">
-        <div class="pw-bui-content-grid<?php echo $has_sidebar
-        	? " has-sidebar"
-        	: ""; ?>">
-
-            <main class="pw-bui-main" style="min-width: 0;">
+        <?php if (!empty($page["title"]) && !empty($brand["name"])): ?>
+            <div style="margin-bottom:20px;">
+                <h1 style="font-size:20px;font-weight:600;color:var(--pw-color-fg-default);margin:0 0 4px;">
+                    <?php echo esc_html($page["title"]); ?>
+                </h1>
                 <?php if (!empty($page["description"])): ?>
-                    <p style="font-size: var(--pw-text-sm); color: var(--pw-fg-muted); margin-bottom: 20px;">
+                    <p style="font-size:13px;color:var(--pw-color-fg-muted);margin:0;">
                         <?php echo esc_html($page["description"]); ?>
                     </p>
                 <?php endif; ?>
+            </div>
+        <?php elseif (!empty($page["description"])): ?>
+            <p style="font-size:13px;color:var(--pw-color-fg-muted);margin:0 0 20px;">
+                <?php echo esc_html($page["description"]); ?>
+            </p>
+        <?php endif; ?>
 
+        <div class="pw-bui-layout <?php echo $has_sidebar
+        	? "pw-bui-layout--with-sidebar"
+        	: ""; ?>">
+
+            <main class="pw-bui-layout__main" style="min-width:0;">
                 <?php if (is_callable($page["content"])) {
-                	call_user_func($page["content"], $this);
+                	call_user_func($page["content"], $bui);
                 } ?>
             </main>
 
             <?php if ($has_sidebar): ?>
-                <aside class="pw-bui-sidebar">
+                <aside class="pw-bui-layout__sidebar" style="min-width:0;">
                     <?php if (!empty($page["sidebar"]["title"])): ?>
-                        <p class="pw-bui-text-small" style="text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; margin-bottom: 8px;">
+                        <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--pw-color-fg-muted);margin:0 0 10px;">
                             <?php echo esc_html($page["sidebar"]["title"]); ?>
                         </p>
                     <?php endif; ?>
                     <?php if (
                     	is_callable($page["sidebar"]["content"] ?? null)
                     ) {
-                    	call_user_func($page["sidebar"]["content"], $this);
+                    	call_user_func($page["sidebar"]["content"], $bui);
                     } ?>
                 </aside>
             <?php endif; ?>
@@ -155,18 +152,18 @@ $has_sidebar = !empty($page["sidebar"]);
     </div>
 
     <?php
-/* ── FOOTER ──────────────────────────────────────────── */
+// ── FOOTER ─────────────────────────────────────────────────────────
 ?>
     <?php if (!empty($page["footer"])): ?>
         <footer class="pw-bui-footer">
             <div>
                 <?php if (is_callable($page["footer"]["left"] ?? null)) {
-                	call_user_func($page["footer"]["left"], $this);
+                	call_user_func($page["footer"]["left"], $bui);
                 } ?>
             </div>
             <div>
                 <?php if (is_callable($page["footer"]["right"] ?? null)) {
-                	call_user_func($page["footer"]["right"], $this);
+                	call_user_func($page["footer"]["right"], $bui);
                 } ?>
             </div>
         </footer>

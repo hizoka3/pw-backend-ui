@@ -2,29 +2,30 @@
 // views/components/link.php
 
 /**
- * Link component.
+ * Link component — PW Design System.
  *
  * @var array $atts  Link attributes from ComponentRenderer::link().
  */
 
-defined( 'ABSPATH' ) || exit;
+defined("ABSPATH") || exit();
 
-$variant_classes = [
-    'default' => 'pw-text-brand-600 hover:pw-text-brand-700',
-    'muted'   => 'pw-text-surface-500 hover:pw-text-surface-700',
-    'danger'  => 'pw-text-danger-500 hover:pw-text-danger-700',
-];
-
-$classes = 'pw-text-sm pw-font-medium pw-underline pw-underline-offset-2 pw-decoration-1 pw-transition-colors '
-    . ( $variant_classes[ $atts['variant'] ] ?? $variant_classes['default'] ) . ' '
-    . $atts['class'];
+$variant = $atts["variant"] ?? "default";
+$classes = implode(
+	" ",
+	array_filter([
+		"pw-bui-link",
+		$variant !== "default" ? "pw-bui-link--" . $variant : "",
+		$atts["class"] ?? "",
+	]),
+);
 ?>
-
 <a
-    href="<?php echo esc_url( $atts['href'] ); ?>"
-    target="<?php echo esc_attr( $atts['target'] ); ?>"
-    class="<?php echo esc_attr( $classes ); ?>"
-    <?php echo $atts['target'] === '_blank' ? 'rel="noopener noreferrer"' : ''; ?>
+    href="<?php echo esc_url($atts["href"] ?? "#"); ?>"
+    target="<?php echo esc_attr($atts["target"] ?? "_self"); ?>"
+    class="<?php echo esc_attr($classes); ?>"
+    <?php echo ($atts["target"] ?? "") === "_blank"
+    	? 'rel="noopener noreferrer"'
+    	: ""; ?>
 >
-    <?php echo esc_html( $atts['label'] ); ?>
+    <?php echo esc_html($atts["label"] ?? ""); ?>
 </a>

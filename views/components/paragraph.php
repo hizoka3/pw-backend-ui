@@ -2,24 +2,23 @@
 // views/components/paragraph.php
 
 /**
- * Paragraph component.
+ * Paragraph component — PW Design System.
  *
  * @var array $atts  Paragraph attributes from ComponentRenderer::paragraph().
  */
 
-defined( 'ABSPATH' ) || exit;
+defined("ABSPATH") || exit();
 
-$variant_classes = [
-    'default' => 'pw-text-sm pw-text-surface-700',
-    'muted'   => 'pw-text-sm pw-text-surface-400',
-    'small'   => 'pw-text-xs pw-text-surface-500',
-];
-
-$classes = 'pw-m-0 pw-leading-relaxed '
-    . ( $variant_classes[ $atts['variant'] ] ?? $variant_classes['default'] ) . ' '
-    . $atts['class'];
+$variant = $atts["variant"] ?? "default";
+$classes = implode(
+	" ",
+	array_filter([
+		"pw-bui-paragraph",
+		$variant !== "default" ? "pw-bui-paragraph--" . $variant : "",
+		$atts["class"] ?? "",
+	]),
+);
 ?>
-
-<p class="<?php echo esc_attr( $classes ); ?>">
-    <?php echo wp_kses_post( $atts['text'] ); ?>
-</p>
+<p class="<?php echo esc_attr($classes); ?>"><?php echo wp_kses_post(
+	$atts["text"] ?? "",
+); ?></p>

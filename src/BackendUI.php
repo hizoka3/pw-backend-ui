@@ -10,18 +10,15 @@ use PW\BackendUI\Components\ComponentRenderer;
  * Entry point for the pw/backend-ui design system.
  *
  * Singleton. Call BackendUI::init($config) once in plugins_loaded,
- * then use BackendUI::init()->render_page() or BackendUI::init()->ui().
+ * then use BackendUI::init()->render_page() to wrap your settings page
+ * and BackendUI::init()->ui() to access individual component methods.
  */
 class BackendUI
 {
 	private static ?self $instance = null;
-	private static bool $playground = false;
-
 	private AssetsManager $assets;
 	private ComponentRenderer $ui;
 	private array $config;
-
-	const PLAYGROUND_SLUG = "pw-bui-playground";
 
 	private function __construct(array $config)
 	{
@@ -30,7 +27,6 @@ class BackendUI
 			"version" => "1.0.0",
 			"screens" => [],
 			"slug" => "pw-backend-ui",
-			"theme" => "dark", // 'dark' | 'light' — default dark
 			"brand" => [
 				"name" => "",
 				"logo_url" => "",
@@ -46,11 +42,9 @@ class BackendUI
 	 *
 	 * @param array $config {
 	 *     @type string   $assets_url  Full URL to the package assets/ dir (required).
-	 *     @type string   $version     Package version for cache busting.
+	 *     @type string   $version     Package version for cache busting. Default: '1.0.0'.
 	 *     @type string[] $screens     WP admin screen IDs where assets load.
-	 *     @type string   $slug        Unique slug used for CSS/JS handles.
-	 *     @type string   $theme       Default theme: 'dark' (default) | 'light'.
-	 *                                 User can override at runtime via the header toggle button.
+	 *     @type string   $slug        Unique slug used for CSS/JS handles. Default: 'pw-backend-ui'.
 	 *     @type array    $brand       { name: string, logo_url: string }
 	 * }
 	 */
@@ -61,65 +55,6 @@ class BackendUI
 			self::$instance->boot();
 		}
 		return self::$instance;
-	}
-
-	/**
-	 * Register a playground admin page showing all components.
-	 *
-	 * Idempotent — safe to call multiple times.
-	 * Assets load automatically on the playground screen.
-	 *
-	 * Usage:
-	 *
-	 *   if ( defined('WP_DEBUG') && WP_DEBUG ) {
-	 *       BackendUI::playground();
-	 *   }
-	 *
-	 * @param array $options {
-	 *     @type string  $capability   WP capability required. Default: 'manage_options'.
-	 *     @type int     $menu_order   Admin menu position. Default: 99.
-	 * }
-	 */
-	public static function playground(array $options = []): void
-	{
-		if (self::$playground) {
-			return;
-		}
-		self::$playground = true;
-
-		$options = wp_parse_args($options, [
-			"capability" => "manage_options",
-			"menu_order" => 99,
-		]);
-
-		add_action("admin_menu", function () use ($options) {
-			add_menu_page(
-				"PW UI Playground",
-				"PW Playground",
-				$options["capability"],
-				self::PLAYGROUND_SLUG,
-				[self::class, "_render_playground"],
-				"dashicons-color-picker",
-				$options["menu_order"],
-			);
-			self::init()->_register_playground_screen();
-		});
-	}
-
-	/** @internal */
-	public function _register_playground_screen(): void
-	{
-		$screen_id = "toplevel_page_" . self::PLAYGROUND_SLUG;
-		if (!in_array($screen_id, $this->config["screens"], true)) {
-			$this->config["screens"][] = $screen_id;
-		}
-	}
-
-	/** @internal */
-	public static function _render_playground(): void
-	{
-		$bui = self::init();
-		include dirname(__DIR__) . "/views/playground/playground.php";
 	}
 
 	private function boot(): void
@@ -136,23 +71,26 @@ class BackendUI
 	}
 
 	/**
-	 * Get the current config or a single value.
+	 * Get the current config (all keys or a specific key).
 	 */
 	public function config(?string $key = null): mixed
 	{
-		return $key === null ? $this->config : $this->config[$key] ?? null;
+		if ($key === null) {
+			return $this->config;
+		}
+		return $this->config[$key] ?? null;
 	}
 
 	/**
 	 * Render a full settings page wrapped in the design system layout.
 	 *
 	 * @param array $page {
-	 *     @type string    $title        Page title shown in the header.
-	 *     @type string    $description  Short description under the title.
-	 *     @type array     $tabs         [ ['slug','label','active','count'], ... ]
-	 *     @type callable  $content      Function that outputs the page body.
-	 *     @type array     $sidebar      [ 'title' => '', 'content' => callable ]
-	 *     @type array     $footer       [ 'left' => callable, 'right' => callable ]
+	 *     @type string   $title       Page title shown in the header.
+	 *     @type string   $description Short description under the title.
+	 *     @type array    $tabs        [ [ 'slug' => 'general', 'label' => 'General', 'active' => true ], ... ]
+	 *     @type callable $content     function( BackendUI $bui ) — outputs the page body.
+	 *     @type array    $sidebar     Optional sidebar: [ 'title' => '', 'content' => callable ].
+	 *     @type array    $footer      Optional footer: [ 'left' => callable, 'right' => callable ].
 	 * }
 	 */
 	public function render_page(array $page): void
@@ -168,7 +106,147 @@ class BackendUI
 
 		$page = apply_filters("pw_bui/page_config", $page);
 
-		include dirname(__DIR__) . "/views/layout/page-wrapper.php";
+		// $bui expuesto para que page-wrapper.php lo use sin depender de $this
+		$bui = $this;
+		include __DIR__ . "/../views/layout/page-wrapper.php";
+	}
+
+	/**
+	 * Register a self-documenting playground admin page.
+	 *
+	 * Registers a WP admin menu page that showcases all components.
+	 * Recommended to call only when WP_DEBUG is true.
+	 *
+	 *   if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+	 *       BackendUI::playground();
+	 *   }
+	 *
+	 * @param array $opts {
+	 *     @type string $capability Capability required. Default: 'manage_options'.
+	 *     @type int    $menu_order Menu position. Default: 99.
+	 * }
+	 */
+	public static function playground(array $opts = []): void
+	{
+		static $registered = false;
+		if ($registered) {
+			return;
+		}
+		$registered = true;
+
+		$opts = wp_parse_args($opts, [
+			"capability" => "manage_options",
+			"menu_order" => 99,
+		]);
+
+		add_action("admin_menu", function () use ($opts) {
+			add_menu_page(
+				"PW UI Playground",
+				"PW Playground",
+				$opts["capability"],
+				"pw-bui-playground",
+				[self::class, "_render_playground"],
+				"dashicons-art",
+				(int) $opts["menu_order"],
+			);
+
+			self::_register_playground_screen();
+		});
+	}
+
+	/**
+	 * Add the playground screen to AssetsManager so CSS/JS loads on it.
+	 * @internal
+	 */
+	public static function _register_playground_screen(): void
+	{
+		$instance = self::$instance;
+		if (!$instance) {
+			return;
+		}
+
+		$pg_screen = "toplevel_page_pw-bui-playground";
+		if (!in_array($pg_screen, $instance->config["screens"], true)) {
+			$instance->config["screens"][] = $pg_screen;
+			$instance->assets->update_config($instance->config);
+		}
+	}
+
+	/**
+	 * Render the playground page.
+	 * @internal
+	 */
+	public static function _render_playground(): void
+	{
+		$bui = self::$instance;
+		$page = [
+			"title" => "PW UI Playground",
+			"description" => "Todos los componentes del design system.",
+			"tabs" => [
+				[
+					"slug" => "buttons",
+					"label" => "Botones & Badges",
+					"active" => true,
+				],
+				["slug" => "forms", "label" => "Formularios"],
+				["slug" => "feedback", "label" => "Feedback"],
+				["slug" => "navigation", "label" => "Navegación"],
+				["slug" => "layout", "label" => "Tipo & Layout"],
+			],
+			"content" => function (BackendUI $bui) {
+				include __DIR__ . "/../views/playground/playground.php";
+			},
+			"sidebar" => [
+				"title" => "Componentes",
+				"content" => function (BackendUI $bui) {
+					$ui = $bui->ui();
+					$ui->card([
+						"content" => function () use ($ui) {
+							$components = [
+								"button",
+								"badge",
+								"input",
+								"textarea",
+								"select",
+								"checkbox",
+								"toggle",
+								"radio_group",
+								"date_input",
+								"segmented_control",
+								"card",
+								"notice",
+								"spinner",
+								"progress_bar",
+								"breadcrumbs",
+								"pagination",
+								"tooltip",
+								"skeleton",
+								"tabs",
+								"separator",
+								"heading",
+								"paragraph",
+								"link",
+							];
+							echo '<div style="display:flex;flex-direction:column;gap:4px;">';
+							foreach ($components as $c) {
+								echo '<code style="font-size:11px;color:var(--pw-color-fg-muted);">' .
+									esc_html($c) .
+									"()</code>";
+							}
+							echo "</div>";
+						},
+					]);
+					$ui->separator();
+					$ui->paragraph([
+						"text" => "pw/backend-ui v1.1.0",
+						"variant" => "muted",
+					]);
+				},
+			],
+		];
+
+		$page = apply_filters("pw_bui/page_config", $page);
+		include __DIR__ . "/../views/layout/page-wrapper.php";
 	}
 
 	/**
@@ -178,6 +256,5 @@ class BackendUI
 	public static function reset(): void
 	{
 		self::$instance = null;
-		self::$playground = false;
 	}
 }

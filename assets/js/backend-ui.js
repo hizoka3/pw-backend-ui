@@ -1,15 +1,15 @@
 // assets/js/backend-ui.js
 
 /**
- * pw/backend-ui — Interactive behaviors for the PW Design System.
+ * pw/backend-ui — Interactive behaviors for the PW design system.
  *
  * Handles:
- *   - Theme toggle (dark / light) with localStorage persistence
- *   - Tab navigation (click + keyboard)
- *   - Toggle switch state
+ *   - Theme toggle (dark/light) with localStorage persistence
+ *   - Tab / UnderlineNav navigation (click + keyboard)
  *   - Segmented control
- *   - Dismissible notices / banners
- *   - Tooltip (CSS-driven, JS for dynamic positioning)
+ *   - Toggle switch state
+ *   - Dismissible notices
+ *   - Tooltip show/hide
  *
  * No dependencies. Vanilla JS. Scoped to #pw-backend-ui-app.
  */
@@ -18,27 +18,25 @@
 	"use strict";
 
 	const SCOPE = "#pw-backend-ui-app";
-	const STORAGE_KEY = "pw-bui-theme";
-	const DARK_CLASS = "dark";
-	const ATTR_THEME = "data-pw-theme";
+	const THEME_KEY = "pw-bui-theme";
+	const THEME_DEFAULT = "dark";
 
 	// =========================================================================
 	// HELPERS
 	// =========================================================================
 
-	function scope() {
+	function getRoot() {
 		return document.querySelector(SCOPE);
 	}
 
 	function $$(selector) {
-		const root = scope();
+		const root = getRoot();
 		return root ? Array.from(root.querySelectorAll(selector)) : [];
 	}
 
 	function delegate(event, selector, handler) {
-		const root = scope();
+		const root = getRoot();
 		if (!root) return;
-
 		root.addEventListener(event, function (e) {
 			const target = e.target.closest(selector);
 			if (target && root.contains(target)) {
@@ -53,112 +51,84 @@
 
 	function getTheme() {
 		try {
-			return localStorage.getItem(STORAGE_KEY) || "dark";
+			return localStorage.getItem(THEME_KEY) || THEME_DEFAULT;
 		} catch (e) {
-			return "dark";
+			return THEME_DEFAULT;
 		}
 	}
 
 	function setTheme(theme) {
-		const root = scope();
+		const root = getRoot();
 		if (!root) return;
 
-		root.setAttribute(ATTR_THEME, theme);
+		root.setAttribute("data-pw-theme", theme);
 
 		try {
-			localStorage.setItem(STORAGE_KEY, theme);
+			localStorage.setItem(THEME_KEY, theme);
 		} catch (e) {
-			/* ignore */
-		}
-
-		// Update toggle icon + aria-label
-		const toggleBtn = root.querySelector("[data-pw-theme-toggle]");
-		if (toggleBtn) {
-			toggleBtn.setAttribute(
-				"aria-label",
-				theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
-			);
-			toggleBtn.setAttribute(
-				"title",
-				theme === "dark" ? "Light mode" : "Dark mode",
-			);
-
-			const iconDark = toggleBtn.querySelector(".pw-bui-icon-moon");
-			const iconLight = toggleBtn.querySelector(".pw-bui-icon-sun");
-
-			if (iconDark) iconDark.style.display = theme === "dark" ? "none" : "";
-			if (iconLight) iconLight.style.display = theme === "light" ? "none" : "";
+			/* silently fail in private browsing */
 		}
 
 		document.dispatchEvent(
 			new CustomEvent("pw-bui:theme-changed", {
-				detail: { theme },
+				detail: { theme: theme },
 			}),
 		);
 	}
 
-	function applyInitialTheme() {
-		const root = scope();
+	function initTheme() {
+		const root = getRoot();
 		if (!root) return;
 
+		// Apply persisted theme immediately
 		const saved = getTheme();
-		// If theme was already set server-side via data-pw-theme attr, respect it on first load.
-		// Otherwise apply saved preference.
-		const current = root.getAttribute(ATTR_THEME);
-		setTheme(current || saved);
-	}
+		root.setAttribute("data-pw-theme", saved);
 
-	function initThemeToggle() {
-		applyInitialTheme();
-
-		delegate("click", "[data-pw-theme-toggle]", function () {
-			const root = scope();
-			const current = root ? root.getAttribute(ATTR_THEME) : "dark";
+		// Wire the toggle button
+		delegate("click", ".pw-bui-theme-toggle", function () {
+			const current = getRoot().getAttribute("data-pw-theme") || THEME_DEFAULT;
 			setTheme(current === "dark" ? "light" : "dark");
 		});
 	}
 
 	// =========================================================================
-	// TABS
+	// TABS (UnderlineNav)
 	// =========================================================================
 
 	function initTabs() {
-		delegate("click", "[data-pw-tab]", function (e) {
-			e.preventDefault();
+		delegate("click", "[data-pw-tab]", function () {
 			const slug = this.getAttribute("data-pw-tab");
 			const tabNav = this.closest('[role="tablist"]');
 			if (!tabNav) return;
 
+			// Deactivate all in same nav
 			tabNav.querySelectorAll("[data-pw-tab]").forEach(function (tab) {
-				tab.classList.remove("pw-bui-active");
+				tab.classList.remove("pw-bui-tab--active");
 				tab.setAttribute("aria-selected", "false");
-				tab.removeAttribute("tabindex");
 			});
 
-			this.classList.add("pw-bui-active");
+			// Activate clicked
+			this.classList.add("pw-bui-tab--active");
 			this.setAttribute("aria-selected", "true");
-			this.setAttribute("tabindex", "0");
 
+			// Show/hide panels
 			$$("[data-pw-tab-panel]").forEach(function (panel) {
-				if (panel.getAttribute("data-pw-tab-panel") === slug) {
-					panel.classList.remove("pw-bui-hidden");
-					panel.removeAttribute("aria-hidden");
-				} else {
-					panel.classList.add("pw-bui-hidden");
-					panel.setAttribute("aria-hidden", "true");
-				}
+				const isTarget = panel.getAttribute("data-pw-tab-panel") === slug;
+				panel.hidden = !isTarget;
+				panel.setAttribute("aria-hidden", String(!isTarget));
 			});
 
 			document.dispatchEvent(
 				new CustomEvent("pw-bui:tab-changed", {
-					detail: { slug },
+					detail: { slug: slug },
 				}),
 			);
 		});
 
-		// Keyboard: left / right arrows
+		// Keyboard: left/right arrows
 		delegate("keydown", "[data-pw-tab]", function (e) {
 			if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+			e.preventDefault();
 
 			const tabs = Array.from(
 				this.closest('[role="tablist"]').querySelectorAll("[data-pw-tab]"),
@@ -175,11 +145,44 @@
 	}
 
 	// =========================================================================
+	// SEGMENTED CONTROL
+	// =========================================================================
+
+	function initSegmented() {
+		delegate("click", "[data-pw-segment]", function () {
+			const value = this.getAttribute("data-pw-segment");
+			const control = this.closest("[data-pw-segmented]");
+			if (!control) return;
+
+			control.querySelectorAll("[data-pw-segment]").forEach(function (btn) {
+				btn.classList.remove("pw-bui-segmented__btn--active");
+				btn.setAttribute("aria-selected", "false");
+			});
+
+			this.classList.add("pw-bui-segmented__btn--active");
+			this.setAttribute("aria-selected", "true");
+
+			// Update hidden input if present
+			const input = control.querySelector('input[type="hidden"]');
+			if (input) input.value = value;
+
+			document.dispatchEvent(
+				new CustomEvent("pw-bui:segment-changed", {
+					detail: {
+						name: control.getAttribute("data-pw-segmented"),
+						value: value,
+					},
+				}),
+			);
+		});
+	}
+
+	// =========================================================================
 	// TOGGLE SWITCH
 	// =========================================================================
 
 	function initToggles() {
-		delegate("click", ".pw-bui-toggle-btn", function () {
+		delegate("click", ".pw-bui-toggle", function () {
 			if (this.hasAttribute("disabled")) return;
 
 			const isChecked = this.getAttribute("aria-checked") === "true";
@@ -187,71 +190,60 @@
 			const name = this.getAttribute("data-name");
 			const value = this.getAttribute("data-value");
 
-			this.setAttribute("aria-checked", newState.toString());
+			this.setAttribute("aria-checked", String(newState));
 
-			const input = this.parentElement.querySelector(
-				'input[type="hidden"][name="' + name + '"]',
-			);
-			if (input) {
-				input.value = newState ? value : "";
-			}
+			// Update hidden input
+			const input = this.closest(".pw-bui-toggle-wrap")
+				? this.closest(".pw-bui-toggle-wrap").querySelector(
+						'input[type="hidden"]',
+					)
+				: this.parentElement.querySelector('input[name="' + name + '"]');
+
+			if (input) input.value = newState ? value || "1" : "";
 
 			document.dispatchEvent(
 				new CustomEvent("pw-bui:toggle-changed", {
-					detail: { name, checked: newState, value },
+					detail: { name: name, checked: newState, value: value },
 				}),
 			);
 		});
 	}
 
 	// =========================================================================
-	// SEGMENTED CONTROL
-	// =========================================================================
-
-	function initSegmented() {
-		delegate("click", ".pw-bui-segmented-item", function () {
-			const group = this.closest(".pw-bui-segmented");
-			if (!group) return;
-
-			group.querySelectorAll(".pw-bui-segmented-item").forEach(function (item) {
-				item.setAttribute("aria-pressed", "false");
-			});
-
-			this.setAttribute("aria-pressed", "true");
-
-			const name = group.getAttribute("data-name");
-			const value = this.getAttribute("data-value");
-
-			// Update hidden input if present
-			const input = group.parentElement
-				? group.parentElement.querySelector(
-						'input[type="hidden"][name="' + name + '"]',
-					)
-				: null;
-			if (input) input.value = value;
-
-			document.dispatchEvent(
-				new CustomEvent("pw-bui:segmented-changed", {
-					detail: { name, value },
-				}),
-			);
-		});
-	}
-
-	// =========================================================================
-	// DISMISSIBLE (notices, banners)
+	// DISMISSIBLE NOTICES
 	// =========================================================================
 
 	function initDismissible() {
-		delegate("click", ".pw-bui-dismiss, .pw-bui-banner-dismiss", function () {
+		delegate("click", ".pw-bui-notice__dismiss", function () {
 			const notice = this.closest("[data-pw-dismissible]");
 			if (!notice) return;
 
 			notice.classList.add("pw-bui-dismissing");
-
 			setTimeout(function () {
 				notice.remove();
 			}, 220);
+		});
+	}
+
+	// =========================================================================
+	// TOOLTIP (keyboard / focus fallback — hover handled by CSS)
+	// =========================================================================
+
+	function initTooltips() {
+		delegate("focusin", "[data-pw-tooltip]", function () {
+			let tip = this.querySelector(".pw-bui-tooltip");
+			if (!tip) {
+				tip = document.createElement("span");
+				tip.className = "pw-bui-tooltip";
+				tip.textContent = this.getAttribute("data-pw-tooltip");
+				this.appendChild(tip);
+			}
+			tip.classList.add("pw-bui-tooltip--visible");
+		});
+
+		delegate("focusout", "[data-pw-tooltip]", function () {
+			const tip = this.querySelector(".pw-bui-tooltip");
+			if (tip) tip.classList.remove("pw-bui-tooltip--visible");
 		});
 	}
 
@@ -260,11 +252,12 @@
 	// =========================================================================
 
 	function init() {
-		initThemeToggle();
+		initTheme();
 		initTabs();
-		initToggles();
 		initSegmented();
+		initToggles();
 		initDismissible();
+		initTooltips();
 
 		document.dispatchEvent(new CustomEvent("pw-bui:ready"));
 	}
