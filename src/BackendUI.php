@@ -100,6 +100,7 @@ class BackendUI
 			"description" => "",
 			"tabs" => [],
 			"content" => null,
+			"sidenav" => null, // callable|array — activa layout sidenav
 			"sidebar" => null,
 			"footer" => null,
 		]);

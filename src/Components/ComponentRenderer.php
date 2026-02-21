@@ -653,4 +653,42 @@ class ComponentRenderer
 	{
 		$this->breadcrumbs($atts);
 	}
+
+	// =========================================================================
+	// SIDE NAVIGATION
+	// =========================================================================
+
+	/**
+	 * Render a vertical side navigation (sidebar nav, subtabs style).
+	 *
+	 * Designed to be used inside a sidenav layout (render_page with 'sidenav' key).
+	 * Supports groups, separators, active states, optional icons, and href or button items.
+	 *
+	 * @param array $atts {
+	 *     @type array $items Array of nav items. Each item:
+	 *         - Regular item:  [ 'label' => '', 'href' => '', 'active' => false, 'icon' => '', 'data' => '' ]
+	 *         - Group label:   [ 'group' => 'Sección' ]
+	 *         - Separator:     [ 'separator' => true ]
+	 *     @type string $class Additional CSS classes for the wrapper.
+	 * }
+	 *
+	 * @example
+	 *   $ui->side_nav([
+	 *       'items' => [
+	 *           [ 'label' => 'Conexión',          'href' => '#conexion',  'active' => true ],
+	 *           [ 'label' => 'Enlazar Proyectos',  'href' => '#proyectos' ],
+	 *           [ 'separator' => true ],
+	 *           [ 'group' => 'Avanzado' ],
+	 *           [ 'label' => 'Logs', 'href' => '#logs' ],
+	 *       ],
+	 *   ]);
+	 */
+	public function side_nav(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"items" => [],
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/side-nav.php";
+	}
 }

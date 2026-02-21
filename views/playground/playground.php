@@ -411,6 +411,32 @@ $ui->tab_panel([
 			],
 		]);
 		pw_pg_section_end();
+
+		pw_pg_section("Side Nav (navegación lateral tipo WP Settings)");
+		echo '<div style="display:grid;grid-template-columns:200px 1fr;border:1px solid var(--pw-color-border-default);border-radius:2px;overflow:hidden;">';
+		echo '<nav class="pw-bui-sidenav" style="min-height:auto;position:static;">';
+		$ui->side_nav([
+			"items" => [
+				["label" => "Conexión", "href" => "#", "active" => true],
+				["label" => "Enlazar Proyectos", "href" => "#"],
+				["separator" => true],
+				["group" => "Avanzado"],
+				["label" => "Logs", "href" => "#"],
+				["label" => "Webhooks", "href" => "#"],
+			],
+		]);
+		echo "</nav>";
+		echo '<div style="padding:20px;">';
+		$ui->heading(["text" => "Panel de contenido", "level" => 3]);
+		$ui->paragraph([
+			"text" =>
+				'El side_nav funciona como nav lateral. Se activa automáticamente al usar la clave "sidenav" en render_page().',
+			"variant" => "muted",
+		]);
+		echo "</div>";
+		echo "</div>";
+		pw_pg_section_end();
+
 		pw_pg_section("Tabs anidados");
 		$ui->card([
 			"title" => "Contenido tabulado",

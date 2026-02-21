@@ -15,6 +15,7 @@ defined("ABSPATH") || exit();
 
 $brand = $bui->config("brand");
 $has_sidebar = !empty($page["sidebar"]);
+$has_sidenav = !empty($page["sidenav"]);
 ?>
 
 <div id="pw-backend-ui-app" data-pw-theme="dark">
@@ -26,14 +27,10 @@ $has_sidebar = !empty($page["sidebar"]);
         <div class="pw-bui-header__inner">
 
             <?php
-// Logo PW
+// Logo PW — cuadrado rojo sin contenido interior
 ?>
             <a href="<?php echo esc_url(admin_url()); ?>" class="pw-bui-logo">
-                <span class="pw-bui-logo__mark" aria-hidden="true">
-                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 2h4a3 3 0 0 1 0 6H5v4H3V2zm2 4h2a1 1 0 0 0 0-2H5v2zM9.5 2H12l2.5 10H12.5L12 9.5H10L9.5 12H7.5L9.5 2zm1 5.5h1L11 4l-.5 3.5z" fill="white"/>
-                    </svg>
-                </span>
+                <span class="pw-bui-logo__mark" aria-hidden="true"></span>
                 <?php if (!empty($brand["name"])): ?>
                     <span class="pw-bui-logo__name"><?php echo esc_html(
                     	$brand["name"],
@@ -123,32 +120,76 @@ $has_sidebar = !empty($page["sidebar"]);
             </p>
         <?php endif; ?>
 
-        <div class="pw-bui-layout <?php echo $has_sidebar
-        	? "pw-bui-layout--with-sidebar"
-        	: ""; ?>">
+        <?php if ($has_sidenav): ?>
+            <?php
+        	// ── SIDENAV LAYOUT (nav lateral + contenido) ──────────
+        	?>
+            <div class="pw-bui-layout pw-bui-layout--with-sidenav">
 
-            <main class="pw-bui-layout__main" style="min-width:0;">
-                <?php if (is_callable($page["content"])) {
-                	call_user_func($page["content"], $bui);
-                } ?>
-            </main>
-
-            <?php if ($has_sidebar): ?>
-                <aside class="pw-bui-layout__sidebar" style="min-width:0;">
-                    <?php if (!empty($page["sidebar"]["title"])): ?>
-                        <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--pw-color-fg-muted);margin:0 0 10px;">
-                            <?php echo esc_html($page["sidebar"]["title"]); ?>
-                        </p>
-                    <?php endif; ?>
-                    <?php if (
-                    	is_callable($page["sidebar"]["content"] ?? null)
+                <?php
+        	// Side navigation
+        	?>
+                <nav class="pw-bui-sidenav" aria-label="Navegación secundaria">
+                    <?php if (is_callable($page["sidenav"])) {
+                    	call_user_func($page["sidenav"], $bui);
+                    } elseif (
+                    	is_array($page["sidenav"]) &&
+                    	isset($page["sidenav"]["items"])
                     ) {
-                    	call_user_func($page["sidebar"]["content"], $bui);
+                    	// Render automático desde array de items
+                    	$bui->ui()->side_nav([
+                    		"items" => $page["sidenav"]["items"],
+                    	]);
                     } ?>
-                </aside>
-            <?php endif; ?>
+                </nav>
 
-        </div>
+                <?php
+        	// Contenido principal
+        	?>
+                <div class="pw-bui-sidenav-content">
+                    <?php if (is_callable($page["content"])) {
+                    	call_user_func($page["content"], $bui);
+                    } ?>
+                </div>
+
+            </div>
+
+        <?php // ── LAYOUT NORMAL (con sidebar opcional) ──────────────
+
+        	else: ?>
+            <?php
+        	// ── LAYOUT NORMAL (con sidebar opcional) ──────────────
+        	?>
+            <div class="pw-bui-layout <?php echo $has_sidebar
+            	? "pw-bui-layout--with-sidebar"
+            	: ""; ?>">
+
+                <main class="pw-bui-layout__main" style="min-width:0;">
+                    <?php if (is_callable($page["content"])) {
+                    	call_user_func($page["content"], $bui);
+                    } ?>
+                </main>
+
+                <?php if ($has_sidebar): ?>
+                    <aside class="pw-bui-layout__sidebar" style="min-width:0;">
+                        <?php if (!empty($page["sidebar"]["title"])): ?>
+                            <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--pw-color-fg-muted);margin:0 0 10px;">
+                                <?php echo esc_html(
+                                	$page["sidebar"]["title"],
+                                ); ?>
+                            </p>
+                        <?php endif; ?>
+                        <?php if (
+                        	is_callable($page["sidebar"]["content"] ?? null)
+                        ) {
+                        	call_user_func($page["sidebar"]["content"], $bui);
+                        } ?>
+                    </aside>
+                <?php endif; ?>
+
+            </div>
+        <?php endif; ?>
+
     </div>
 
     <?php
