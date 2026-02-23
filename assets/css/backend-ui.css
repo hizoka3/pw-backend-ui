@@ -214,6 +214,11 @@
 	box-sizing: border-box;
 }
 
+/* Protección: WP admin puede sobreescribir el comportamiento nativo de [hidden] */
+#pw-backend-ui-app [hidden] {
+	display: none !important;
+}
+
 /* Headings */
 #pw-backend-ui-app h1,
 #pw-backend-ui-app h2,
