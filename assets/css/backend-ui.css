@@ -1520,3 +1520,21 @@
 #pw-backend-ui-app a.pw-bui-btn--invisible:focus {
 	color: var(--pw-color-accent-fg);
 }
+
+/* ── WP_List_Table search_box fix ───────────────────────────────────────────
+   WP genera el search input y su botón como elementos separados que flotan.
+   Dentro del layout del package el float pierde contexto — los forzamos inline.
+   ─────────────────────────────────────────────────────────────────────────── */
+#pw-backend-ui-app .search-box {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	float: right;
+	margin-bottom: 8px;
+}
+#pw-backend-ui-app .search-box input[type="search"] {
+	margin: 0;
+}
+#pw-backend-ui-app .search-box input[type="submit"] {
+	margin: 0;
+}
