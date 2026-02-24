@@ -16,7 +16,9 @@ $has_sidebar = !empty($page["sidebar"]);
 $has_sidenav = !empty($page["sidenav"]);
 ?>
 
+
 <div id="pw-backend-ui-app" data-pw-theme="dark">
+<script>try{var __pwt=localStorage.getItem('pw-bui-theme');if(__pwt==='light'||__pwt==='dark'){document.getElementById('pw-backend-ui-app').setAttribute('data-pw-theme',__pwt);}}catch(e){}</script>
 
     <?php
 // ── HEADER ───────────────────────────────────────────────
