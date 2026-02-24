@@ -191,7 +191,9 @@
 	width: calc(100% + 20px); /* recupera el espacio cancelado */
 	background: var(--pw-color-bg-default);
 	color: var(--pw-color-fg-default);
-	font-family: Roboto, "Courier New", Courier, monospace;
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
+		Arial, sans-serif;
 	font-size: 14px;
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
