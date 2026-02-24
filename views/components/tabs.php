@@ -6,6 +6,10 @@
  * Works with tab-panel.php and backend-ui.js.
  *
  * @var array $atts  Tabs attributes from ComponentRenderer::tabs().
+ *
+ * Modes:
+ *   - 'js'  (default) — <button> elements, JS toggles tab panels.
+ *   - 'url'           — <a href> elements, active tab marked server-side via 'active' => true.
  */
 
 defined("ABSPATH") || exit();
@@ -13,6 +17,8 @@ defined("ABSPATH") || exit();
 if (empty($atts["tabs"])) {
 	return;
 }
+
+$mode = $atts["mode"] ?? "js";
 ?>
 
 <nav
@@ -22,46 +28,43 @@ if (empty($atts["tabs"])) {
     style="display:flex;gap:0;"
 >
     <?php foreach ($atts["tabs"] as $tab):
+
     	$slug = $tab["slug"] ?? "";
     	$label = $tab["label"] ?? "";
     	$active = !empty($tab["active"]);
     	$count = $tab["count"] ?? null;
-    	$href = $tab["href"] ?? null; // link mode vs JS mode
 
-    	$cls = "pw-bui-tab" . ($active ? " pw-bui-tab--active" : "");
-    	$badge =
-    		$count !== null
-    			? '<span class="pw-bui-badge pw-bui-badge--default pw-bui-badge--sm" style="margin-left:4px;">' .
-    				esc_html($count) .
-    				"</span>"
-    			: "";
+    	$base_class = "pw-bui-tab" . ($active ? " pw-bui-tab--active" : "");
 
-    	if ($href):// Link mode: navegación de página completa
-    		 ?>
-        <a
-            href="<?php echo esc_url($href); ?>"
-            role="tab"
-            class="<?php echo esc_attr($cls); ?>"
-            aria-selected="<?php echo $active ? "true" : "false"; ?>"
-        ><?php
-        echo esc_html($label);
-        echo $badge;
-        ?></a>
+    	ob_start();
+    	?>
+            <?php echo esc_html($label); ?>
+            <?php if ($count !== null): ?>
+                <span class="pw-bui-badge pw-bui-badge--default pw-bui-badge--sm" style="margin-left:4px;">
+                    <?php echo esc_html($count); ?>
+                </span>
+            <?php endif; ?>
     <?php
-    		// JS mode: show/hide tab-panels
+    $inner = ob_get_clean();
 
-    		else: ?>
+    if ($mode === "url"): ?>
+        <a
+            href="<?php echo esc_url($tab["href"] ?? "#"); ?>"
+            role="tab"
+            class="<?php echo esc_attr($base_class); ?>"
+            aria-selected="<?php echo $active ? "true" : "false"; ?>"
+        ><?php echo $inner; ?></a>
+    <?php else: ?>
         <button
             type="button"
             role="tab"
-            class="<?php echo esc_attr($cls); ?>"
+            class="<?php echo esc_attr($base_class); ?>"
             data-pw-tab="<?php echo esc_attr($slug); ?>"
             aria-selected="<?php echo $active ? "true" : "false"; ?>"
             aria-controls="pw-tab-panel-<?php echo esc_attr($slug); ?>"
-        ><?php
-        echo esc_html($label);
-        echo $badge;
-        ?></button>
+        ><?php echo $inner; ?></button>
     <?php endif;
+    ?>
+    <?php
     endforeach; ?>
 </nav>
