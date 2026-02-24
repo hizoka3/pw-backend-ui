@@ -1521,25 +1521,30 @@
 	color: var(--pw-color-accent-fg);
 }
 
-/* ── WP_List_Table search_box fix ───────────────────────────────────────────
-   WP envuelve el input+botón en <p class="search-box"> que es block por defecto.
-   Lo forzamos a flex para que queden en la misma línea.
+/* ── WP_List_Table search_box + tablenav fix ────────────────────────────────
+   WP genera <p class="search-box"> con float:right seguido del .tablenav.
+   Forzamos el search-box a inline-flex y el tablenav top a overflow:hidden
+   para que contenga el float y queden visualmente alineados.
    ─────────────────────────────────────────────────────────────────────────── */
 #pw-backend-ui-app p.search-box {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	gap: 4px;
 	float: right;
-	margin: 0 0 8px 0;
+	margin: 0;
+	padding: 0;
 }
 #pw-backend-ui-app p.search-box label {
 	display: none;
 }
 #pw-backend-ui-app p.search-box input[type="search"] {
-	margin: 0;
 	float: none;
+	margin: 0;
 }
 #pw-backend-ui-app p.search-box input[type="submit"] {
-	margin: 0;
 	float: none;
+	margin: 0;
+}
+#pw-backend-ui-app .tablenav.top {
+	overflow: hidden;
 }
