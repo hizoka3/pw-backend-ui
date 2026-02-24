@@ -1,14 +1,12 @@
 <?php
 // views/layout/page-wrapper.php
+// PATCH v1.2.1: soporte tabs_mode en render_page() → pasa mode al componente tabs()
 
 /**
  * Main page wrapper layout — PW Design System.
  *
- * No border-radius on layout elements. No extra margin/padding vs WP menu.
- * Header includes the PW logo (red square) + theme toggle + right slot.
- *
  * @var array                       $page  Page config array.
- * @var \PW\BackendUI\BackendUI     $bui   BackendUI instance (passed from render_page / _render_playground).
+ * @var \PW\BackendUI\BackendUI     $bui   BackendUI instance.
  */
 
 defined("ABSPATH") || exit();
@@ -21,14 +19,11 @@ $has_sidenav = !empty($page["sidenav"]);
 <div id="pw-backend-ui-app" data-pw-theme="dark">
 
     <?php
-// ── HEADER ─────────────────────────────────────────────────────────
+// ── HEADER ───────────────────────────────────────────────
 ?>
     <header class="pw-bui-header">
         <div class="pw-bui-header__inner">
 
-            <?php
-// Logo PW — cuadrado rojo sin contenido interior
-?>
             <a href="<?php echo esc_url(admin_url()); ?>" class="pw-bui-logo">
                 <span class="pw-bui-logo__mark" aria-hidden="true"></span>
                 <?php if (!empty($brand["name"])): ?>
@@ -38,24 +33,15 @@ $has_sidenav = !empty($page["sidenav"]);
                 <?php endif; ?>
             </a>
 
-            <?php
-// Page title en el header cuando no hay logo name
-?>
             <?php if (!empty($page["title"]) && empty($brand["name"])): ?>
                 <h1 style="font-size:14px;font-weight:600;color:var(--pw-color-fg-default);margin:0;">
                     <?php echo esc_html($page["title"]); ?>
                 </h1>
             <?php endif; ?>
 
-            <?php
-// Header right slot
-?>
             <div class="pw-bui-header__right">
                 <?php do_action("pw_bui/header_right", $page); ?>
 
-                <?php
-// Theme toggle button
-?>
                 <button
                     type="button"
                     class="pw-bui-theme-toggle"
@@ -68,15 +54,9 @@ $has_sidenav = !empty($page["sidenav"]);
                     	"pw-backend-ui",
                     ); ?>"
                 >
-                    <?php
-// Moon icon (visible en dark mode)
-?>
                     <svg class="pw-bui-icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Z"/>
                     </svg>
-                    <?php
-// Sun icon (visible en light mode)
-?>
                     <svg class="pw-bui-icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm.25-9.25v-1.5a.25.25 0 0 0-.5 0v1.5a.25.25 0 0 0 .5 0Zm0 10v1.5a.25.25 0 0 0-.5 0v-1.5a.25.25 0 0 0 .5 0ZM2.75 8a.25.25 0 0 0 0-.5h-1.5a.25.25 0 0 0 0 .5ZM14 7.75a.25.25 0 0 0 0-.5h-1.5a.25.25 0 0 0 0 .5ZM4.11 4.64a.25.25 0 0 0 .35-.35l-1.06-1.06a.25.25 0 0 0-.35.35Zm7.79 7.79a.25.25 0 0 0 .35-.35l-1.06-1.06a.25.25 0 0 0-.35.35Zm.35-9.21a.25.25 0 0 0-.35-.35L10.83 4.03a.25.25 0 0 0 .35.35Zm-7.79 7.79a.25.25 0 0 0-.35-.35L3.11 11.88a.25.25 0 0 0 .35.35Z"/>
                     </svg>
@@ -90,19 +70,19 @@ $has_sidenav = !empty($page["sidenav"]);
 ?>
         <?php if (!empty($page["tabs"])): ?>
             <div class="pw-bui-tabs-nav">
-                <?php $bui->ui()->tabs(["tabs" => $page["tabs"]]); ?>
+                <?php $bui->ui()->tabs([
+                	"tabs" => $page["tabs"],
+                	"mode" => $page["tabs_mode"] ?? "js", // ← PATCH: soporte mode url
+                ]); ?>
             </div>
         <?php endif; ?>
     </header>
 
     <?php
-// ── MAIN ───────────────────────────────────────────────────────────
+// ── MAIN ───────────────────────────────────────────────────
 ?>
     <div class="pw-bui-main">
 
-        <?php
-// Page title / description cuando hay brand name (va en el body, no en el header)
-?>
         <?php if (!empty($page["title"]) && !empty($brand["name"])): ?>
             <div style="margin-bottom:20px;">
                 <h1 style="font-size:20px;font-weight:600;color:var(--pw-color-fg-default);margin:0 0 4px;">
@@ -121,14 +101,8 @@ $has_sidenav = !empty($page["sidenav"]);
         <?php endif; ?>
 
         <?php if ($has_sidenav): ?>
-            <?php
-        	// ── SIDENAV LAYOUT (nav lateral + contenido) ──────────
-        	?>
             <div class="pw-bui-layout pw-bui-layout--with-sidenav">
 
-                <?php
-        	// Side navigation
-        	?>
                 <nav class="pw-bui-sidenav" aria-label="Navegación secundaria">
                     <?php if (is_callable($page["sidenav"])) {
                     	call_user_func($page["sidenav"], $bui);
@@ -136,16 +110,12 @@ $has_sidenav = !empty($page["sidenav"]);
                     	is_array($page["sidenav"]) &&
                     	isset($page["sidenav"]["items"])
                     ) {
-                    	// Render automático desde array de items
                     	$bui->ui()->side_nav([
                     		"items" => $page["sidenav"]["items"],
                     	]);
                     } ?>
                 </nav>
 
-                <?php
-        	// Contenido principal
-        	?>
                 <div class="pw-bui-sidenav-content">
                     <?php if (is_callable($page["content"])) {
                     	call_user_func($page["content"], $bui);
@@ -154,12 +124,7 @@ $has_sidenav = !empty($page["sidenav"]);
 
             </div>
 
-        <?php // ── LAYOUT NORMAL (con sidebar opcional) ──────────────
-
-        	else: ?>
-            <?php
-        	// ── LAYOUT NORMAL (con sidebar opcional) ──────────────
-        	?>
+        <?php else: ?>
             <div class="pw-bui-layout <?php echo $has_sidebar
             	? "pw-bui-layout--with-sidebar"
             	: ""; ?>">
@@ -193,7 +158,7 @@ $has_sidenav = !empty($page["sidenav"]);
     </div>
 
     <?php
-// ── FOOTER ─────────────────────────────────────────────────────────
+// ── FOOTER ───────────────────────────────────────────────
 ?>
     <?php if (!empty($page["footer"])): ?>
         <footer class="pw-bui-footer">

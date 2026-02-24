@@ -1,6 +1,5 @@
 <?php
 // views/components/tabs.php
-
 /**
  * Tabs navigation — Primer UnderlineNav style — PW Design System.
  * Works with tab-panel.php and backend-ui.js.
@@ -11,7 +10,6 @@
  *   - 'js'  (default) — <button> elements, JS toggles tab panels.
  *   - 'url'           — <a href> elements, active tab marked server-side via 'active' => true.
  */
-
 defined("ABSPATH") || exit();
 
 if (empty($atts["tabs"])) {
