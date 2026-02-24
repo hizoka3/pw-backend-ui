@@ -1522,19 +1522,24 @@
 }
 
 /* ── WP_List_Table search_box fix ───────────────────────────────────────────
-   WP genera el search input y su botón como elementos separados que flotan.
-   Dentro del layout del package el float pierde contexto — los forzamos inline.
+   WP envuelve el input+botón en <p class="search-box"> que es block por defecto.
+   Lo forzamos a flex para que queden en la misma línea.
    ─────────────────────────────────────────────────────────────────────────── */
-#pw-backend-ui-app .search-box {
+#pw-backend-ui-app p.search-box {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	float: right;
-	margin-bottom: 8px;
+	margin: 0 0 8px 0;
 }
-#pw-backend-ui-app .search-box input[type="search"] {
-	margin: 0;
+#pw-backend-ui-app p.search-box label {
+	display: none;
 }
-#pw-backend-ui-app .search-box input[type="submit"] {
+#pw-backend-ui-app p.search-box input[type="search"] {
 	margin: 0;
+	float: none;
+}
+#pw-backend-ui-app p.search-box input[type="submit"] {
+	margin: 0;
+	float: none;
 }
