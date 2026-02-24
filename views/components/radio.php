@@ -11,10 +11,7 @@
 defined("ABSPATH") || exit();
 
 $radio_id =
-	"pw-radio-" .
-	sanitize_title($atts["name"]) .
-	"-" .
-	sanitize_title($atts["value"]);
+	sanitize_title($atts["name"]) . "-" . sanitize_title($atts["value"]);
 ?>
 
 <div class="pw-bui-radio-item <?php echo esc_attr($atts["class"] ?? ""); ?>">

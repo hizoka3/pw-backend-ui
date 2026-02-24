@@ -11,7 +11,7 @@
 defined("ABSPATH") || exit();
 
 $has_error = !empty($atts["error"]);
-$input_id = "pw-input-" . sanitize_title($atts["name"]);
+$input_id = sanitize_title($atts["name"]);
 $classes = implode(
 	" ",
 	array_filter([

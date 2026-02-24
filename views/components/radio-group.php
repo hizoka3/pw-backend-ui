@@ -24,7 +24,6 @@ defined("ABSPATH") || exit(); ?>
             <div class="pw-bui-radio-group">
                 <?php foreach ($atts["options"] ?? [] as $option):
                 	$radio_id =
-                		"pw-radio-" .
                 		sanitize_title($atts["name"]) .
                 		"-" .
                 		sanitize_title($option["value"] ?? ""); ?>
@@ -66,7 +65,6 @@ defined("ABSPATH") || exit(); ?>
         <div class="pw-bui-radio-group">
             <?php foreach ($atts["options"] ?? [] as $option):
             	$radio_id =
-            		"pw-radio-" .
             		sanitize_title($atts["name"]) .
             		"-" .
             		sanitize_title($option["value"] ?? ""); ?>

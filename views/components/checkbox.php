@@ -9,8 +9,7 @@
 
 defined("ABSPATH") || exit();
 
-$checkbox_id =
-	"pw-checkbox-" . sanitize_title($atts["name"]) . "-" . wp_rand(1000, 9999);
+$checkbox_id = sanitize_title($atts["name"]) . "-" . wp_rand(1000, 9999);
 ?>
 
 <div class="pw-bui-form-group">

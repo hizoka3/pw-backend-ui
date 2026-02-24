@@ -10,7 +10,7 @@
 defined("ABSPATH") || exit();
 
 $has_error = !empty($atts["error"]);
-$textarea_id = "pw-textarea-" . sanitize_title($atts["name"]);
+$textarea_id = sanitize_title($atts["name"]);
 $classes = implode(
 	" ",
 	array_filter([

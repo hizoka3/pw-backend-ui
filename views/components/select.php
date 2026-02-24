@@ -10,7 +10,7 @@
 defined("ABSPATH") || exit();
 
 $has_error = !empty($atts["error"]);
-$select_id = "pw-select-" . sanitize_title($atts["name"]);
+$select_id = sanitize_title($atts["name"]);
 $classes = implode(
 	" ",
 	array_filter([
