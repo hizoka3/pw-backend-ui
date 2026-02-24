@@ -530,13 +530,6 @@
 	font-family: inherit;
 }
 
-a.pw-bui-btn:hover,
-a.pw-bui-btn:focus,
-a.pw-bui-btn:active,
-a.pw-bui-btn:visited {
-	color: inherit;
-	text-decoration: none;
-}
 .pw-bui-btn:focus-visible {
 	outline: 2px solid var(--pw-color-accent-fg);
 	outline-offset: 2px;
@@ -1488,4 +1481,42 @@ a.pw-bui-btn:visited {
 	transition:
 		opacity 0.2s ease-out,
 		transform 0.2s ease-out;
+}
+
+/* ── WP admin color override fix ────────────────────────────────────────────
+   WP admin stylesheet pisa el color de <a> en :hover con mayor especificidad.
+   Se repite el color explícito en cada variante para ganar la cascada.
+   ─────────────────────────────────────────────────────────────────────────── */
+#pw-backend-ui-app a.pw-bui-btn {
+	text-decoration: none;
+}
+#pw-backend-ui-app a.pw-bui-btn--primary,
+#pw-backend-ui-app a.pw-bui-btn--primary:hover,
+#pw-backend-ui-app a.pw-bui-btn--primary:focus {
+	color: #ffffff;
+}
+#pw-backend-ui-app a.pw-bui-btn--danger,
+#pw-backend-ui-app a.pw-bui-btn--danger:hover,
+#pw-backend-ui-app a.pw-bui-btn--danger:focus {
+	color: #ffffff;
+}
+#pw-backend-ui-app a.pw-bui-btn--secondary,
+#pw-backend-ui-app a.pw-bui-btn--secondary:hover,
+#pw-backend-ui-app a.pw-bui-btn--secondary:focus {
+	color: var(--pw-color-fg-default);
+}
+#pw-backend-ui-app a.pw-bui-btn--outline,
+#pw-backend-ui-app a.pw-bui-btn--outline:hover,
+#pw-backend-ui-app a.pw-bui-btn--outline:focus {
+	color: var(--pw-color-fg-default);
+}
+#pw-backend-ui-app a.pw-bui-btn--ghost,
+#pw-backend-ui-app a.pw-bui-btn--ghost:hover,
+#pw-backend-ui-app a.pw-bui-btn--ghost:focus {
+	color: var(--pw-color-fg-default);
+}
+#pw-backend-ui-app a.pw-bui-btn--invisible,
+#pw-backend-ui-app a.pw-bui-btn--invisible:hover,
+#pw-backend-ui-app a.pw-bui-btn--invisible:focus {
+	color: var(--pw-color-accent-fg);
 }
