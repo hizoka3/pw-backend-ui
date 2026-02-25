@@ -111,17 +111,12 @@
 			this.classList.add("pw-bui-tab--active");
 			this.setAttribute("aria-selected", "true");
 
-			// Show/hide only the panels controlled by THIS tablist (via aria-controls)
-			tabNav
-				.querySelectorAll("[data-pw-tab][aria-controls]")
-				.forEach(function (tab) {
-					var panelId = tab.getAttribute("aria-controls");
-					var panel = document.getElementById(panelId);
-					if (!panel) return;
-					var isTarget = tab.getAttribute("data-pw-tab") === slug;
-					panel.hidden = !isTarget;
-					panel.setAttribute("aria-hidden", String(!isTarget));
-				});
+			// Show/hide panels
+			$$("[data-pw-tab-panel]").forEach(function (panel) {
+				const isTarget = panel.getAttribute("data-pw-tab-panel") === slug;
+				panel.hidden = !isTarget;
+				panel.setAttribute("aria-hidden", String(!isTarget));
+			});
 
 			document.dispatchEvent(
 				new CustomEvent("pw-bui:tab-changed", {
@@ -448,6 +443,8 @@
 	}
 
 	// =========================================================================
+
+	// =========================================================================
 	// INIT
 	// =========================================================================
 
@@ -458,6 +455,7 @@
 		initToggles();
 		initDismissible();
 		initTooltips();
+		initWizard();
 
 		document.dispatchEvent(new CustomEvent("pw-bui:ready"));
 	}
