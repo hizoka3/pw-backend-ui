@@ -253,6 +253,201 @@
 	}
 
 	// =========================================================================
+	// WIZARD (Stepper multi-step forms)
+	// =========================================================================
+	//
+	// Estructura HTML esperada:
+	//
+	//   [data-pw-stepper]          → el componente stepper (indicador visual)
+	//     [data-pw-step="slug"]    → item de paso individual
+	//
+	//   [data-pw-wizard]           → el form wrapper
+	//     [data-pw-wizard-step="slug"]       → panel de contenido del paso
+	//     [data-pw-wizard-next]              → botón avanzar
+	//     [data-pw-wizard-prev]              → botón retroceder
+	//     [data-pw-wizard-submit]            → botón submit (solo en último paso)
+	//
+	// Validación automática:
+	//   - Antes de avanzar, se validan todos los [required] visibles del paso actual.
+	//   - Si falla, se muestra un mensaje de error nativo del browser (reportValidity).
+	//   - Hacia atrás no requiere validación.
+	//
+	// Evento disparado al cambiar de paso:
+	//   pw-bui:wizard-step-changed → { detail: { from, to, index } }
+
+	function initWizard() {
+		const wizards = document.querySelectorAll("[data-pw-wizard]");
+		if (!wizards.length) return;
+
+		wizards.forEach(function (wizard) {
+			const steps = Array.from(
+				wizard.querySelectorAll("[data-pw-wizard-step]"),
+			);
+			const stepper = wizard.closest(".pw-bui-page-wrapper")
+				? wizard
+						.closest(".pw-bui-page-wrapper")
+						.querySelector("[data-pw-stepper]")
+				: document.querySelector("[data-pw-stepper]");
+
+			let currentIndex = 0;
+
+			// Muestra el paso en el índice dado, oculta el resto.
+			function goTo(targetIndex) {
+				if (targetIndex < 0 || targetIndex >= steps.length) return;
+
+				const fromSlug = steps[currentIndex].getAttribute(
+					"data-pw-wizard-step",
+				);
+				const toSlug = steps[targetIndex].getAttribute("data-pw-wizard-step");
+
+				// Ocultar todos los paneles
+				steps.forEach(function (panel) {
+					panel.hidden = true;
+				});
+
+				// Mostrar el target
+				steps[targetIndex].hidden = false;
+				currentIndex = targetIndex;
+
+				// Actualizar botones de navegación
+				updateNavButtons();
+
+				// Sincronizar stepper visual
+				if (stepper) {
+					syncStepper(stepper, steps, currentIndex);
+				}
+
+				document.dispatchEvent(
+					new CustomEvent("pw-bui:wizard-step-changed", {
+						detail: { from: fromSlug, to: toSlug, index: currentIndex },
+					}),
+				);
+			}
+
+			// Valida los campos required del paso actual.
+			function validateCurrentStep() {
+				const currentPanel = steps[currentIndex];
+				const fields = Array.from(
+					currentPanel.querySelectorAll("[required]"),
+				).filter(function (el) {
+					// Solo campos visibles y no deshabilitados
+					return !el.disabled && el.offsetParent !== null;
+				});
+
+				for (const field of fields) {
+					if (!field.checkValidity()) {
+						field.reportValidity();
+						return false;
+					}
+				}
+
+				// Validación extra: al menos un checkbox si el step lo requiere
+				const checkGroup = currentPanel.querySelector(
+					"[data-pw-wizard-require-check]",
+				);
+				if (checkGroup) {
+					const checked = checkGroup.querySelectorAll(
+						'input[type="checkbox"]:checked',
+					);
+					if (!checked.length) {
+						// Mostrar error personalizado dentro del grupo
+						let errEl = checkGroup.querySelector(".pw-bui-wizard-check-error");
+						if (!errEl) {
+							errEl = document.createElement("p");
+							errEl.className = "pw-bui-wizard-check-error";
+							errEl.style.cssText =
+								"color:var(--pw-color-danger-fg);font-size:13px;margin:8px 0 0;";
+							checkGroup.appendChild(errEl);
+						}
+						errEl.textContent =
+							checkGroup.getAttribute("data-pw-wizard-require-check") ||
+							"Debes seleccionar al menos un ítem.";
+						return false;
+					} else {
+						// Limpiar error si existe
+						const errEl = checkGroup.querySelector(
+							".pw-bui-wizard-check-error",
+						);
+						if (errEl) errEl.remove();
+					}
+				}
+
+				return true;
+			}
+
+			// Muestra / oculta botones según el paso actual.
+			function updateNavButtons() {
+				const btnPrev = wizard.querySelector("[data-pw-wizard-prev]");
+				const btnNext = wizard.querySelector("[data-pw-wizard-next]");
+				const btnSubmit = wizard.querySelector("[data-pw-wizard-submit]");
+				const isLast = currentIndex === steps.length - 1;
+				const isFirst = currentIndex === 0;
+
+				if (btnPrev) btnPrev.style.display = isFirst ? "none" : "";
+				if (btnNext) btnNext.style.display = isLast ? "none" : "";
+				if (btnSubmit) btnSubmit.style.display = isLast ? "" : "none";
+			}
+
+			// Avanzar
+			wizard.addEventListener("click", function (e) {
+				if (!e.target.closest("[data-pw-wizard-next]")) return;
+				e.preventDefault();
+				if (validateCurrentStep()) {
+					goTo(currentIndex + 1);
+				}
+			});
+
+			// Retroceder
+			wizard.addEventListener("click", function (e) {
+				if (!e.target.closest("[data-pw-wizard-prev]")) return;
+				e.preventDefault();
+				goTo(currentIndex - 1);
+			});
+
+			// Init: mostrar solo el primer paso
+			goTo(0);
+		});
+	}
+
+	// Sincroniza el stepper visual con el paso actual.
+	function syncStepper(stepper, steps, currentIndex) {
+		const items = Array.from(stepper.querySelectorAll("[data-pw-step]"));
+
+		items.forEach(function (item, i) {
+			item.classList.remove(
+				"pw-bui-stepper__item--active",
+				"pw-bui-stepper__item--done",
+				"pw-bui-stepper__item--pending",
+			);
+
+			let state;
+			if (i < currentIndex) state = "done";
+			else if (i === currentIndex) state = "active";
+			else state = "pending";
+
+			item.classList.add("pw-bui-stepper__item--" + state);
+
+			// Swap número por checkmark cuando done
+			const indicator = item.querySelector(".pw-bui-stepper__indicator");
+			if (!indicator) return;
+
+			if (state === "done") {
+				indicator.innerHTML =
+					'<span class="pw-bui-stepper__icon" aria-hidden="true">' +
+					'<svg width="14" height="14" viewBox="0 0 16 16" fill="none">' +
+					'<path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+					"</svg></span>";
+			} else {
+				const num = i + 1;
+				indicator.innerHTML =
+					'<span class="pw-bui-stepper__number" aria-hidden="true">' +
+					num +
+					"</span>";
+			}
+		});
+	}
+
+	// =========================================================================
 	// INIT
 	// =========================================================================
 

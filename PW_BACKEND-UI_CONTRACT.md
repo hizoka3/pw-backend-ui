@@ -1,6 +1,6 @@
 # Package: pw/backend-ui
 
-**Versión:** 1.2.0
+**Versión:** 1.3.0
 **Namespace:** `PW\BackendUI`
 **Propósito:** Sistema de diseño compartido para el backend (admin) de plugins WordPress del ecosistema PW. Inspirado en Primer (GitHub). Tema dark por defecto, con soporte light switcheable desde el header. Paleta de colores PW. Sin Tailwind CDN — CSS puro con custom properties.
 
@@ -10,13 +10,22 @@
 
 ```json
 "require": {
-    "pw/backend-ui": "^1.1"
+    "pw/backend-ui": "^1.3"
 }
 ```
 
 > Requiere que el plugin llame `BackendUI::init($config)` en el hook `plugins_loaded` o posterior.
 
 ---
+
+## Cambios en v1.3.0
+
+- **`tabs()` soporta `mode: 'url'`**: nuevo parámetro `mode` en el componente tabs. `'js'` (default) = `<button>` con toggle JS. `'url'` = `<a href>` para navegación server-side. Activar pasando `'active' => true` en el tab correspondiente server-side.
+- **`render_page()` acepta `tabs_mode`**: nueva key `tabs_mode` en el array de `render_page()` que se pasa directo al componente `tabs()`. Default `'js'`. Usar `'url'` para tabs de navegación por URL.
+- **`button()` soporta `href`**: cuando se pasa `href`, el componente renderiza `<a href>` en lugar de `<button>`. Soporta también `target`. Sin `href` el comportamiento es idéntico al anterior.
+- **Anti-flash de tema**: `page-wrapper.php` incluye un script inline bloqueante inmediatamente después del `<div id="pw-backend-ui-app">` que lee `localStorage` y aplica el tema guardado antes del primer paint, eliminando el flash dark→light en recarga.
+- **CSS fix — hover color en `<a>.pw-bui-btn`**: el CSS de WP admin pisaba el `color` de los `<a>` en `:hover`. Se agregaron reglas con mayor especificidad en `backend-ui.css` para todos los variantes de botón.
+- **CSS fix — `WP_List_Table` search_box**: `WP_List_Table::search_box()` genera `<p class="search-box">` que es `display:block` por defecto. Se agrega `display:inline-flex` al `<p>` y `overflow:hidden` al `.tablenav.top` para que input y botón queden en la misma línea.
 
 ## Cambios en v1.2.0
 
@@ -58,7 +67,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 | `init()` | `array $config` | `self` | Inicializa el design system (singleton) |
 | `ui()` | — | `ComponentRenderer` | Accede al renderer de componentes |
 | `config()` | `?string $key` | `mixed` | Obtiene toda la config o un valor específico |
-| `render_page()` | `array $page` | `void` | Renderiza página completa con layout. Keys: `title`, `description`, `tabs`, `content`, `sidenav`, `sidebar`, `footer` |
+| `render_page()` | `array $page` | `void` | Renderiza página completa con layout. Keys: `title`, `description`, `tabs`, `tabs_mode`, `content`, `sidenav`, `sidebar`, `footer` |
 | `playground()` | `array $opts` | `void` | Registra página de dev con todos los componentes |
 | `reset()` | — | `void` | Resetea el singleton (para testing) |
 
@@ -67,7 +76,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 #### Acciones / Botones
 | Método | Descripción |
 |--------|-------------|
-| `button()` | Botón: primary, secondary, outline, ghost, danger, invisible |
+| `button()` | Botón: primary, secondary, outline, ghost, danger, invisible. Acepta `href` → renderiza `<a>`. |
 
 #### Formularios
 | Método | Descripción |
@@ -108,7 +117,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 #### Navegación
 | Método | Descripción |
 |--------|-------------|
-| `tabs()` | Navegación UnderlineNav (estilo Primer) con soporte de contador |
+| `tabs()` | Navegación UnderlineNav (estilo Primer). Soporta `count` y `mode` (`'js'` default \| `'url'`) |
 | `tab_panel()` | Panel de contenido asociado a un tab |
 | `breadcrumbs()` | Migas de pan |
 | `pagination()` | Control de paginación con gaps |
@@ -121,12 +130,12 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 ```php
 [
     'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/', // requerido
-    'version'    => '1.1.0',
+    'version'    => '1.3.0',
     'screens'    => ['toplevel_page_mi-plugin'],  // requerido — screen IDs de WP
     'slug'       => 'pw-backend-ui',              // prefijo para handles de assets
     'brand'      => [
         'name'     => 'Mi Plugin',                // nombre mostrado junto al logo PW
-        'logo_url' => '',                         // no usado en v1.1 (logo es el cuadrado rojo PW)
+        'logo_url' => '',                         // no usado (logo es el cuadrado rojo PW)
     ],
 ]
 ```
@@ -151,7 +160,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 |--------|----------|-------------|
 | `pw-bui:ready` | — | El JS se ha inicializado |
 | `pw-bui:theme-changed` | `{ theme }` | Se cambió el tema ('dark' \| 'light') |
-| `pw-bui:tab-changed` | `{ slug }` | Se cambió de pestaña |
+| `pw-bui:tab-changed` | `{ slug }` | Se cambió de pestaña (solo mode `'js'`) |
 | `pw-bui:toggle-changed` | `{ name, checked, value }` | Se cambió un toggle switch |
 | `pw-bui:segment-changed` | `{ name, value }` | Se cambió una opción en segmented control |
 
@@ -166,6 +175,8 @@ El tema se controla mediante el atributo `data-pw-theme` en el wrapper `#pw-back
 
 El botón de toggle en el header cambia el tema y persiste la preferencia en `localStorage` bajo la clave `pw-bui-theme`.
 
+Un script inline bloqueante en `page-wrapper.php` aplica el tema guardado **antes del primer paint** para evitar el flash dark→light en recarga. No requiere configuración adicional.
+
 Para escuchar cambios de tema desde un plugin:
 
 ```js
@@ -173,6 +184,83 @@ document.addEventListener('pw-bui:theme-changed', function(e) {
     console.log('Nuevo tema:', e.detail.theme); // 'dark' | 'light'
 });
 ```
+
+---
+
+## Tabs — modos de navegación
+
+### Modo JS (default)
+Tabs client-side. El JS del package muestra/oculta `tab_panel()` al hacer click.
+
+```php
+$bui->render_page([
+    'tabs' => [
+        [ 'slug' => 'general',  'label' => 'General',  'active' => true ],
+        [ 'slug' => 'advanced', 'label' => 'Avanzado' ],
+    ],
+    // tabs_mode no requerido — default 'js'
+    'content' => function( $bui ) {
+        $bui->ui()->tab_panel([ 'slug' => 'general',  'active' => true, 'content' => fn() => '...' ]);
+        $bui->ui()->tab_panel([ 'slug' => 'advanced', 'content' => fn() => '...' ]);
+    },
+]);
+```
+
+### Modo URL
+Tabs server-side. Cada tab es un `<a href>`. El tab activo se marca con `'active' => true` desde PHP según el parámetro de URL. No usa `tab_panel()`.
+
+```php
+$tab = sanitize_key( $_GET['tab'] ?? 'datos' );
+
+$bui->render_page([
+    'tabs'      => [
+        [ 'slug' => 'datos',     'label' => 'Datos',     'href' => add_query_arg('tab', 'datos',     $base_url), 'active' => $tab === 'datos' ],
+        [ 'slug' => 'clases',    'label' => 'Clases',    'href' => add_query_arg('tab', 'clases',    $base_url), 'active' => $tab === 'clases' ],
+        [ 'slug' => 'preguntas', 'label' => 'Preguntas', 'href' => add_query_arg('tab', 'preguntas', $base_url), 'active' => $tab === 'preguntas' ],
+    ],
+    'tabs_mode' => 'url',
+    'content'   => function( $bui ) use ( $tab ) {
+        if ( $tab === 'datos' )     { /* render datos */ }
+        if ( $tab === 'clases' )    { /* render clases */ }
+        if ( $tab === 'preguntas' ) { /* render preguntas */ }
+    },
+]);
+```
+
+---
+
+## `button()` — soporte href
+
+Cuando se pasa `href`, el componente renderiza `<a>` en lugar de `<button>`. Útil para CTAs de navegación dentro del design system sin romper los estilos.
+
+```php
+// Renderiza <a href="...">
+$ui->button([
+    'label'   => 'Agregar empresa',
+    'href'    => admin_url('admin.php?page=imec-empresas&action=new'),
+    'variant' => 'primary',
+]);
+
+// Renderiza <button type="submit">
+$ui->button([
+    'label'   => 'Guardar',
+    'type'    => 'submit',
+    'variant' => 'primary',
+]);
+```
+
+| Key | Aplica a | Descripción |
+|-----|----------|-------------|
+| `href` | `<a>` | URL de destino. Si está presente, renderiza `<a>`. |
+| `target` | `<a>` | Atributo target (`_blank`, etc.) |
+| `type` | `<button>` | `button` (default), `submit`, `reset` |
+| `variant` | ambos | `primary`, `secondary`, `outline`, `ghost`, `danger`, `invisible` |
+| `label` | ambos | Texto del botón |
+| `icon` | ambos | HTML/SVG antes del label |
+| `disabled` | `<button>` | Solo aplica en `<button>` |
+| `style` | ambos | Estilos inline adicionales |
+| `class` | ambos | Clases CSS adicionales |
+| `attrs` | ambos | Array de atributos HTML adicionales |
 
 ---
 
@@ -190,6 +278,25 @@ Todos los tokens cambian automáticamente según el tema. Se recomienda usar sie
 | `--pw-color-fg-muted` | `#6d6d6d` | `#57606a` | Texto secundario |
 | `--pw-color-border-default` | `#161616` | `#d0d7de` | Líneas divisoras |
 | `--pw-color-accent-fg` | `#ff0000` | `#ff0000` | Rojo PW (brand) |
+
+---
+
+## Compatibilidad con WP_List_Table
+
+El package incluye CSS específico para que `WP_List_Table` funcione correctamente dentro del layout de `#pw-backend-ui-app`.
+
+**Search box:** `WP_List_Table::search_box()` genera `<p class="search-box">` con `float:right`. El package lo convierte a `inline-flex` para que input y botón queden en la misma línea.
+
+**Uso estándar:**
+```php
+echo '<form method="get" style="overflow:hidden;">';
+echo '<input type="hidden" name="page" value="mi-pagina">';
+$table->search_box( 'Buscar', 'mi-tabla' );
+$table->display();
+echo '</form>';
+```
+
+> El `overflow:hidden` en el form es necesario como clearfix para contener el float del search-box.
 
 ---
 
@@ -213,10 +320,11 @@ BackendUI::playground([
 **Importante:** `playground()` debe llamarse después de `init()`. Es idempotente (seguro llamarlo múltiples veces).
 
 **Contenido del playground:**
-- Tab "Botones & Badges": variantes, tamaños, con iconos, disabled, badges
+- Tab "Botones & Badges": variantes, tamaños, con iconos, disabled, badges, botones con href
 - Tab "Formularios": inputs, textarea, select, date, checkbox, toggle, radio group, segmented control
 - Tab "Feedback": notices, spinner, progress bar, skeleton, tooltip
-- Tab "Navegación": breadcrumbs, side_nav, tabs anidados, paginación
+- Tab "Navegación": breadcrumbs, side_nav, tabs JS, tabs URL, paginación
+- Tab "Tipo & Layout": headings, paragraphs, links, cards, separator
 
 ---
 
@@ -254,7 +362,6 @@ También acepta callable en lugar de array: `'sidenav' => function($bui) { $bui-
 | `data` | string | Valor del atributo `data-pw-sidenav` |
 | `group` | string | Si existe, renderiza como encabezado de grupo |
 | `separator` | true | Renderiza línea divisoria horizontal |
-- Tab "Tipo & Layout": headings, paragraphs, links, cards, separator
 
 ---
 
@@ -263,13 +370,11 @@ También acepta callable en lugar de array: `'sidenav' => function($bui) { $bui-
 ### Lo mínimo que el plugin debe hacer
 
 ```php
-// 1. Inicializar en plugins_loaded
-add_action( 'plugins_loaded', function() {
-    BackendUI::init([
-        'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'screens'    => [ 'toplevel_page_mi-plugin-settings' ],
-    ]);
-});
+// 1. Inicializar — puede ser directo en el archivo principal o en plugins_loaded
+BackendUI::init([
+    'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
+    'screens'    => [ 'toplevel_page_mi-plugin-settings' ],
+]);
 
 // 2. Registrar la página de admin
 add_action( 'admin_menu', function() {
@@ -298,107 +403,73 @@ function mi_plugin_render_page() {
 
 - El package **NO** persiste datos — solo renderiza UI. El plugin guarda/recupera settings.
 - El package **NO** registra páginas de admin — el plugin crea las páginas con `add_menu_page`.
-- **Sin Tailwind CDN** en v1.1. Todos los estilos están en `backend-ui.css`.
+- **Sin Tailwind CDN**. Todos los estilos están en `backend-ui.css`.
 - El layout **no tiene border-radius** ni márgenes extra vs. el menú de WP.
 - `screens` vacío = assets NO se cargan en ninguna pantalla (opt-in explícito).
 - No tiene dependencias de jQuery.
 - PHP mínimo: 8.0. WordPress mínimo: 6.0.
+- Los tabs en `mode: 'url'` **no usan `tab_panel()`** — el contenido lo controla PHP según el parámetro GET.
+- El componente `button()` con `href` no soporta `disabled` (comportamiento nativo de `<a>`).
 
 ---
 
-## Ejemplo de uso completo (v1.1)
+## Ejemplo de uso completo (v1.3)
 
 ```php
 use PW\BackendUI\BackendUI;
 
-add_action( 'plugins_loaded', function() {
-    BackendUI::init([
-        'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'version'    => '1.1.0',
-        'screens'    => [ 'toplevel_page_mi-plugin' ],
-        'brand'      => [ 'name' => 'Mi Plugin Pro' ],
-    ]);
+// Inicializar (dentro de is_admin() o directo)
+BackendUI::init([
+    'assets_url' => IMEC_CAPACITA_URL . 'vendor/pw/backend-ui/assets/',
+    'version'    => '1.3.0',
+    'screens'    => [
+        'toplevel_page_mi-plugin',
+        'mi-plugin_page_mi-subpagina',
+    ],
+    'brand' => [ 'name' => 'Mi Plugin Pro' ],
+]);
 
-    if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-        BackendUI::playground();
-    }
-});
+// Página con tabs URL (server-side)
+function mi_plugin_page_editor() {
+    $tab      = sanitize_key( $_GET['tab'] ?? 'datos' );
+    $item_id  = absint( $_GET['item_id'] ?? 0 );
+    $base_url = add_query_arg( [ 'page' => 'mi-plugin', 'action' => 'edit', 'item_id' => $item_id ], admin_url( 'admin.php' ) );
 
-add_action( 'admin_menu', function() {
-    add_menu_page( 'Mi Plugin', 'Mi Plugin', 'manage_options', 'mi-plugin', 'mi_plugin_page' );
-});
-
-function mi_plugin_page() {
     BackendUI::init()->render_page([
-        'title'       => 'Configuración',
-        'description' => 'Ajustes generales del plugin.',
-        'tabs'        => [
-            [ 'slug' => 'general',  'label' => 'General',  'active' => true ],
-            [ 'slug' => 'advanced', 'label' => 'Avanzado' ],
+        'title'      => 'Editar item',
+        'tabs'       => [
+            [ 'slug' => 'datos',    'label' => 'Datos',    'href' => add_query_arg( 'tab', 'datos',    $base_url ), 'active' => $tab === 'datos' ],
+            [ 'slug' => 'relacion', 'label' => 'Relación', 'href' => add_query_arg( 'tab', 'relacion', $base_url ), 'active' => $tab === 'relacion' ],
         ],
-        'content' => function( $bui ) {
+        'tabs_mode'  => 'url',
+        'content'    => function( $bui ) use ( $tab ) {
             $ui = $bui->ui();
 
-            $ui->tab_panel([
-                'slug'   => 'general',
-                'active' => true,
-                'content' => function() use ( $ui ) {
-                    $ui->card([
-                        'title'   => 'Ajustes básicos',
-                        'content' => function() use ( $ui ) {
-                            $ui->input([
-                                'name'  => 'site_name',
-                                'label' => 'Nombre del sitio',
-                                'value' => get_option( 'mi_plugin_site_name', '' ),
-                                'help'  => 'Se mostrará en el header.',
-                            ]);
-                            $ui->toggle([
-                                'name'    => 'enabled',
-                                'label'   => 'Activar funcionalidad',
-                                'checked' => (bool) get_option( 'mi_plugin_enabled', false ),
-                            ]);
-                        },
-                        'footer' => function() use ( $ui ) {
-                            $ui->button([ 'label' => 'Guardar', 'type' => 'submit' ]);
-                        },
-                    ]);
-                },
+            $ui->breadcrumbs([
+                'items' => [
+                    [ 'label' => 'Items', 'href' => admin_url( 'admin.php?page=mi-plugin' ) ],
+                    [ 'label' => 'Editar' ],
+                ],
             ]);
 
-            $ui->tab_panel([
-                'slug'    => 'advanced',
-                'content' => function() use ( $ui ) {
-                    $ui->notice([ 'type' => 'warning', 'message' => 'Ajustes para usuarios avanzados.' ]);
-                    $ui->card([
-                        'title'   => 'Configuración avanzada',
-                        'content' => function() use ( $ui ) {
-                            $ui->radio_group([
-                                'name'    => 'cache_strategy',
-                                'label'   => 'Estrategia de caché',
-                                'value'   => get_option( 'mi_plugin_cache', 'auto' ),
-                                'options' => [
-                                    [ 'value' => 'none', 'label' => 'Sin caché' ],
-                                    [ 'value' => 'auto', 'label' => 'Automático', 'help' => 'Recomendado.' ],
-                                    [ 'value' => 'full', 'label' => 'Completo' ],
-                                ],
-                            ]);
-                        },
-                    ]);
-                },
-            ]);
-        },
-        'sidebar' => [
-            'title'   => 'Información',
-            'content' => function( $bui ) {
-                $ui = $bui->ui();
+            if ( $tab === 'datos' ) {
                 $ui->card([
+                    'title'   => 'Datos principales',
                     'content' => function() use ( $ui ) {
-                        $ui->paragraph([ 'text' => 'Mi Plugin Pro v1.0.0' ]);
-                        $ui->link([ 'label' => 'Documentación ↗', 'href' => 'https://docs.miplugin.com', 'target' => '_blank' ]);
+                        $ui->input([ 'name' => 'nombre', 'label' => 'Nombre', 'required' => true ]);
+                        $ui->textarea([ 'name' => 'descripcion', 'label' => 'Descripción' ]);
+                    },
+                    'footer' => function() use ( $ui ) {
+                        $ui->button([ 'label' => 'Guardar', 'type' => 'submit', 'variant' => 'primary' ]);
+                        $ui->button([ 'label' => 'Cancelar', 'href' => admin_url( 'admin.php?page=mi-plugin' ), 'variant' => 'secondary' ]);
                     },
                 ]);
-            },
-        ],
+            }
+
+            if ( $tab === 'relacion' ) {
+                // contenido tab relación
+            }
+        },
     ]);
 }
 ```

@@ -691,4 +691,34 @@ class ComponentRenderer
 		]);
 		include __DIR__ . "/../../views/components/side-nav.php";
 	}
+
+	// =========================================================================
+	// STEPPER / WIZARD
+	// =========================================================================
+
+	/**
+	 * Render a step progress indicator for multi-step forms (wizard).
+	 *
+	 * Works with the wizard JS logic in backend-ui.js:
+	 *   - Advancing a step marks the previous as 'done' and activates the next.
+	 *   - Navigation backwards is always allowed; forward requires JS validation.
+	 *
+	 * @param array $atts {
+	 *     @type array  $steps  Required. Array of step definitions:
+	 *                          [
+	 *                            [ 'slug' => string, 'label' => string, 'state' => 'pending|active|done' ],
+	 *                            ...
+	 *                          ]
+	 *                          The first step should have state 'active', the rest 'pending'.
+	 *     @type string $class  Additional CSS classes.
+	 * }
+	 */
+	public function stepper(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"steps" => [],
+			"class" => "",
+		]);
+		include __DIR__ . "/../../views/components/stepper.php";
+	}
 }

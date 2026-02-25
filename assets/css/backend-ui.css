@@ -1548,3 +1548,132 @@
 #pw-backend-ui-app .tablenav.top {
 	overflow: hidden;
 }
+
+/* ── STEPPER / WIZARD ── */
+
+.pw-bui-stepper {
+	display: flex;
+	align-items: flex-start;
+	gap: 0;
+	margin-bottom: 32px;
+}
+
+/* Item: el contenedor de cada paso */
+.pw-bui-stepper__item {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	gap: 10px;
+	position: relative;
+	min-width: 0;
+}
+
+/* Último item no crece — el conector lo ocupa */
+.pw-bui-stepper__item:last-child {
+	flex: 0 0 auto;
+}
+
+/* Círculo indicador */
+.pw-bui-stepper__indicator {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	border: 2px solid var(--pw-color-border-emphasis);
+	background: var(--pw-color-bg-inset);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease;
+}
+
+.pw-bui-stepper__number,
+.pw-bui-stepper__icon {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--pw-color-fg-muted);
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.2s ease;
+}
+
+/* Label */
+.pw-bui-stepper__label {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--pw-color-fg-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: color 0.2s ease;
+}
+
+/* Línea conectora entre pasos */
+.pw-bui-stepper__connector {
+	flex: 1;
+	height: 2px;
+	background: var(--pw-color-border-emphasis);
+	margin: 0 8px;
+	flex-shrink: 0;
+	transition: background 0.3s ease;
+}
+
+/* ── ESTADOS ── */
+
+/* Activo */
+.pw-bui-stepper__item--active .pw-bui-stepper__indicator {
+	border-color: var(--pw-color-accent-fg);
+	background: var(--pw-color-accent-subtle);
+}
+
+.pw-bui-stepper__item--active .pw-bui-stepper__number {
+	color: var(--pw-color-accent-fg);
+}
+
+.pw-bui-stepper__item--active .pw-bui-stepper__label {
+	color: var(--pw-color-fg-default);
+	font-weight: 600;
+}
+
+/* Completado */
+.pw-bui-stepper__item--done .pw-bui-stepper__indicator {
+	border-color: var(--pw-color-success-emphasis);
+	background: var(--pw-color-success-emphasis);
+}
+
+.pw-bui-stepper__item--done .pw-bui-stepper__icon {
+	color: var(--pw-color-fg-onEmphasis);
+}
+
+.pw-bui-stepper__item--done .pw-bui-stepper__label {
+	color: var(--pw-color-fg-muted);
+}
+
+/* Conector activo (entre done y active) */
+.pw-bui-stepper__item--done .pw-bui-stepper__connector {
+	background: var(--pw-color-success-emphasis);
+}
+
+/* Pendiente (default — sin cambios extra, ya está en los valores base) */
+.pw-bui-stepper__item--pending .pw-bui-stepper__label {
+	color: var(--pw-color-fg-subtle);
+}
+
+/* ── LIGHT THEME ── */
+[data-pw-theme="light"] .pw-bui-stepper__indicator {
+	background: #f5f5f5;
+	border-color: #d0d0d0;
+}
+
+[data-pw-theme="light"] .pw-bui-stepper__connector {
+	background: #d0d0d0;
+}
+
+[data-pw-theme="light"] .pw-bui-stepper__item--done .pw-bui-stepper__connector {
+	background: var(--pw-color-success-emphasis);
+}
