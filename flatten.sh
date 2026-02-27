@@ -12,7 +12,7 @@ CARPETAS=(
 ARCHIVOS_ROOT=(
     "./composer.json"
     "./flatten.sh"
-    "./CONTRACT.md"
+    "./PW_BACKEND-UI_CONTRACT.md"
 )
 
 EXTENSIONES_TEXTO=(

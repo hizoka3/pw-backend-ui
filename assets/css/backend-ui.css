@@ -1549,6 +1549,10 @@
 	overflow: hidden;
 	padding-top: 0;
 }
+#pw-backend-ui-app .tablenav select,
+#pw-backend-ui-app .tablenav input[type="submit"] {
+	width: auto;
+}
 
 /* ── STEPPER / WIZARD ── */
 
