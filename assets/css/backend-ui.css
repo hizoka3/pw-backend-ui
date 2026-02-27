@@ -1553,6 +1553,12 @@
 #pw-backend-ui-app .tablenav input[type="submit"] {
 	width: auto;
 }
+#pw-backend-ui-app p.search-box input[type="search"] {
+	width: 200px;
+}
+#pw-backend-ui-app .bulkactions input[type="submit"] {
+	margin-left: 4px;
+}
 
 /* ── STEPPER / WIZARD ── */
 
