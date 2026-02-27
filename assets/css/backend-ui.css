@@ -1547,6 +1547,7 @@
 }
 #pw-backend-ui-app .tablenav.top {
 	overflow: hidden;
+	padding-top: 0;
 }
 
 /* ── STEPPER / WIZARD ── */

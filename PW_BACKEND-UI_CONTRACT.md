@@ -1,6 +1,6 @@
 # Package: pw/backend-ui
 
-**Versión:** 1.3.0
+**Versión:** 1.4.0
 **Namespace:** `PW\BackendUI`
 **Propósito:** Sistema de diseño compartido para el backend (admin) de plugins WordPress del ecosistema PW. Inspirado en Primer (GitHub). Tema dark por defecto, con soporte light switcheable desde el header. Paleta de colores PW. Sin Tailwind CDN — CSS puro con custom properties.
 
@@ -17,6 +17,12 @@
 > Requiere que el plugin llame `BackendUI::init($config)` en el hook `plugins_loaded` o posterior.
 
 ---
+
+## Cambios en v1.4.0
+
+- **`stepper()` + wizard JS**: nuevo componente `stepper()` para formularios multi-paso. El JS inicializa automáticamente cualquier `[data-pw-wizard]` encontrado en el DOM al cargar la página. El stepper visual se sincroniza automáticamente con el paso activo.
+- **Fix: `initWizard()` no se llamaba desde `init()`**: el código del wizard existía en `assets/js/backend-ui.js` pero no estaba registrado en la función `init()`. Corregido — ahora se llama junto al resto de inicializadores.
+- **Fix: `flattened/backend-ui.js` desactualizado**: el archivo flattened no incluía el bloque wizard/stepper. Sincronizado con `assets/js/backend-ui.js`.
 
 ## Cambios en v1.3.0
 
@@ -122,6 +128,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 | `breadcrumbs()` | Migas de pan |
 | `pagination()` | Control de paginación con gaps |
 | `side_nav()` | Navegación vertical tipo WP Settings (grupos, separators, active) |
+| `stepper()` | Indicador visual de progreso para formularios multi-paso (wizard) |
 
 ---
 
@@ -163,6 +170,7 @@ Es un singleton. Llamadas posteriores a `init()` retornan la misma instancia.
 | `pw-bui:tab-changed` | `{ slug }` | Se cambió de pestaña (solo mode `'js'`) |
 | `pw-bui:toggle-changed` | `{ name, checked, value }` | Se cambió un toggle switch |
 | `pw-bui:segment-changed` | `{ name, value }` | Se cambió una opción en segmented control |
+| `pw-bui:wizard-step-changed` | `{ from, to, index }` | Se avanzó o retrocedió un paso del wizard |
 
 ---
 
@@ -229,38 +237,240 @@ $bui->render_page([
 
 ---
 
-## `button()` — soporte href
+## `button()` — referencia completa
 
-Cuando se pasa `href`, el componente renderiza `<a>` en lugar de `<button>`. Útil para CTAs de navegación dentro del design system sin romper los estilos.
+El componente se comporta diferente según si recibe `href` o no.
 
 ```php
-// Renderiza <a href="...">
+// Botón de acción — renderiza <button>
+$ui->button([
+    'label'   => 'Guardar',
+    'type'    => 'submit',       // 'button' (default) | 'submit' | 'reset'
+    'variant' => 'primary',
+]);
+
+// Botón de navegación — renderiza <a href>
 $ui->button([
     'label'   => 'Agregar empresa',
     'href'    => admin_url('admin.php?page=imec-empresas&action=new'),
     'variant' => 'primary',
 ]);
 
-// Renderiza <button type="submit">
+// Botón con atributo HTML personalizado (ej. para wizard)
 $ui->button([
-    'label'   => 'Guardar',
-    'type'    => 'submit',
+    'label'   => 'Siguiente →',
     'variant' => 'primary',
+    'attrs'   => [ 'data-pw-wizard-next' => '' ],
+]);
+
+// Botón con icono SVG
+$ui->button([
+    'label'   => 'Exportar',
+    'variant' => 'outline',
+    'icon'    => '<svg .../>',
 ]);
 ```
 
+### Variantes disponibles
+
+| Variante | Uso |
+|----------|-----|
+| `primary` | Acción principal de la página |
+| `secondary` | Acción secundaria o alternativa |
+| `outline` | Acción terciaria, menos énfasis |
+| `ghost` | Sin borde, fondo transparente. Para "Cancelar" o "Anterior" |
+| `danger` | Acción destructiva (eliminar, desactivar) |
+| `invisible` | Sin estilos visibles, solo texto |
+
+### Tabla de keys
+
 | Key | Aplica a | Descripción |
 |-----|----------|-------------|
-| `href` | `<a>` | URL de destino. Si está presente, renderiza `<a>`. |
+| `label` | ambos | Texto visible del botón |
+| `href` | `<a>` | URL de destino. Si está presente, renderiza `<a>` en lugar de `<button>` |
 | `target` | `<a>` | Atributo target (`_blank`, etc.) |
 | `type` | `<button>` | `button` (default), `submit`, `reset` |
-| `variant` | ambos | `primary`, `secondary`, `outline`, `ghost`, `danger`, `invisible` |
-| `label` | ambos | Texto del botón |
-| `icon` | ambos | HTML/SVG antes del label |
-| `disabled` | `<button>` | Solo aplica en `<button>` |
-| `style` | ambos | Estilos inline adicionales |
+| `variant` | ambos | Ver tabla de variantes arriba |
+| `icon` | ambos | HTML/SVG renderizado antes del label |
+| `disabled` | `<button>` | Solo aplica en `<button>` — `<a>` no soporta disabled nativamente |
 | `class` | ambos | Clases CSS adicionales |
-| `attrs` | ambos | Array de atributos HTML adicionales |
+| `style` | ambos | Estilos inline adicionales |
+| `attrs` | ambos | Array asociativo de atributos HTML arbitrarios. Ej: `['data-pw-wizard-next' => '']` |
+
+---
+
+## Wizard y Stepper — formularios multi-paso
+
+El wizard es el sistema de formularios multi-paso del package. Combina dos piezas: el componente PHP `stepper()` (indicador visual) y el JS de `backend-ui.js` (lógica de navegación).
+
+### Cómo funciona
+
+El JS escanea el DOM en `DOMContentLoaded` buscando `[data-pw-wizard]`. Por cada wizard encontrado:
+- Recoge todos los `[data-pw-wizard-step]` como paneles
+- Busca `[data-pw-stepper]` dentro del mismo `.pw-bui-page-wrapper` para sincronizar el indicador visual
+- Muestra solo el primer panel, oculta el resto con `hidden`
+- Maneja clicks en `[data-pw-wizard-next]`, `[data-pw-wizard-prev]` y `[data-pw-wizard-submit]`
+- Valida campos `[required]` visibles antes de avanzar (usa `reportValidity()` nativo del browser)
+
+### Estructura HTML esperada
+
+```
+[data-pw-stepper]              ← componente stepper(), FUERA del form
+  [data-pw-step="slug"]        ← generado automáticamente por stepper()
+
+<form data-pw-wizard>          ← el form wrapper
+  [data-pw-wizard-step="slug"] ← panel de cada paso
+    [required]                 ← campos que se validan antes de avanzar
+    [data-pw-wizard-next]      ← botón avanzar
+    [data-pw-wizard-prev]      ← botón retroceder
+    [data-pw-wizard-submit]    ← botón submit (solo en último paso)
+```
+
+> **Importante:** El stepper debe estar **fuera del `<form>`** pero dentro del `.pw-bui-page-wrapper` que renderiza `render_page()`. El JS lo localiza vía `.closest('.pw-bui-page-wrapper').querySelector('[data-pw-stepper]')`.
+
+> **Importante:** Los slugs en `stepper()` deben coincidir exactamente con los valores de `data-pw-wizard-step` en los paneles del form.
+
+### `stepper()` — uso
+
+```php
+$ui->stepper([
+    'steps' => [
+        [ 'slug' => 'paso-curso',    'label' => 'Curso',    'state' => 'active'  ],
+        [ 'slug' => 'paso-empresa',  'label' => 'Empresa',  'state' => 'pending' ],
+        [ 'slug' => 'paso-alumnos',  'label' => 'Alumnos',  'state' => 'pending' ],
+        [ 'slug' => 'paso-detalles', 'label' => 'Detalles', 'state' => 'pending' ],
+    ],
+]);
+```
+
+El JS actualiza los estados `active` / `done` / `pending` automáticamente al navegar — solo el estado inicial importa en el PHP (siempre el primero en `active`, el resto en `pending`).
+
+### `stepper()` — tabla de keys
+
+| Key | Tipo | Descripción |
+|-----|------|-------------|
+| `steps` | array | Lista de pasos. Cada item es un array con `slug`, `label` y `state` |
+| `class` | string | Clases CSS adicionales en el `<nav>` |
+
+**Cada step:**
+
+| Key | Tipo | Descripción |
+|-----|------|-------------|
+| `slug` | string | Identificador único. Debe coincidir con el `data-pw-wizard-step` del panel |
+| `label` | string | Texto visible debajo del indicador |
+| `state` | string | `active` \| `pending` \| `done`. El JS lo actualiza dinámicamente |
+
+### Botones de navegación del wizard
+
+Los botones next/prev/submit se pasan como `attrs` a `button()`:
+
+```php
+// Avanzar (se oculta automáticamente en el último paso)
+$ui->button([
+    'label'   => 'Siguiente →',
+    'variant' => 'primary',
+    'attrs'   => [ 'data-pw-wizard-next' => '' ],
+]);
+
+// Retroceder (se oculta automáticamente en el primer paso)
+$ui->button([
+    'label'   => '← Anterior',
+    'variant' => 'ghost',
+    'attrs'   => [ 'data-pw-wizard-prev' => '' ],
+]);
+
+// Submit (se oculta en todos los pasos excepto el último)
+$ui->button([
+    'label'   => 'Crear',
+    'type'    => 'submit',
+    'variant' => 'primary',
+    'attrs'   => [ 'data-pw-wizard-submit' => '' ],
+]);
+```
+
+### Validación de checkboxes
+
+Para pasos donde se requiere seleccionar al menos un checkbox, agrega `data-pw-wizard-require-check` al contenedor. El JS lo detecta antes de avanzar y muestra un error si no hay ninguno marcado:
+
+```html
+<div data-pw-wizard-require-check="Debes seleccionar al menos un alumno.">
+    <input type="checkbox" name="alumno_ids[]" value="1">
+    ...
+</div>
+```
+
+### Evento JS al cambiar de paso
+
+```js
+document.addEventListener('pw-bui:wizard-step-changed', function(e) {
+    console.log('Desde:', e.detail.from);   // slug del paso anterior
+    console.log('Hacia:', e.detail.to);     // slug del paso actual
+    console.log('Índice:', e.detail.index); // 0-based
+});
+```
+
+### Ejemplo completo de wizard 4 pasos
+
+```php
+// El stepper va FUERA del form, dentro del content de render_page()
+$ui->stepper([
+    'steps' => [
+        [ 'slug' => 'paso-1', 'label' => 'Datos',    'state' => 'active'  ],
+        [ 'slug' => 'paso-2', 'label' => 'Empresa',  'state' => 'pending' ],
+        [ 'slug' => 'paso-3', 'label' => 'Alumnos',  'state' => 'pending' ],
+        [ 'slug' => 'paso-4', 'label' => 'Confirmar','state' => 'pending' ],
+    ],
+]);
+?>
+
+<form method="post" data-pw-wizard>
+    <?php wp_nonce_field('mi_nonce'); ?>
+
+    <div data-pw-wizard-step="paso-1">
+        <?php $ui->card([
+            'title'   => 'Datos del curso',
+            'content' => function() use ($ui) {
+                $ui->select([
+                    'name'     => 'curso_id',
+                    'label'    => 'Curso',
+                    'options'  => $opciones,
+                    'required' => true,  // validado por el wizard al avanzar
+                ]);
+            },
+        ]); ?>
+        <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+            <?php $ui->button(['label' => 'Siguiente →', 'variant' => 'primary', 'attrs' => ['data-pw-wizard-next' => '']]); ?>
+        </div>
+    </div>
+
+    <div data-pw-wizard-step="paso-2">
+        <?php /* ... contenido paso 2 ... */ ?>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;">
+            <?php $ui->button(['label' => '← Anterior', 'variant' => 'ghost',   'attrs' => ['data-pw-wizard-prev' => '']]); ?>
+            <?php $ui->button(['label' => 'Siguiente →', 'variant' => 'primary', 'attrs' => ['data-pw-wizard-next' => '']]); ?>
+        </div>
+    </div>
+
+    <div data-pw-wizard-step="paso-3">
+        <?php /* ... contenido paso 3 con checkboxes ... */ ?>
+        <div data-pw-wizard-require-check="Selecciona al menos un alumno.">
+            <input type="checkbox" name="ids[]" value="1"> Alumno A
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;">
+            <?php $ui->button(['label' => '← Anterior', 'variant' => 'ghost',   'attrs' => ['data-pw-wizard-prev' => '']]); ?>
+            <?php $ui->button(['label' => 'Siguiente →', 'variant' => 'primary', 'attrs' => ['data-pw-wizard-next' => '']]); ?>
+        </div>
+    </div>
+
+    <div data-pw-wizard-step="paso-4">
+        <?php /* ... resumen + campos finales ... */ ?>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;">
+            <?php $ui->button(['label' => '← Anterior', 'variant' => 'ghost',   'attrs' => ['data-pw-wizard-prev'   => '']]); ?>
+            <?php $ui->button(['label' => 'Guardar',    'type' => 'submit', 'variant' => 'primary', 'attrs' => ['data-pw-wizard-submit' => '']]); ?>
+        </div>
+    </div>
+</form>
+```
 
 ---
 
@@ -410,6 +620,9 @@ function mi_plugin_render_page() {
 - PHP mínimo: 8.0. WordPress mínimo: 6.0.
 - Los tabs en `mode: 'url'` **no usan `tab_panel()`** — el contenido lo controla PHP según el parámetro GET.
 - El componente `button()` con `href` no soporta `disabled` (comportamiento nativo de `<a>`).
+- El **stepper debe estar fuera del `<form>`** — si se coloca dentro, el JS no puede encontrarlo correctamente vía `.closest('.pw-bui-page-wrapper')`.
+- Los slugs de `stepper()` y `data-pw-wizard-step` **deben coincidir exactamente** — el JS los sincroniza por valor de atributo.
+- `data-pw-wizard-next` / `prev` / `submit` son detectados con `closest()` — pueden estar en el botón directo o en un wrapper.
 
 ---
 
