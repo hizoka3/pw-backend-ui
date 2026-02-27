@@ -1793,3 +1793,45 @@
 #pw-backend-ui-app .tablenav .pagination-links a:hover {
 	background: var(--pw-color-bg-overlay);
 }
+
+/* Botones nativos WP (.button) dentro del wrapper */
+#pw-backend-ui-app .button,
+#pw-backend-ui-app .button-secondary {
+	background: var(--pw-color-bg-emphasis) !important;
+	border-color: var(--pw-color-border-emphasis) !important;
+	color: var(--pw-color-fg-default) !important;
+	box-shadow: none !important;
+	text-shadow: none !important;
+}
+
+#pw-backend-ui-app .button:hover,
+#pw-backend-ui-app .button-secondary:hover {
+	background: var(--pw-color-bg-overlay) !important;
+	border-color: var(--pw-color-border-emphasis) !important;
+	color: var(--pw-color-fg-default) !important;
+}
+
+#pw-backend-ui-app .button:disabled,
+#pw-backend-ui-app .button.disabled {
+	background: var(--pw-color-bg-inset) !important;
+	border-color: var(--pw-color-border-muted) !important;
+	color: var(--pw-color-fg-subtle) !important;
+	opacity: 0.6;
+}
+
+/* Select nativo WP dentro del wrapper */
+#pw-backend-ui-app .tablenav select,
+#pw-backend-ui-app .bulkactions select {
+	background: var(--pw-color-bg-emphasis) !important;
+	border-color: var(--pw-color-border-emphasis) !important;
+	color: var(--pw-color-fg-default) !important;
+	box-shadow: none !important;
+}
+
+/* Input de página actual */
+#pw-backend-ui-app .tablenav-pages input.current-page {
+	background: var(--pw-color-bg-emphasis) !important;
+	border-color: var(--pw-color-border-emphasis) !important;
+	color: var(--pw-color-fg-default) !important;
+	box-shadow: none !important;
+}
