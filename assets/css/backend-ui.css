@@ -1691,3 +1691,105 @@
 [data-pw-theme="light"] .pw-bui-stepper__item--done .pw-bui-stepper__connector {
 	background: var(--pw-color-success-emphasis);
 }
+
+/* =========================================================================
+   6. WP_LIST_TABLE THEME OVERRIDES
+   Normaliza colores de tablas nativas de WP (.wp-list-table) para que
+   respeten el tema activo (dark/light) del wrapper pw-backend-ui-app.
+   ========================================================================= */
+
+#pw-backend-ui-app .wp-list-table {
+	border: 1px solid var(--pw-color-border-default);
+	background: var(--pw-color-bg-subtle);
+	color: var(--pw-color-fg-default);
+}
+
+/* Cabecera y pie */
+#pw-backend-ui-app .wp-list-table thead tr,
+#pw-backend-ui-app .wp-list-table tfoot tr {
+	background: var(--pw-color-bg-inset);
+}
+
+#pw-backend-ui-app .wp-list-table thead th,
+#pw-backend-ui-app .wp-list-table thead td,
+#pw-backend-ui-app .wp-list-table tfoot th,
+#pw-backend-ui-app .wp-list-table tfoot td {
+	color: var(--pw-color-fg-muted);
+	border-bottom: 1px solid var(--pw-color-border-default);
+}
+
+/* Filas */
+#pw-backend-ui-app .wp-list-table tbody tr {
+	background: var(--pw-color-bg-subtle);
+}
+
+#pw-backend-ui-app .wp-list-table.striped tbody tr:nth-child(odd) {
+	background: var(--pw-color-bg-inset);
+}
+
+#pw-backend-ui-app .wp-list-table tbody tr:hover td,
+#pw-backend-ui-app .wp-list-table tbody tr:hover th {
+	background: var(--pw-color-bg-overlay) !important;
+}
+
+/* Celdas */
+#pw-backend-ui-app .wp-list-table td,
+#pw-backend-ui-app .wp-list-table th {
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-border-default);
+}
+
+/* Links dentro de la tabla */
+#pw-backend-ui-app .wp-list-table td a,
+#pw-backend-ui-app .wp-list-table th a {
+	color: var(--pw-color-info-fg);
+}
+
+#pw-backend-ui-app .wp-list-table td a:hover,
+#pw-backend-ui-app .wp-list-table th a:hover {
+	color: var(--pw-color-accent-fg);
+}
+
+/* Sorting indicators */
+#pw-backend-ui-app .wp-list-table .sorted,
+#pw-backend-ui-app .wp-list-table .sortable:hover {
+	background: var(--pw-color-bg-overlay);
+}
+
+#pw-backend-ui-app .wp-list-table .manage-column a {
+	color: var(--pw-color-fg-muted);
+}
+
+/* Row actions */
+#pw-backend-ui-app .wp-list-table .row-actions {
+	color: var(--pw-color-fg-subtle);
+}
+
+#pw-backend-ui-app .wp-list-table .row-actions a {
+	color: var(--pw-color-info-fg);
+}
+
+/* Check column */
+#pw-backend-ui-app .wp-list-table .check-column input[type="checkbox"] {
+	accent-color: var(--pw-color-accent-fg);
+}
+
+/* Tablenav */
+#pw-backend-ui-app .tablenav {
+	color: var(--pw-color-fg-muted);
+}
+
+#pw-backend-ui-app .tablenav .displaying-num {
+	color: var(--pw-color-fg-muted);
+}
+
+#pw-backend-ui-app .tablenav .pagination-links a,
+#pw-backend-ui-app .tablenav .pagination-links span.current-page {
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-border-emphasis);
+	background: var(--pw-color-bg-inset);
+}
+
+#pw-backend-ui-app .tablenav .pagination-links a:hover {
+	background: var(--pw-color-bg-overlay);
+}
