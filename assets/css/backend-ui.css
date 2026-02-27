@@ -1559,6 +1559,9 @@
 #pw-backend-ui-app .bulkactions input[type="submit"] {
 	margin-left: 4px;
 }
+#pw-backend-ui-app .tablenav-pages input.current-page {
+	width: 50px;
+}
 
 /* ── STEPPER / WIZARD ── */
 
