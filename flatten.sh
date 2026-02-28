@@ -13,6 +13,8 @@ ARCHIVOS_ROOT=(
     "./composer.json"
     "./flatten.sh"
     "./PW_BACKEND-UI_CONTRACT.md"
+    "./INSTRUCCIONES_pw-backend-ui.txt"
+    "./ESTADO_pw-backend-ui.txt"
 )
 
 EXTENSIONES_TEXTO=(
