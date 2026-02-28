@@ -29,7 +29,9 @@ foreach ($atts["options"] ?? [] as $key => $option) {
 }
 ?>
 
-<div class="pw-bui-form-group">
+<div class="pw-bui-form-group <?php echo esc_attr(
+	$atts["wrapper_class"] ?? "",
+); ?>">
     <?php if (!empty($atts["label"])): ?>
         <label
             for="<?php echo esc_attr($select_id); ?>"

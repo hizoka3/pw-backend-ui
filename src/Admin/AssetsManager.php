@@ -39,6 +39,15 @@ class AssetsManager
 		$version = $this->config["version"];
 		$slug = $this->config["slug"];
 
+		// Tailwind CSS CDN (disponible para el package y plugins consumidores)
+		wp_enqueue_script(
+			"tailwind-cdn",
+			"https://cdn.tailwindcss.com",
+			[],
+			null,
+			false,
+		);
+
 		// Package stylesheet (CSS variables + all component styles)
 		wp_enqueue_style(
 			$slug . "-styles",
