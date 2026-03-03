@@ -1563,6 +1563,15 @@
 #pw-backend-ui-app p.search-box input[type="submit"] {
 	float: none;
 	margin: 0;
+	background: var(--pw-color-accent-fg) !important;
+	border-color: var(--pw-color-accent-fg) !important;
+	color: #ffffff !important;
+	text-shadow: none !important;
+	box-shadow: none !important;
+}
+#pw-backend-ui-app p.search-box input[type="submit"]:hover {
+	background: var(--pw-color-accent-emphasis) !important;
+	border-color: var(--pw-color-accent-emphasis) !important;
 }
 #pw-backend-ui-app .tablenav.top {
 	overflow: hidden;
