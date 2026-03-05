@@ -942,7 +942,6 @@
 .pw-bui-switch-wrap {
 	display: flex;
 	align-items: center;
-	gap: 16px;
 }
 
 .pw-bui-switch {
