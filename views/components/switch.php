@@ -11,6 +11,10 @@ $wrap_class = implode(" ", array_filter([
 	"pw-bui-switch-wrap",
 	$atts["class"] ?? "",
 ]));
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 <div class="pw-bui-form-group">
 	<div class="<?php echo esc_attr($wrap_class); ?>">
@@ -38,6 +42,7 @@ $wrap_class = implode(" ", array_filter([
 				class="pw-bui-switch__input"
 				<?php checked($checked); ?>
 				<?php echo !empty($atts["disabled"]) ? "disabled" : ""; ?>
+				<?php echo $data_attrs; ?>
 			>
 			<span class="pw-bui-switch__slider" aria-hidden="true"></span>
 		</label>

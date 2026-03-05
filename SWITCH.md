@@ -14,8 +14,9 @@ $ui->switch([
     'value'    => '1',               // string — value cuando checked (default: '1')
     'variant'  => 'default',         // 'default' | 'status'
     'help'     => '',                // string — texto de ayuda (opcional)
-    'disabled' => false,             // bool
-    'class'    => '',                // string — clases extra en el wrap
+    'disabled'   => false,           // bool
+    'class'      => '',              // string — clases extra en el wrap
+    'data_attrs' => [],              // array  — key→value → data-* en el <input>
 ]);
 ```
 
@@ -66,10 +67,11 @@ El componente no incluye JS. Para toggle AJAX en una `WP_List_Table`:
 ```php
 // En column_estado():
 $ui->switch([
-    'name'    => 'estado_' . $item->id,
-    'checked' => $item->activo,
-    'variant' => 'status',
-    'class'   => 'js-toggle-estado',
+    'name'       => 'estado_' . $item->id,
+    'checked'    => $item->activo,
+    'variant'    => 'status',
+    'class'      => 'js-toggle-estado',
+    'data_attrs' => ['id' => $item->id],  // → data-id="95" en el <input>
 ]);
 ```
 
@@ -77,11 +79,10 @@ $ui->switch([
 // JS del plugin — escuchar change en el input:
 document.querySelectorAll('.js-toggle-estado .pw-bui-switch__input').forEach(input => {
     input.addEventListener('change', function () {
-        const id = /* extraer del name o data-* */;
         this.disabled = true;
         fetch(myPlugin.ajaxurl, {
             method: 'POST',
-            body: new URLSearchParams({ action: 'my_toggle', nonce: myPlugin.nonce, id })
+            body: new URLSearchParams({ action: 'my_toggle', nonce: myPlugin.nonce, id: this.dataset.id })
         })
         .then(r => r.json())
         .then(data => { if (!data.success) this.checked = !this.checked; })
