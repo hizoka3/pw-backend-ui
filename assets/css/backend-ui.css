@@ -938,6 +938,93 @@
 	cursor: not-allowed;
 }
 
+/* ── SWITCH ── */
+.pw-bui-switch-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.pw-bui-switch {
+	position: relative;
+	display: inline-block;
+	width: 36px;
+	height: 20px;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+.pw-bui-switch__input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.pw-bui-switch__slider {
+	position: absolute;
+	inset: 0;
+	background: var(--pw-color-bg-emphasis);
+	border: 1px solid var(--pw-color-border-emphasis);
+	border-radius: 20px;
+	transition: background 0.2s, border-color 0.2s;
+}
+
+.pw-bui-switch__slider::before {
+	content: "";
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	left: 2px;
+	bottom: 2px;
+	background: var(--pw-color-fg-muted);
+	border-radius: 50%;
+	box-shadow: var(--pw-shadow-sm);
+	transition: transform 0.2s, background 0.2s;
+}
+
+/* default: on = accent (rojo PW) */
+.pw-bui-switch--default .pw-bui-switch__input:checked + .pw-bui-switch__slider {
+	background: var(--pw-color-accent-fg);
+	border-color: var(--pw-color-accent-fg);
+}
+.pw-bui-switch--default .pw-bui-switch__input:checked + .pw-bui-switch__slider::before {
+	transform: translateX(16px);
+	background: #ffffff;
+}
+
+/* status: off = danger (rojo semántico), on = success (verde) */
+.pw-bui-switch--status .pw-bui-switch__slider {
+	background: var(--pw-color-danger-fg);
+	border-color: var(--pw-color-danger-fg);
+}
+.pw-bui-switch--status .pw-bui-switch__slider::before {
+	background: #ffffff;
+}
+.pw-bui-switch--status .pw-bui-switch__input:checked + .pw-bui-switch__slider {
+	background: var(--pw-color-success-fg);
+	border-color: var(--pw-color-success-fg);
+}
+.pw-bui-switch--status .pw-bui-switch__input:checked + .pw-bui-switch__slider::before {
+	transform: translateX(16px);
+}
+
+/* focus */
+.pw-bui-switch__input:focus-visible + .pw-bui-switch__slider {
+	outline: 2px solid var(--pw-color-accent-fg);
+	outline-offset: 2px;
+}
+
+/* disabled */
+.pw-bui-switch__input:disabled + .pw-bui-switch__slider {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+.pw-bui-switch:has(.pw-bui-switch__input:disabled) {
+	cursor: not-allowed;
+}
+
 /* ── TABS (Underline Nav — estilo Primer) ── */
 .pw-bui-tab {
 	display: inline-flex;

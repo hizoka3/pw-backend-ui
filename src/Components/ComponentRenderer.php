@@ -721,4 +721,33 @@ class ComponentRenderer
 		]);
 		include __DIR__ . "/../../views/components/stepper.php";
 	}
+
+	/**
+	 * Render a switch (checkbox-based toggle).
+	 *
+	 * @param array $atts {
+	 *     @type string $name     Input name attribute.
+	 *     @type string $label    Label text.
+	 *     @type bool   $checked  Whether checked.
+	 *     @type string $value    Input value. Default: '1'.
+	 *     @type string $variant  Visual variant: 'default' | 'status'. Default: 'default'.
+	 *     @type string $help     Help text.
+	 *     @type bool   $disabled Whether disabled.
+	 *     @type string $class    Additional CSS classes on the wrap.
+	 * }
+	 */
+	public function switch(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"name"     => "",
+			"label"    => "",
+			"checked"  => false,
+			"value"    => "1",
+			"variant"  => "default",
+			"help"     => "",
+			"disabled" => false,
+			"class"    => "",
+		]);
+		include __DIR__ . "/../../views/components/switch.php";
+	}
 }
