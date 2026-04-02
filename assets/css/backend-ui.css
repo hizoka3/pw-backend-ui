@@ -2039,16 +2039,25 @@
 }
 
 .pw-bui-logo__dot {
-	display: block;
+	display: block !important;
 	width: 5px !important;
 	height: 5px !important;
+	max-width: 5px !important;
+	max-height: 5px !important;
 	min-width: 0 !important;
 	min-height: 0 !important;
 	border-radius: 0 !important;
 	background-color: #c0392b !important;
-	flex-shrink: 0;
+	background-image: none !important;
+	flex-shrink: 0 !important;
 	padding: 0 !important;
 	margin: 0 !important;
+	line-height: 1 !important;
+	font-size: 0 !important;
+	overflow: hidden !important;
+	box-sizing: border-box !important;
+	box-shadow: none !important;
+	border: none !important;
 	animation: pw-bui-logo-blink 0.4s ease-in-out infinite;
 }
 
