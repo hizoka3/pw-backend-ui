@@ -299,6 +299,7 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	color: #fff !important;
 }
 
 .pw-bui-logo__mark {
