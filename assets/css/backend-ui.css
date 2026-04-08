@@ -1438,6 +1438,23 @@
 	color: var(--pw-color-fg-subtle);
 }
 
+/* Playground — tab Tipo & Layout: misma escala tipográfica para todos los headings */
+#pw-tab-panel-layout .pw-bui-heading,
+#pw-tab-panel-layout .pw-bui-section-label,
+#pw-tab-panel-layout .pw-bui-card__title {
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1.2rem;
+	text-transform: uppercase;
+	letter-spacing: normal;
+}
+#pw-tab-panel-layout h3:not(.pw-bui-card__title) {
+	font-size: 10px !important;
+	font-weight: 700 !important;
+	line-height: 1.2rem !important;
+	text-transform: uppercase !important;
+}
+
 /* Label de sección (p) — mismo estilo eyebrow */
 .pw-bui-section-label {
 	font-family: var(--pw-font-sans);
