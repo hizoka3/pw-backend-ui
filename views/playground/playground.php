@@ -9,7 +9,7 @@ $ui = $bui->ui();
 if (!function_exists("pw_pg_section")):
 	function pw_pg_section(string $title, string $desc = ""): void
 	{
-		echo '<div style="margin-bottom:24px;"><h3 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--pw-color-fg-muted);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--pw-color-border-default);">' .
+		echo '<div style="margin-bottom:24px;"><h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pw-color-fg-muted);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--pw-color-border-default);">' .
 			esc_html($title) .
 			"</h3>";
 		if ($desc) {
