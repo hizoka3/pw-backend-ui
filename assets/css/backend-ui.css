@@ -302,7 +302,6 @@
 
 #pw-backend-ui-app button {
 	font-family: inherit;
-	font-size: inherit;
 	cursor: pointer;
 }
 
@@ -1555,7 +1554,6 @@
 #pw-tab-panel-layout .pw-bui-heading,
 #pw-tab-panel-layout .pw-bui-section-label,
 #pw-tab-panel-layout .pw-bui-card__title {
-	font-size: 10px;
 	font-weight: 700;
 	line-height: 1.2rem;
 	text-transform: uppercase;
@@ -1604,28 +1602,25 @@
 	padding: 12px;
 }
 
-.pw-bui-stat:last-child {
-	border-right: none;
-	margin-right: 0;
-}
-
 .pw-bui-stat__label {
 	display: block;
 	font-family: var(--pw-font-sans);
 	font-size: 10px;
-	font-weight: 600;
+	font-weight: 500;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
+	color: var(--pw-color-fg-muted);
 }
 
 .pw-bui-stat__value {
 	display: block;
 	font-family: var(--pw-font-sans);
-	font-size: 10px;
-	font-weight: 600;
+	font-size: 18px;
+	font-weight: 500;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
 	line-height: 1;
+	color: var(--pw-color-fg-muted);
 }
 
 .pw-bui-stat__breakdown {
