@@ -812,6 +812,29 @@ class ComponentRenderer
 		include __DIR__ . "/../../views/components/stepper.php";
 	}
 
+	// =========================================================================
+	// ACCORDION
+	// =========================================================================
+
+	/**
+	 * Render an accordion (collapsible sections) with smooth height animation.
+	 *
+	 * @param array $atts {
+	 *     @type array  $items           Items: [ ['title'=>'', 'content'=>callable|string, 'open'=>false, 'disabled'=>false], ... ].
+	 *     @type bool   $allow_multiple  Whether multiple panels can be open simultaneously. Default: false.
+	 *     @type string $class           Additional CSS classes on the root element.
+	 * }
+	 */
+	public function accordion(array $atts = []): void
+	{
+		$atts = wp_parse_args($atts, [
+			"items"          => [],
+			"allow_multiple" => false,
+			"class"          => "",
+		]);
+		include __DIR__ . "/../../views/components/accordion.php";
+	}
+
 	/**
 	 * Render a switch (checkbox-based toggle).
 	 *

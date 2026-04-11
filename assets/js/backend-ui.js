@@ -248,6 +248,87 @@
 	}
 
 	// =========================================================================
+	// ACCORDION
+	// =========================================================================
+
+	function openAccordionPanel(trigger) {
+		var item = trigger.closest("[data-pw-accordion-item]");
+		var panel = item.querySelector("[data-pw-accordion-panel]");
+		trigger.setAttribute("aria-expanded", "true");
+		item.classList.add("pw-bui-accordion__item--open");
+		panel.removeAttribute("hidden");
+		panel.style.overflow = "hidden";
+		panel.style.height = "0";
+		requestAnimationFrame(function () {
+			panel.style.transition = "height 0.22s ease";
+			panel.style.height = panel.scrollHeight + "px";
+		});
+		panel.addEventListener("transitionend", function handler() {
+			panel.style.height = "auto";
+			panel.style.overflow = "";
+			panel.style.transition = "";
+			panel.removeEventListener("transitionend", handler);
+		});
+	}
+
+	function closeAccordionPanel(trigger) {
+		var item = trigger.closest("[data-pw-accordion-item]");
+		var panel = item.querySelector("[data-pw-accordion-panel]");
+		panel.style.overflow = "hidden";
+		panel.style.height = panel.scrollHeight + "px";
+		item.classList.remove("pw-bui-accordion__item--open");
+		trigger.setAttribute("aria-expanded", "false");
+		requestAnimationFrame(function () {
+			panel.style.transition = "height 0.22s ease";
+			panel.style.height = "0";
+		});
+		panel.addEventListener("transitionend", function handler() {
+			panel.setAttribute("hidden", "");
+			panel.style.height = "";
+			panel.style.overflow = "";
+			panel.style.transition = "";
+			panel.removeEventListener("transitionend", handler);
+		});
+	}
+
+	function initAccordion() {
+		delegate("click", "[data-pw-accordion-trigger]", function () {
+			if (this.hasAttribute("disabled")) return;
+
+			var accordion = this.closest("[data-pw-accordion]");
+			var allowMultiple = accordion.hasAttribute("data-pw-accordion-multiple");
+			var isOpen = this.getAttribute("aria-expanded") === "true";
+			var self = this;
+
+			if (!allowMultiple && !isOpen) {
+				accordion
+					.querySelectorAll(
+						'[data-pw-accordion-trigger][aria-expanded="true"]',
+					)
+					.forEach(function (btn) {
+						if (btn !== self) closeAccordionPanel(btn);
+					});
+			}
+
+			if (isOpen) closeAccordionPanel(this);
+			else openAccordionPanel(this);
+
+			document.dispatchEvent(
+				new CustomEvent("pw-bui:accordion-changed", {
+					detail: {
+						open: !isOpen,
+						title: self.querySelector(".pw-bui-accordion__title")
+							? self
+									.querySelector(".pw-bui-accordion__title")
+									.textContent.trim()
+							: "",
+					},
+				}),
+			);
+		});
+	}
+
+	// =========================================================================
 	// WIZARD (Stepper multi-step forms)
 	// =========================================================================
 	//
@@ -455,6 +536,7 @@
 		initToggles();
 		initDismissible();
 		initTooltips();
+		initAccordion();
 		initWizard();
 
 		document.dispatchEvent(new CustomEvent("pw-bui:ready"));

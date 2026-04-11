@@ -417,6 +417,56 @@ $ui->tab_panel([
 $ui->tab_panel([
 	"slug" => "navigation",
 	"content" => function () use ($ui) {
+		pw_pg_section("Accordion — básico");
+		$ui->accordion([
+			"items" => [
+				[
+					"title"   => "Instalación",
+					"content" =>
+						"Descarga el plugin y cópialo en wp-content/plugins. Actívalo desde el panel de Plugins de WordPress.",
+					"open"    => true,
+				],
+				[
+					"title"   => "Configuración inicial",
+					"content" =>
+						"Ve a Ajustes → PW Config y completa los campos requeridos antes de comenzar a usar la integración.",
+				],
+				[
+					"title"   => "Soporte y documentación",
+					"content" =>
+						"Consulta la documentación en docs.pezweb.com o abre un ticket de soporte si necesitas ayuda.",
+				],
+				[
+					"title"    => "Item deshabilitado",
+					"content"  => "Este panel no puede abrirse.",
+					"disabled" => true,
+				],
+			],
+		]);
+		pw_pg_section_end();
+		pw_pg_section("Accordion — múltiple abierto simultáneo");
+		$ui->accordion([
+			"allow_multiple" => true,
+			"items" => [
+				[
+					"title"   => "Panel A",
+					"content" =>
+						"Contenido del panel A. Puede estar abierto a la vez que B.",
+					"open"    => true,
+				],
+				[
+					"title"   => "Panel B",
+					"content" => "Contenido del panel B.",
+					"open"    => true,
+				],
+				[
+					"title"   => "Panel C",
+					"content" => "Contenido del panel C. Cerrado por defecto.",
+				],
+			],
+		]);
+		pw_pg_section_end();
+
 		pw_pg_section("Breadcrumbs");
 		$ui->breadcrumbs([
 			"items" => [
