@@ -233,6 +233,7 @@ class BackendUI
 					$ui = $bui->ui();
 					$ui->card([
 						"content" => function () use ($ui) {
+							// breadcrumb() es alias de breadcrumbs() (misma salida); solo listamos breadcrumbs para evitar duplicado.
 							$components = [
 								"button",
 								"badge",
@@ -241,6 +242,7 @@ class BackendUI
 								"select",
 								"checkbox",
 								"toggle",
+								"radio",
 								"radio_group",
 								"date_input",
 								"segmented_control",
@@ -252,14 +254,18 @@ class BackendUI
 								"pagination",
 								"tooltip",
 								"skeleton",
-								"tabs",
-								"separator",
 								"heading",
 								"section_label",
 								"stats_bar",
 								"data_table",
 								"paragraph",
 								"link",
+								"separator",
+								"tabs",
+								"tab_panel",
+								"side_nav",
+								"stepper",
+								"switch",
 							];
 							echo '<div style="display:flex;flex-direction:column;gap:4px;">';
 							foreach ($components as $c) {
