@@ -478,8 +478,8 @@ $ui->tab_panel([
 		pw_pg_section_end();
 
 		pw_pg_section("Side Nav (navegación lateral tipo WP Settings)");
-		echo '<div style="display:grid;grid-template-columns:200px 1fr;border:1px solid var(--pw-color-border-default);border-radius:2px;overflow:hidden;">';
-		echo '<nav class="pw-bui-sidenav" style="min-height:auto;position:static;border-right:none;">';
+		echo '<div style="display:grid;grid-template-columns:200px 1fr;border:1px solid var(--pw-color-border-default);align-items:stretch;overflow:hidden;">';
+		echo '<nav class="pw-bui-sidenav" style="min-height:0;position:static;">';
 		$ui->side_nav([
 			"items" => [
 				["label" => "Conexión", "href" => "#", "active" => true],
@@ -768,23 +768,70 @@ $ui->tab_panel([
 ]);
 
 // ── TAB 6: CONTENEDORES & ESPACIADO ─────────────────────────────────────────
+
+// ── Inline icon library (directional arrows) ─────────────────────────────────
+if (!function_exists("pw_pg_arrow")):
+	function pw_pg_arrow(string $dir, int $size = 10): string
+	{
+		static $paths = [
+			"right"        => "M1 5H9 M6 2L9 5L6 8",
+			"left"         => "M9 5H1 M4 2L1 5L4 8",
+			"up"           => "M5 9V1 M2 4L5 1L8 4",
+			"down"         => "M5 1V9 M2 6L5 9L8 6",
+			"top-right"    => "M2 8L8 2 M4 2L8 2L8 6",
+			"top-left"     => "M8 8L2 2 M6 2L2 2L2 6",
+			"bottom-right" => "M2 2L8 8 M4 8L8 8L8 4",
+			"bottom-left"  => "M8 2L2 8 M6 8L2 8L2 4",
+		];
+		$d = $paths[$dir] ?? $paths["right"];
+		return sprintf(
+			'<svg xmlns="http://www.w3.org/2000/svg" width="%1$d" height="%1$d" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;" aria-hidden="true"><path d="%2$s"/></svg>',
+			$size,
+			esc_attr($d)
+		);
+	}
+endif;
+
 $ui->tab_panel([
-	"slug" => "containers",
+	"slug"    => "containers",
 	"content" => function () use ($ui) {
+		pw_pg_section("Librería de iconos — flechas");
+		$arrow_dirs = [
+			"right"        => "Derecha",
+			"left"         => "Izquierda",
+			"up"           => "Arriba",
+			"down"         => "Abajo",
+			"top-right"    => "Superior derecha",
+			"top-left"     => "Superior izquierda",
+			"bottom-right" => "Inferior derecha",
+			"bottom-left"  => "Inferior izquierda",
+		];
+		pw_pg_row();
+		foreach ($arrow_dirs as $dir => $label) {
+			echo '<span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border:1px solid var(--pw-color-border-default);min-width:60px;">';
+			echo '<span style="color:var(--pw-color-fg-default);">' . pw_pg_arrow($dir, 14) . "</span>";
+			echo '<span style="font-size:8px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">' .
+				esc_html($label) .
+				"</span>";
+			echo "</span>";
+		}
+		pw_pg_row_end();
+		echo '<p style="font-size:11px;color:var(--pw-color-fg-subtle);margin-top:8px;">Uso: <code style="font-size:10px;">pw_pg_arrow(\'right\', 12)</code> — hereda <code style="font-size:10px;">color:currentColor</code>.</p>';
+		pw_pg_section_end();
+
 		pw_pg_section(
 			"Tokens de espaciado",
-			"Escala de 4px. Usar siempre estos tokens para gaps, padding y margins entre elementos.",
+			"Escala de 4px. Usar siempre estos tokens para gaps y margins.",
 		);
 		echo '<table class="wp-list-table widefat fixed striped" style="width:auto;max-width:480px;">';
 		echo "<thead><tr><th>Token</th><th>Valor</th><th>Uso típico</th></tr></thead><tbody>";
 		$spacing = [
-			["--pw-space-1", "4px", "Gaps internos, íconos"],
+			["--pw-space-1", "4px", "Gap interno, separación entre íconos"],
 			["--pw-space-2", "8px", "Gap entre controles, row-actions"],
-			["--pw-space-3", "12px", "Padding lateral de ítems de nav"],
-			["--pw-space-4", "16px", "Card padding, form-gap"],
-			["--pw-space-5", "20px", "Margin entre secciones dentro de un card"],
-			["--pw-space-6", "24px", "Content padding, layout-gap"],
-			["--pw-space-7", "28px", "Espacio entre bloques mayores"],
+			["--pw-space-3", "12px", "Padding lateral de ítems nav"],
+			["--pw-space-4", "16px", "Card padding, form-gap interno"],
+			["--pw-space-5", "20px", "Margin entre bloques dentro de un card"],
+			["--pw-space-6", "24px", "Content padding, layout gap"],
 			["--pw-space-8", "32px", "Separación entre secciones de página"],
 			["--pw-content-padding", "24px", "Padding del área de contenido principal"],
 			["--pw-layout-gap", "24px", "Gap entre columnas del layout grid"],
@@ -812,81 +859,59 @@ $ui->tab_panel([
 		echo "</tbody></table>";
 		pw_pg_section_end();
 
-		pw_pg_section(
-			"Aire entre elementos",
-			"Reglas de espaciado recomendadas entre componentes tipográficos y contenedores.",
-		);
-		echo '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--pw-layout-gap);">';
-
-		echo "<div>";
-		echo '<p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--pw-color-fg-muted);margin:0 0 12px;">Título → párrafo → título</p>';
-		$ui->heading(["text" => "Heading nivel 2", "level" => 2]);
-		echo '<div style="margin-top:8px;">';
-		$ui->paragraph([
-			"text" =>
-				"Párrafo que sigue a un heading. El margen entre heading y párrafo es 8px (var(--pw-space-2)).",
-			"variant" => "muted",
-		]);
-		echo "</div>";
-		echo '<div style="margin-top:24px;">';
-		$ui->heading(["text" => "Siguiente bloque", "level" => 2]);
-		echo "</div>";
-		echo '<div style="margin-top:8px;">';
-		$ui->paragraph([
-			"text" =>
-				"El espacio entre secciones de contenido es 24px (var(--pw-space-6) / --pw-content-padding).",
-			"variant" => "muted",
-		]);
-		echo "</div>";
-		echo "</div>";
-
-		echo "<div>";
-		echo '<p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--pw-color-fg-muted);margin:0 0 12px;">Imagen → caption → contenido</p>';
-		echo '<div style="width:100%;height:80px;background:var(--pw-color-bg-emphasis);border:1px solid var(--pw-color-border-emphasis);display:flex;align-items:center;justify-content:center;">';
-		echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">Imagen / Media</span>';
-		echo "</div>";
-		echo '<p style="font-size:11px;color:var(--pw-color-fg-subtle);margin:6px 0 0;">Caption: 6px arriba de la imagen (var(--pw-space-1) + 2px).</p>';
-		echo '<div style="margin-top:16px;">';
-		$ui->paragraph([
-			"text" => "Párrafo que sigue al caption. Espacio: 16px (var(--pw-card-padding)).",
-			"variant" => "muted",
-		]);
-		echo "</div>";
-		echo "</div>";
-
-		echo "</div>";
+		pw_pg_section("Reglas de espaciado entre elementos");
+		echo '<table class="wp-list-table widefat fixed striped" style="width:auto;max-width:580px;">';
+		echo "<thead><tr><th>Contexto</th><th>Token recomendado</th><th>Valor</th></tr></thead><tbody>";
+		$rules = [
+			["Heading " . pw_pg_arrow("down", 9) . " Párrafo", "--pw-space-2", "8px"],
+			["Párrafo " . pw_pg_arrow("down", 9) . " Párrafo", "--pw-space-2", "8px"],
+			["Imagen " . pw_pg_arrow("down", 9) . " Caption", "6px (manual)", "6px"],
+			["Caption " . pw_pg_arrow("down", 9) . " Párrafo siguiente", "--pw-card-padding", "16px"],
+			["Card " . pw_pg_arrow("right", 9) . " Card (gap horizontal)", "--pw-layout-gap", "24px"],
+			["Sección " . pw_pg_arrow("down", 9) . " Sección (bloques de página)", "--pw-space-8", "32px"],
+			["Label " . pw_pg_arrow("down", 9) . " Control de formulario", "--pw-space-2", "8px"],
+			["Campo " . pw_pg_arrow("down", 9) . " Campo", "--pw-form-gap", "16px"],
+		];
+		foreach ($rules as [$ctx, $token, $val]) {
+			echo "<tr>";
+			echo '<td style="font-size:11px;">' . $ctx . "</td>";
+			echo '<td><code style="font-size:10px;color:var(--pw-color-fg-default);">' .
+				esc_html($token) .
+				"</code></td>";
+			echo '<td style="font-size:11px;color:var(--pw-color-fg-subtle);">' .
+				esc_html($val) .
+				"</td>";
+			echo "</tr>";
+		}
+		echo "</tbody></table>";
 		pw_pg_section_end();
 
 		pw_pg_section(
-			"Contenedor básico",
-			"Un div con padding estándar y borde. Base de todos los contenedores del sistema.",
+			"Contenedor básico y profundidad anidada",
+			"Cada nivel de anidamiento usa un fondo más oscuro y un borde más sutil.",
 		);
 		echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);">';
-		$ui->paragraph([
-			"text" =>
-				"Contenedor con padding var(--pw-card-padding) = 16px y borde var(--pw-color-border-default).",
-		]);
+		$ui->paragraph(["text" => "Nivel 0 — contenedor raíz. bg-subtle, border-default."]);
+		echo '<div style="margin-top:var(--pw-card-padding);border:1px solid var(--pw-color-border-muted);padding:var(--pw-card-padding);background:var(--pw-color-bg-inset);">';
+		$ui->paragraph(["text" => "Nivel 1 — anidado. bg-inset, border-muted.", "variant" => "muted"]);
+		echo '<div style="margin-top:var(--pw-card-padding);border:1px solid var(--pw-color-border-muted);padding:var(--pw-card-padding);background:var(--pw-color-bg-emphasis);">';
+		$ui->paragraph(["text" => "Nivel 2 — más profundo. bg-emphasis, border-muted.", "variant" => "muted"]);
+		echo '<div style="margin-top:var(--pw-card-padding);border:1px solid var(--pw-color-border-emphasis);padding:var(--pw-card-padding);background:var(--pw-color-bg-overlay);">';
+		$ui->paragraph(["text" => "Nivel 3 — hoja. bg-overlay, border-emphasis.", "variant" => "muted"]);
 		echo "</div>";
-		echo '<div style="margin-top:8px;border-left:2px solid var(--pw-color-accent-fg);padding:var(--pw-card-padding);background:var(--pw-color-bg-inset);">';
-		$ui->paragraph([
-			"text" =>
-				"Variante: border-left de acento. Útil para callouts, advertencias o contexto secundario.",
-			"variant" => "muted",
-		]);
+		echo "</div>";
+		echo "</div>";
 		echo "</div>";
 		pw_pg_section_end();
 
-		pw_pg_section(
-			"Grid 2 columnas (1fr 1fr)",
-			"Gap = var(--pw-layout-gap) = 24px. Usar para contenido de igual peso.",
-		);
+		pw_pg_section("Grid 2 columnas (1fr 1fr)", "Gap uniforme: var(--pw-layout-gap) = 24px.");
 		echo '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--pw-layout-gap);">';
 		foreach (["Columna A", "Columna B"] as $col) {
 			echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);">';
 			$ui->heading(["text" => $col, "level" => 4]);
 			echo '<div style="margin-top:8px;">';
 			$ui->paragraph([
-				"text" => "Contenido de $col. Cada columna ocupa el mismo ancho.",
+				"text" => "$col — peso igual. Útil para formularios en dos columnas.",
 				"variant" => "muted",
 			]);
 			echo "</div></div>";
@@ -895,15 +920,26 @@ $ui->tab_panel([
 		pw_pg_section_end();
 
 		pw_pg_section(
-			"Grid 3 columnas (1fr 1fr 1fr)",
-			"Gap = var(--pw-layout-gap). Útil para métricas, stats o cards de tamaño uniforme.",
+			"Grid 3 columnas — métricas (repeat(3, 1fr))",
+			"Indicador decorativo gris en esquina superior derecha.",
 		);
-		echo '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--pw-layout-gap);">';
-		foreach (["Métrica A", "Métrica B", "Métrica C"] as $col) {
-			echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);text-align:center;">';
-			echo '<div style="font-size:24px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">—</div>';
-			echo '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--pw-color-fg-subtle);margin-top:4px;">' .
-				esc_html($col) .
+		$metrics = [
+			["Neto", "$120.000", "12 facturas"],
+			["Activos", "47", "3 pendientes"],
+			["Cobertura", "94%", "Último mes"],
+		];
+		echo '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--pw-layout-gap);">';
+		foreach ($metrics as [$lbl, $val, $sub]) {
+			echo '<div style="position:relative;border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);overflow:hidden;">';
+			echo '<div style="position:absolute;top:0;right:0;width:20px;height:20px;background:var(--pw-color-bg-inset);"></div>';
+			echo '<div style="font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
+				esc_html($val) .
+				"</div>";
+			echo '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--pw-color-fg-subtle);margin-top:4px;">' .
+				esc_html($lbl) .
+				"</div>";
+			echo '<div style="font-size:10px;color:var(--pw-color-fg-subtle);margin-top:6px;">' .
+				esc_html($sub) .
 				"</div>";
 			echo "</div>";
 		}
@@ -911,39 +947,49 @@ $ui->tab_panel([
 		pw_pg_section_end();
 
 		pw_pg_section(
+			"Grid 4 columnas (repeat(4, 1fr))",
+			"Gap uniforme: var(--pw-layout-gap) = 24px. Catálogos, iconografía, grids de opciones.",
+		);
+		echo '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--pw-layout-gap);">';
+		foreach (range(1, 8) as $n) {
+			echo '<div style="position:relative;border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);display:flex;align-items:center;justify-content:center;overflow:hidden;">';
+			echo '<div style="position:absolute;top:0;right:0;width:16px;height:16px;background:var(--pw-color-bg-inset);"></div>';
+			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">Ítem ' .
+				(int) $n .
+				"</span>";
+			echo "</div>";
+		}
+		echo "</div>";
+		pw_pg_section_end();
+
+		pw_pg_section(
 			"Grid asimétrico (2fr 1fr)",
-			"Contenido principal ancho + sidebar angosto. Gap = var(--pw-layout-gap).",
+			"Contenido principal ancho " . pw_pg_arrow("right", 10) . " sidebar angosto. Gap uniforme: var(--pw-layout-gap).",
 		);
 		echo '<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--pw-layout-gap);">';
 		echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);">';
 		$ui->heading(["text" => "Área principal (2fr)", "level" => 4]);
 		echo '<div style="margin-top:8px;">';
 		$ui->paragraph([
-			"text" => "El área de contenido principal ocupa dos tercios del ancho disponible.",
+			"text" => "Ocupa dos tercios. Contenido principal, formularios, tablas.",
 			"variant" => "muted",
 		]);
 		echo "</div></div>";
 		echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-inset);">';
 		$ui->heading(["text" => "Sidebar (1fr)", "level" => 4]);
 		echo '<div style="margin-top:8px;">';
-		$ui->paragraph([
-			"text" => "Contextual, filtros o acciones secundarias.",
-			"variant" => "muted",
-		]);
+		$ui->paragraph(["text" => "Filtros, meta, acciones secundarias.", "variant" => "muted"]);
 		echo "</div></div>";
 		echo "</div>";
 		pw_pg_section_end();
 
 		pw_pg_section(
 			"Grid irregular (1fr 2fr 1fr)",
-			"Columna central dominante. Útil para layouts editoriales o dashboards con foco central.",
+			"Columna central dominante — editorial, dashboards con foco en el centro.",
 		);
 		echo '<div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:var(--pw-layout-gap);">';
-		foreach (["Nav / Meta", "Contenido central", "Acciones"] as $col) {
-			$bg =
-				$col === "Contenido central"
-					? "var(--pw-color-bg-subtle)"
-					: "var(--pw-color-bg-inset)";
+		foreach (["Nav / Meta (1fr)", "Contenido central (2fr)", "Acciones (1fr)"] as $col) {
+			$bg = strpos($col, "central") !== false ? "var(--pw-color-bg-subtle)" : "var(--pw-color-bg-inset)";
 			echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:' .
 				esc_attr($bg) .
 				';">';
@@ -954,53 +1000,17 @@ $ui->tab_panel([
 		pw_pg_section_end();
 
 		pw_pg_section(
-			"Grid 4 columnas (repeat(4, 1fr))",
-			"Para ítems de catálogo, iconografía o grids de opciones compactas.",
+			"Geometría irregular A — hero + side + meta/body",
+			"grid-template-areas. El hero span 2 cols; el side span 2 rows.",
 		);
-		echo '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--pw-space-4);">';
-		foreach (range(1, 8) as $n) {
-			echo '<div style="border:1px solid var(--pw-color-border-default);padding:var(--pw-space-4);background:var(--pw-color-bg-subtle);display:flex;align-items:center;justify-content:center;">';
-			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">Ítem ' .
-				(int) $n .
-				"</span>";
-			echo "</div>";
-		}
-		echo "</div>";
-		pw_pg_section_end();
-
-		pw_pg_section(
-			"Masonry — CSS columns",
-			"Usando column-count + column-gap. Los ítems fluyen verticalmente, no requieren altura uniforme.",
-		);
-		echo '<div style="column-count:3;column-gap:var(--pw-layout-gap);">';
-		$items = [100, 60, 140, 80, 120, 50, 90, 110];
-		foreach ($items as $h) {
-			echo '<div style="break-inside:avoid;margin-bottom:var(--pw-space-4);border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);height:' .
-				(int) $h .
-				'px;display:flex;align-items:center;">';
-			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);">h=' .
-				(int) $h .
-				"px</span>";
-			echo "</div>";
-		}
-		echo "</div>";
-		pw_pg_section_end();
-
-		pw_pg_section(
-			"Geometría irregular — grid-template-areas",
-			"Áreas con nombres. Permite layouts tipo mosaico o editorial con control total.",
-		);
-		echo '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:120px 80px;gap:var(--pw-space-2);grid-template-areas:\'hero hero side\' \'meta body side\';">';
-		$areas = [
-			"hero" => "Hero (span 2 cols)",
-			"side" => "Side (span 2 rows)",
-			"meta" => "Meta",
-			"body" => "Body",
-		];
-		foreach ($areas as $area => $label) {
+		echo '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:120px 80px;gap:var(--pw-layout-gap);grid-template-areas:\'hero hero side\' \'meta body side\';">';
+		foreach (
+			["hero" => "Hero (2 cols)", "side" => "Side (2 rows)", "meta" => "Meta", "body" => "Body"]
+			as $area => $label
+		) {
 			echo '<div style="grid-area:' .
 				esc_attr($area) .
-				';border:1px solid var(--pw-color-border-emphasis);background:var(--pw-color-bg-inset);display:flex;align-items:center;justify-content:center;padding:var(--pw-space-3);">';
+				';border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-inset);display:flex;align-items:center;justify-content:center;padding:var(--pw-space-3);">';
 			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">' .
 				esc_html($label) .
 				"</span>";
@@ -1010,35 +1020,97 @@ $ui->tab_panel([
 		pw_pg_section_end();
 
 		pw_pg_section(
-			"Reglas de espaciado — inter-contenedor",
-			"Cuánto aire dar entre bloques según su nivel jerárquico.",
+			"Geometría irregular B — 5 celdas asimétricas",
+			"Banner full-width + 2 zonas de distinto peso + 2 módulos angostos.",
 		);
-		echo '<table class="wp-list-table widefat fixed striped" style="width:auto;max-width:560px;">';
-		echo "<thead><tr><th>Contexto</th><th>Token recomendado</th><th>Valor</th></tr></thead><tbody>";
-		$rules = [
-			["Entre secciones de página (h2 block)", "--pw-space-8", "32px"],
-			["Entre cards / contenedores hermanos", "--pw-layout-gap", "24px"],
-			["Entre heading y primer párrafo", "--pw-space-2", "8px"],
-			["Entre párrafos consecutivos", "--pw-space-2", "8px"],
-			["Entre imagen y caption", "6px (manual)", "6px"],
-			["Entre caption y párrafo siguiente", "--pw-card-padding", "16px"],
-			["Gap interno de un card", "--pw-card-padding", "16px"],
-			["Entre label y control de formulario", "--pw-space-2", "8px"],
-			["Entre campos de formulario", "--pw-form-gap", "16px"],
-			["Entre ítems de grid compacto", "--pw-space-4", "16px"],
-		];
-		foreach ($rules as [$ctx, $token, $val]) {
-			echo "<tr>";
-			echo '<td style="font-size:11px;">' . esc_html($ctx) . "</td>";
-			echo '<td><code style="font-size:10px;color:var(--pw-color-fg-default);">' .
-				esc_html($token) .
-				"</code></td>";
-			echo '<td style="font-size:11px;color:var(--pw-color-fg-subtle);">' .
-				esc_html($val) .
-				"</td>";
-			echo "</tr>";
+		echo '<div style="display:grid;grid-template-columns:3fr 1fr;grid-template-rows:60px 100px 100px;gap:var(--pw-layout-gap);grid-template-areas:\'banner banner\' \'main aux1\' \'main aux2\';">';
+		foreach (
+			[
+				"banner" => "Banner (full width)",
+				"main" => "Main (span 2 rows)",
+				"aux1" => "Aux 1",
+				"aux2" => "Aux 2",
+			]
+			as $area => $label
+		) {
+			echo '<div style="grid-area:' .
+				esc_attr($area) .
+				';border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-inset);display:flex;align-items:center;justify-content:center;padding:var(--pw-space-3);">';
+			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">' .
+				esc_html($label) .
+				"</span>";
+			echo "</div>";
 		}
-		echo "</tbody></table>";
+		echo "</div>";
+		pw_pg_section_end();
+
+		pw_pg_section("Geometría irregular C — mosaico editorial 4 zonas");
+		echo '<div style="display:grid;grid-template-columns:1fr 1fr 2fr;grid-template-rows:80px 120px 80px;gap:var(--pw-layout-gap);grid-template-areas:\'a b feature\' \'c b feature\' \'d d feature\';">';
+		foreach (
+			[
+				"a" => "A",
+				"b" => "B (2 rows)",
+				"feature" => "Feature (3 rows)",
+				"c" => "C",
+				"d" => "D (ancho abajo)",
+			]
+			as $area => $label
+		) {
+			echo '<div style="grid-area:' .
+				esc_attr($area) .
+				';border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-inset);display:flex;align-items:center;justify-content:center;padding:var(--pw-space-3);">';
+			echo '<span style="font-size:9px;color:var(--pw-color-fg-subtle);text-transform:uppercase;letter-spacing:0.06em;">' .
+				esc_html($label) .
+				"</span>";
+			echo "</div>";
+		}
+		echo "</div>";
+		pw_pg_section_end();
+
+		pw_pg_section(
+			"Grid irregular para tablas",
+			"Tabla de datos usando grid en vez de table. Las celdas pueden hacer span de columnas.",
+		);
+		$cols = "2fr 1fr 1fr 80px";
+		echo '<div style="display:grid;grid-template-columns:' .
+			esc_attr($cols) .
+			';gap:1px;background:var(--pw-color-border-default);">';
+		foreach (["Nombre", "Estado", "Fecha", "Acción"] as $h) {
+			echo '<div style="background:var(--pw-color-bg-inset);padding:8px 12px;font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--pw-color-fg-subtle);">' .
+				esc_html($h) .
+				"</div>";
+		}
+		$rows_data = [
+			["Entrada de ejemplo", "Publicado", "2026-04-01", "Ver"],
+			["Otro ítem más largo aquí", "Borrador", "2026-03-28", "Editar"],
+			["Tercera entrada", "Papelera", "—", "—"],
+		];
+		foreach ($rows_data as $row) {
+			foreach ($row as $cell) {
+				echo '<div style="background:var(--pw-color-bg-subtle);padding:8px 12px;font-size:11px;color:var(--pw-color-fg-muted);">' .
+					esc_html($cell) .
+					"</div>";
+			}
+		}
+		echo '<div style="grid-column:span 3;background:var(--pw-color-bg-emphasis);padding:8px 12px;font-size:10px;color:var(--pw-color-fg-subtle);font-style:italic;">Celda span 3 columnas — notas o totales de sección</div>';
+		echo '<div style="background:var(--pw-color-bg-emphasis);padding:8px 12px;font-size:11px;color:var(--pw-color-fg-default);"></div>';
+		echo "</div>";
+		pw_pg_section_end();
+
+		pw_pg_section(
+			"Masonry — CSS columns",
+			"column-count + column-gap. Los ítems fluyen verticalmente con alturas heterogéneas naturales.",
+		);
+		echo '<div style="column-count:3;column-gap:var(--pw-layout-gap);">';
+		$items_h = [100, 60, 140, 80, 120, 50, 90, 110, 70];
+		foreach ($items_h as $h) {
+			echo '<div style="break-inside:avoid;margin-bottom:var(--pw-layout-gap);border:1px solid var(--pw-color-border-default);padding:var(--pw-card-padding);background:var(--pw-color-bg-subtle);height:' .
+				(int) $h .
+				'px;display:flex;align-items:center;">';
+			echo '<span style="font-size:10px;color:var(--pw-color-fg-subtle);">h=' . (int) $h . "px</span>";
+			echo "</div>";
+		}
+		echo "</div>";
 		pw_pg_section_end();
 	},
 ]);
