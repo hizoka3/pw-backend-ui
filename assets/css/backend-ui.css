@@ -1046,15 +1046,22 @@
 	color: var(--pw-color-fg-default);
 }
 
-/* Date input */
+/* Date input — custom minimal calendar icon (terminal style, square strokes) */
 .pw-bui-input[type="date"]::-webkit-calendar-picker-indicator {
-	filter: invert(0.5);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='%23888888' stroke-width='1' stroke-linecap='square' stroke-linejoin='miter'%3E%3Crect x='1' y='3' width='12' height='10'/%3E%3Cline x1='4' y1='1' x2='4' y2='5'/%3E%3Cline x1='10' y1='1' x2='10' y2='5'/%3E%3Cline x1='1' y1='7' x2='13' y2='7'/%3E%3C/svg%3E");
+	background-size: 14px 14px;
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 16px;
+	height: 16px;
+	opacity: 0.75;
 	cursor: pointer;
-	opacity: 0.6;
+	filter: none;
 }
 [data-pw-theme="light"]
 	.pw-bui-input[type="date"]::-webkit-calendar-picker-indicator {
-	filter: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='%23555555' stroke-width='1' stroke-linecap='square' stroke-linejoin='miter'%3E%3Crect x='1' y='3' width='12' height='10'/%3E%3Cline x1='4' y1='1' x2='4' y2='5'/%3E%3Cline x1='10' y1='1' x2='10' y2='5'/%3E%3Cline x1='1' y1='7' x2='13' y2='7'/%3E%3C/svg%3E");
+	opacity: 0.8;
 }
 
 /* ── Input types sin estilo en Work OS (paridad visual) ── */
@@ -1288,7 +1295,7 @@
 	height: 20px;
 	background: #2a2a2a;
 	border: 1px solid #3a3a3a;
-	border-radius: 2px;
+	border-radius: 0;
 	cursor: pointer;
 	transition:
 		background 0.2s,
@@ -1315,7 +1322,7 @@
 	width: 12px;
 	height: 12px;
 	background: #ffffff;
-	border-radius: 1px;
+	border-radius: 0;
 	box-shadow: var(--pw-shadow-sm);
 	transition: transform 0.2s;
 }
@@ -1545,6 +1552,115 @@
 	border-color: var(--pw-color-info-muted);
 }
 
+/* ── ACTION BUTTONS — badge-like & grid-joined ── */
+
+/* Badge-like inline action (ajax, mark done, etc.) */
+.pw-bui-action {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	height: 20px;
+	font-family: inherit;
+	font-size: 8px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	background: transparent;
+	border: 1px solid var(--pw-color-border-emphasis);
+	border-radius: 0;
+	color: var(--pw-color-fg-muted);
+	cursor: pointer;
+	transition:
+		color 0.12s,
+		background 0.12s,
+		border-color 0.12s;
+	white-space: nowrap;
+}
+.pw-bui-action:hover {
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-fg-subtle);
+	background: var(--pw-color-bg-emphasis);
+}
+.pw-bui-action:active {
+	background: var(--pw-color-bg-overlay);
+	color: var(--pw-color-fg-default);
+}
+
+/* Orange accent variant */
+.pw-bui-action--orange {
+	color: #c05a00;
+	border-color: #4a2500;
+}
+[data-pw-theme="dark"] .pw-bui-action--orange {
+	color: #e07020;
+	border-color: #5a3000;
+}
+.pw-bui-action--orange:hover {
+	color: #ff8c30;
+	border-color: #e07020;
+	background: rgba(224, 112, 32, 0.1);
+}
+.pw-bui-action--orange:active {
+	background: rgba(224, 112, 32, 0.18);
+}
+
+/* Danger variant */
+.pw-bui-action--danger {
+	color: var(--pw-color-danger-fg);
+	border-color: var(--pw-color-danger-muted);
+}
+.pw-bui-action--danger:hover {
+	background: rgba(248, 81, 73, 0.08);
+}
+
+/* Full-bleed grid-joined action button — visually joined to container bottom */
+.pw-bui-action-grid {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	padding: 8px 12px;
+	font-family: inherit;
+	font-size: 8px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	background: transparent;
+	border: none;
+	border-top: 1px solid var(--pw-color-border-default);
+	border-radius: 0;
+	color: var(--pw-color-fg-subtle);
+	cursor: pointer;
+	transition:
+		background 0.12s,
+		color 0.12s;
+}
+.pw-bui-action-grid:hover {
+	background: var(--pw-color-bg-emphasis);
+	color: var(--pw-color-fg-default);
+}
+.pw-bui-action-grid:active {
+	background: var(--pw-color-bg-overlay);
+	color: var(--pw-color-fg-default);
+}
+/* Orange accent variant */
+.pw-bui-action-grid--orange {
+	color: #c05a00;
+}
+[data-pw-theme="dark"] .pw-bui-action-grid--orange {
+	color: #e07020;
+}
+.pw-bui-action-grid--orange:hover {
+	color: #ff8c30;
+	background: rgba(224, 112, 32, 0.08);
+}
+.pw-bui-action-grid--orange:active {
+	background: rgba(224, 112, 32, 0.15);
+	color: #ff8c30;
+}
+
 /* ── NOTICE / BANNER ── */
 .pw-bui-notice {
 	display: flex;
@@ -1577,6 +1693,12 @@
 	flex: 1;
 	min-width: 0;
 }
+/* Title always white / default foreground */
+.pw-bui-notice__body strong {
+	color: var(--pw-color-fg-default);
+	font-weight: 600;
+}
+/* Dismiss button: bigger, colored to match notice type */
 .pw-bui-notice__dismiss {
 	flex-shrink: 0;
 	background: none;
@@ -1584,37 +1706,50 @@
 	cursor: pointer;
 	padding: 0;
 	color: inherit;
-	opacity: 0.6;
+	opacity: 0.8;
 	transition: opacity 0.12s;
 	line-height: 1;
+	width: 22px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .pw-bui-notice__dismiss:hover {
 	opacity: 1;
+}
+.pw-bui-notice--info .pw-bui-notice__dismiss {
+	color: var(--pw-color-info-fg);
+}
+.pw-bui-notice--success .pw-bui-notice__dismiss {
+	color: var(--pw-color-success-fg);
+}
+.pw-bui-notice--warning .pw-bui-notice__dismiss {
+	color: var(--pw-color-warning-fg);
+}
+.pw-bui-notice--danger .pw-bui-notice__dismiss {
+	color: var(--pw-color-danger-fg);
 }
 
 .pw-bui-notice--info {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
 	border-color: var(--pw-color-info-fg);
-	opacity: 0.75;
 }
 .pw-bui-notice--success {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
 	border-color: var(--pw-color-success-fg);
-	opacity: 0.75;
 }
 .pw-bui-notice--warning {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
 	border-color: var(--pw-color-warning-fg);
-	opacity: 0.75;
 }
 .pw-bui-notice--danger {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
 	border-color: var(--pw-color-danger-fg);
-	opacity: 0.75;
 }
 
 /* ── SEPARATOR ── */
@@ -1714,9 +1849,15 @@
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
 	color: var(--pw-color-fg-subtle);
-	margin: 0 0 8px;
+	margin: 14px 0 8px;
 	padding: 0;
 	border: none;
+}
+/* First section-label in a container should not add top margin */
+.pw-bui-pg-section > .pw-bui-section-label:first-child,
+.pw-bui-form-group + .pw-bui-section-label,
+:first-child > .pw-bui-section-label {
+	margin-top: 0;
 }
 
 /* Códigos / RUT — Work OS usa Courier solo para esto */
@@ -1744,16 +1885,16 @@
 	overflow: hidden;
 }
 
-/* Decorative corner square — border only, no bg */
+/* Decorative corner square — border only, no bg, matches container border */
 .pw-bui-stat::after {
 	content: "";
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: 18px;
-	height: 18px;
-	border-left: 1px solid var(--pw-color-border-emphasis);
-	border-bottom: 1px solid var(--pw-color-border-emphasis);
+	width: 13px;
+	height: 13px;
+	border-left: 1px solid var(--pw-color-border-default);
+	border-bottom: 1px solid var(--pw-color-border-default);
 	pointer-events: none;
 }
 
@@ -2242,6 +2383,30 @@
 	}
 }
 
+/* ── SCROLLBAR THEMING ──────────────────────────────────────────
+   Thin themed scrollbar inside the app wrapper. Tokens adapt to
+   dark/light automatically. Firefox via scrollbar-color.
+   ─────────────────────────────────────────────────────────────── */
+#pw-backend-ui-app ::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+#pw-backend-ui-app ::-webkit-scrollbar-track {
+	background: var(--pw-color-bg-inset);
+}
+#pw-backend-ui-app ::-webkit-scrollbar-thumb {
+	background: var(--pw-color-border-emphasis);
+}
+#pw-backend-ui-app ::-webkit-scrollbar-thumb:hover {
+	background: var(--pw-color-fg-subtle);
+}
+/* Utility class for scroll containers — Firefox + programmatic */
+.pw-bui-scroll {
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: var(--pw-color-border-emphasis) var(--pw-color-bg-inset);
+}
+
 /* ── Dismiss animation ── */
 [data-pw-dismissible].pw-bui-dismissing {
 	opacity: 0;
@@ -2291,15 +2456,15 @@
 
 /* ── WP_List_Table search_box + tablenav fix ────────────────────────────────
    WP genera <p class="search-box"> con float:right seguido del .tablenav.
-   Forzamos el search-box a inline-flex y el tablenav top a overflow:hidden
-   para que contenga el float y queden visualmente alineados.
+   Search-box en inline-flex sin float; margin-left:auto alinea a la derecha
+   dentro del .tablenav.top (flex).
    ─────────────────────────────────────────────────────────────────────────── */
 #pw-backend-ui-app p.search-box {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	float: right;
-	margin: 0;
+	float: none;
+	margin: 0 0 0 auto;
 	padding: 0;
 }
 #pw-backend-ui-app p.search-box label {
@@ -2310,7 +2475,7 @@
 	margin: 0;
 	width: 200px;
 	height: 28px;
-	padding: 6px 10px;
+	padding: 5px;
 	font-size: 13px;
 	color: var(--pw-color-fg-default) !important;
 	background: var(--pw-color-bg-inset) !important;
@@ -2355,7 +2520,7 @@
 	border-color: var(--pw-color-border-emphasis) !important;
 }
 #pw-backend-ui-app .tablenav.top {
-	overflow: hidden;
+	overflow: visible;
 	padding-top: 0;
 	border-radius: 0;
 	display: flex;
@@ -2542,17 +2707,18 @@
 #pw-backend-ui-app .pw-bui-data-table th,
 #pw-backend-ui-app .pw-bui-data-table td {
 	font-size: 11px;
-	padding: 10px;
+	padding: 7px 12px;
 	border: 1px solid var(--pw-color-border-default);
 	border-radius: 0;
 	text-align: left;
 }
 #pw-backend-ui-app table thead th,
 #pw-backend-ui-app .pw-bui-data-table thead th {
-	font-size: 10px;
+	font-size: 9px;
 	font-weight: 700;
-	text-transform: capitalize;
-	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--pw-color-fg-subtle);
 	background: var(--pw-color-bg-inset);
 }
 
@@ -2566,7 +2732,12 @@
 #pw-backend-ui-app .wp-list-table thead td,
 #pw-backend-ui-app .wp-list-table tfoot th,
 #pw-backend-ui-app .wp-list-table tfoot td {
-	color: var(--pw-color-fg-muted);
+	color: var(--pw-color-fg-subtle);
+	font-size: 9px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	padding: 7px 12px;
 	border-bottom: 1px solid var(--pw-color-border-default);
 }
 
@@ -2589,6 +2760,7 @@
 #pw-backend-ui-app .wp-list-table th {
 	color: var(--pw-color-fg-default);
 	border-color: var(--pw-color-border-default);
+	padding: 7px 12px;
 }
 
 /* Links dentro de la tabla */
