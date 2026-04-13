@@ -24,6 +24,9 @@ $extra_attrs = "";
 foreach ($atts["attrs"] ?? [] as $key => $val) {
 	$extra_attrs .= " " . esc_attr($key) . '="' . esc_attr($val) . '"';
 }
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$extra_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 if (!empty($atts["style"])) {
 	$extra_attrs .= ' style="' . esc_attr($atts["style"]) . '"';

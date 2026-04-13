@@ -10,6 +10,10 @@
 defined("ABSPATH") || exit();
 
 $type = $atts["type"] ?? "info";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 $classes = implode(
 	" ",
 	array_filter([
@@ -25,6 +29,7 @@ $classes = implode(
     class="<?php echo esc_attr($classes); ?>"
     role="alert"
     <?php echo !empty($atts["dismissible"]) ? "data-pw-dismissible" : ""; ?>
+    <?php echo $data_attrs; ?>
 >
     <div class="pw-bui-notice__body">
         <?php if (!empty($atts["title"])): ?>

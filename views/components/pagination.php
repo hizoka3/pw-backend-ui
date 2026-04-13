@@ -13,6 +13,10 @@ $current = (int) ($atts["current"] ?? 1);
 $total = (int) ($atts["total"] ?? 1);
 $base_url = $atts["base_url"] ?? "#";
 $window = (int) ($atts["window"] ?? 2); // pages around current
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 if ($total <= 1) {
 	return;
@@ -42,7 +46,7 @@ sort($pages);
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
 <nav aria-label="Paginación" class="<?php echo esc_attr(
 	$atts["class"] ?? "",
-); ?>">
+); ?>"<?php echo $data_attrs; ?>>
     <div class="pw-bui-pagination">
 
         <?php

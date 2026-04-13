@@ -10,6 +10,10 @@
 defined("ABSPATH") || exit();
 
 $checkbox_id = sanitize_title($atts["name"]) . "-" . wp_rand(1000, 9999);
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <div class="pw-bui-form-group <?php echo esc_attr($atts["wrapper_class"] ?? ""); ?>">
@@ -24,6 +28,7 @@ $checkbox_id = sanitize_title($atts["name"]) . "-" . wp_rand(1000, 9999);
             class="pw-bui-checkbox-item__input"
             <?php checked($atts["checked"] ?? false); ?>
             <?php echo !empty($atts["disabled"]) ? "disabled" : ""; ?>
+            <?php echo $data_attrs; ?>
         />
         <div>
             <?php if (!empty($atts["label"])): ?>

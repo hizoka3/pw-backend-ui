@@ -7,6 +7,7 @@ namespace PW\BackendUI\Components;
  * Renders individual UI components — PW Design System.
  *
  * Each method outputs HTML directly. All methods accept an $atts array.
+ * All components support `data_attrs` (key=>value) to render custom data-* attributes.
  * Components use CSS variables defined in backend-ui.css (no Tailwind utilities).
  */
 class ComponentRenderer
@@ -47,6 +48,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 			"attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/button.php";
@@ -90,6 +92,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/input.php";
 	}
@@ -124,6 +127,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/textarea.php";
 	}
@@ -158,6 +162,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/select.php";
 	}
@@ -186,6 +191,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/checkbox.php";
 	}
@@ -244,6 +250,7 @@ class ComponentRenderer
 			"disabled" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/radio.php";
 	}
@@ -272,6 +279,7 @@ class ComponentRenderer
 			"error" => "",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/radio-group.php";
 	}
@@ -322,6 +330,7 @@ class ComponentRenderer
 			"help" => "",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/segmented-control.php";
 	}
@@ -352,6 +361,7 @@ class ComponentRenderer
 			"padded" => true,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/card.php";
 	}
@@ -376,6 +386,7 @@ class ComponentRenderer
 			"dismissible" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/notice.php";
 	}
@@ -398,6 +409,7 @@ class ComponentRenderer
 			"size" => "md",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/badge.php";
 	}
@@ -418,6 +430,7 @@ class ComponentRenderer
 			"label" => "Cargando...",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/spinner.php";
 	}
@@ -446,6 +459,7 @@ class ComponentRenderer
 			"help" => "",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/progress-bar.php";
 	}
@@ -464,6 +478,7 @@ class ComponentRenderer
 			"items" => [],
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/breadcrumbs.php";
 	}
@@ -490,6 +505,7 @@ class ComponentRenderer
 			"window" => 2,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/pagination.php";
 	}
@@ -515,6 +531,7 @@ class ComponentRenderer
 			"position" => "top",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/tooltip.php";
 	}
@@ -539,6 +556,7 @@ class ComponentRenderer
 			"height" => null,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/skeleton.php";
 	}
@@ -565,6 +583,7 @@ class ComponentRenderer
 			"variant" => "",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/heading.php";
 	}
@@ -586,6 +605,7 @@ class ComponentRenderer
 			"for" => "",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/section-label.php";
 	}
@@ -605,6 +625,7 @@ class ComponentRenderer
 			"items" => [],
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/stats-bar.php";
 	}
@@ -628,6 +649,7 @@ class ComponentRenderer
 			"full_width_headers" => false,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/data-table.php";
 	}
@@ -648,6 +670,7 @@ class ComponentRenderer
 			"variant" => "default",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/paragraph.php";
 	}
@@ -672,6 +695,7 @@ class ComponentRenderer
 			"variant" => "default",
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/link.php";
 	}
@@ -685,7 +709,11 @@ class ComponentRenderer
 	 */
 	public function separator(array $atts = []): void
 	{
-		$atts = wp_parse_args($atts, ["class" => "", "wrapper_class" => ""]);
+		$atts = wp_parse_args($atts, [
+			"class" => "",
+			"wrapper_class" => "",
+			"data_attrs" => [],
+		]);
 		include __DIR__ . "/../../views/components/separator.php";
 	}
 
@@ -707,6 +735,7 @@ class ComponentRenderer
 			"tabs" => [],
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/tabs.php";
 	}
@@ -729,6 +758,7 @@ class ComponentRenderer
 			"content" => null,
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/tab-panel.php";
 	}
@@ -779,6 +809,7 @@ class ComponentRenderer
 			"items" => [],
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/side-nav.php";
 	}
@@ -810,6 +841,7 @@ class ComponentRenderer
 			"steps" => [],
 			"class" => "",
 			"wrapper_class" => "",
+			"data_attrs" => [],
 		]);
 		include __DIR__ . "/../../views/components/stepper.php";
 	}
@@ -833,6 +865,7 @@ class ComponentRenderer
 			"items"          => [],
 			"allow_multiple" => false,
 			"class"          => "",
+			"data_attrs"     => [],
 		]);
 		include __DIR__ . "/../../views/components/accordion.php";
 	}

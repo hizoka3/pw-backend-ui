@@ -11,6 +11,10 @@
 defined("ABSPATH") || exit();
 
 $position = $atts["position"] ?? "top";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 // top | bottom
 ?>
@@ -20,6 +24,7 @@ $position = $atts["position"] ?? "top";
     data-pw-tooltip="<?php echo esc_attr($atts["text"] ?? ""); ?>"
     tabindex="0"
     style="display:inline-flex;"
+    <?php echo $data_attrs; ?>
 >
     <?php if (is_callable($atts["trigger"] ?? null)) {
     	call_user_func($atts["trigger"]);

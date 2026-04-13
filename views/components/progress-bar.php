@@ -12,6 +12,10 @@ defined("ABSPATH") || exit();
 $percent = max(0, min(100, (int) ($atts["value"] ?? 0)));
 $size = $atts["size"] ?? "sm";
 $variant = $atts["variant"] ?? "default";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 $bar_class = implode(
 	" ",
@@ -51,6 +55,7 @@ $wrap_class = implode(
         aria-valuenow="<?php echo esc_attr($percent); ?>"
         aria-valuemin="0"
         aria-valuemax="100"
+        <?php echo $data_attrs; ?>
         <?php if (!empty($atts["label"])) {
         	echo 'aria-label="' . esc_attr($atts["label"]) . '"';
         } ?>

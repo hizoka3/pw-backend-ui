@@ -10,6 +10,13 @@
 
 defined("ABSPATH") || exit(); ?>
 
+<?php
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
+?>
+
 <div class="pw-bui-form-group <?php echo esc_attr($atts["wrapper_class"] ?? ""); ?>">
     <?php if (!empty($atts["label"])): ?>
         <fieldset style="border:none;padding:0;margin:0;">
@@ -43,6 +50,7 @@ defined("ABSPATH") || exit(); ?>
                             <?php echo !empty($option["disabled"])
                             	? "disabled"
                             	: ""; ?>
+                            <?php echo $data_attrs; ?>
                         />
                         <div>
                             <label for="<?php echo esc_attr(
@@ -82,6 +90,7 @@ defined("ABSPATH") || exit(); ?>
                         <?php echo !empty($option["disabled"])
                         	? "disabled"
                         	: ""; ?>
+                        <?php echo $data_attrs; ?>
                     />
                     <div>
                         <label for="<?php echo esc_attr(

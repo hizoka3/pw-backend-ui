@@ -12,6 +12,10 @@ defined("ABSPATH") || exit();
 
 $name = $atts["name"] ?? "";
 $current = $atts["value"] ?? "";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <div class="pw-bui-form-group <?php echo esc_attr($atts["wrapper_class"] ?? ""); ?>">
@@ -24,6 +28,7 @@ $current = $atts["value"] ?? "";
         data-pw-segmented="<?php echo esc_attr($name); ?>"
         role="group"
         aria-label="<?php echo esc_attr($atts["label"] ?? $name); ?>"
+        <?php echo $data_attrs; ?>
     >
         <?php foreach ($atts["options"] ?? [] as $option):
 

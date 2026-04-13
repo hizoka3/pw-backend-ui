@@ -11,12 +11,16 @@ defined("ABSPATH") || exit();
 
 $items = $atts["items"] ?? [];
 $last = count($items) - 1;
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
 <nav aria-label="Breadcrumb" class="<?php echo esc_attr(
 	$atts["class"] ?? "",
-); ?>">
+); ?>"<?php echo $data_attrs; ?>>
     <ol class="pw-bui-breadcrumbs">
         <?php foreach ($items as $i => $item):
         	$is_last = $i === $last; ?>

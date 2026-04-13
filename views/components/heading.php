@@ -10,6 +10,10 @@
 defined("ABSPATH") || exit();
 
 $variant = (string) ($atts["variant"] ?? "");
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 if ($variant === "eyebrow") {
 	$tag = "p";
 	$classes = trim(
@@ -29,7 +33,7 @@ if ($variant === "eyebrow") {
 }
 ?>
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
-<<?php echo $tag; ?> class="<?php echo esc_attr($classes); ?>"><?php echo esc_html(
+<<?php echo $tag; ?> class="<?php echo esc_attr($classes); ?>"<?php echo $data_attrs; ?>><?php echo esc_html(
 	$atts["text"] ?? "",
 ); ?></<?php echo $tag; ?>>
 <?php if (!empty($atts["wrapper_class"])): ?></div><?php endif; ?>

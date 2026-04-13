@@ -13,10 +13,14 @@ $type = $atts["type"] ?? "text"; // text | title | box | avatar
 $lines = (int) ($atts["lines"] ?? 1);
 $width = $atts["width"] ?? "100%";
 $height = $atts["height"] ?? null;
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
-<div class="<?php echo esc_attr($atts["class"] ?? ""); ?>" aria-hidden="true">
+<div class="<?php echo esc_attr($atts["class"] ?? ""); ?>" aria-hidden="true"<?php echo $data_attrs; ?>>
     <?php if ($type === "avatar"): ?>
         <div
             class="pw-bui-skeleton pw-bui-skeleton--avatar"

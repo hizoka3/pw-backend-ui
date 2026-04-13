@@ -15,6 +15,10 @@ if (!is_array($headers)) {
 if (!is_array($rows)) {
 	$rows = [];
 }
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 $tbl = "pw-bui-data-table";
 if (!empty($atts["full_width_headers"])) {
@@ -27,7 +31,7 @@ $tbl = trim($tbl . " " . ($atts["class"] ?? ""));
 <div class="<?php echo esc_attr($atts["wrapper_class"]); ?>">
 <?php endif; ?>
 
-<table class="<?php echo esc_attr($tbl); ?>">
+<table class="<?php echo esc_attr($tbl); ?>"<?php echo $data_attrs; ?>>
     <?php if ($headers !== []): ?>
     <thead>
         <tr>
