@@ -9,6 +9,10 @@
 
 defined("ABSPATH") || exit();
 
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 $classes = implode(
 	" ",
 	array_filter([
@@ -20,7 +24,7 @@ $classes = implode(
 );
 ?>
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
-<span class="<?php echo esc_attr($classes); ?>"><?php echo esc_html(
+<span class="<?php echo esc_attr($classes); ?>"<?php echo $data_attrs; ?>><?php echo esc_html(
 	$atts["label"] ?? "",
 ); ?></span>
 <?php if (!empty($atts["wrapper_class"])): ?></div><?php endif; ?>

@@ -11,6 +11,10 @@ defined("ABSPATH") || exit();
 
 $has_error = !empty($atts["error"]);
 $select_id = sanitize_title($atts["name"]);
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 $classes = implode(
 	" ",
 	array_filter([
@@ -49,6 +53,7 @@ foreach ($atts["options"] ?? [] as $key => $option) {
         class="<?php echo esc_attr($classes); ?>"
         <?php echo !empty($atts["required"]) ? "required" : ""; ?>
         <?php echo !empty($atts["disabled"]) ? "disabled" : ""; ?>
+        <?php echo $data_attrs; ?>
     >
         <?php if (!empty($atts["placeholder"])): ?>
             <option value=""><?php echo esc_html(

@@ -12,6 +12,10 @@ defined("ABSPATH") || exit();
 
 $radio_id =
 	sanitize_title($atts["name"]) . "-" . sanitize_title($atts["value"]);
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
@@ -24,6 +28,7 @@ $radio_id =
         class="pw-bui-radio-item__input"
         <?php checked($atts["checked"] ?? false); ?>
         <?php echo !empty($atts["disabled"]) ? "disabled" : ""; ?>
+        <?php echo $data_attrs; ?>
     />
     <div>
         <?php if (!empty($atts["label"])): ?>

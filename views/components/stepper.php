@@ -22,6 +22,10 @@ defined("ABSPATH") || exit();
 
 $steps = $atts["steps"] ?? [];
 $total = count($steps);
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 if (empty($steps)) {
 	return;
@@ -33,6 +37,7 @@ if (empty($steps)) {
 	class="pw-bui-stepper <?php echo esc_attr($atts["class"] ?? ""); ?>"
 	aria-label="<?php esc_attr_e("Pasos del formulario", "pw-backend-ui"); ?>"
 	data-pw-stepper
+	<?php echo $data_attrs; ?>
 >
 	<?php foreach ($steps as $i => $step):
 

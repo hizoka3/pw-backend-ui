@@ -15,8 +15,12 @@ if (empty($atts["items"])) {
 }
 
 $sidenav_class = implode(" ", array_filter(["pw-bui-sidenav", $atts["class"] ?? "", $atts["wrapper_class"] ?? ""]));
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
-<nav class="<?php echo esc_attr($sidenav_class); ?>">
+<nav class="<?php echo esc_attr($sidenav_class); ?>"<?php echo $data_attrs; ?>>
 <?php foreach ($atts["items"] as $item):
 
 	// Separator

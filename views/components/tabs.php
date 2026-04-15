@@ -17,6 +17,10 @@ if (empty($atts["tabs"])) {
 }
 
 $mode = $atts["mode"] ?? "js";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 ?>
 
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
@@ -25,6 +29,7 @@ $mode = $atts["mode"] ?? "js";
     role="tablist"
     aria-label="Tabs"
     style="display:flex;gap:0;"
+    <?php echo $data_attrs; ?>
 >
     <?php foreach ($atts["tabs"] as $tab):
 

@@ -10,6 +10,13 @@
 
 defined("ABSPATH") || exit(); ?>
 
+<?php
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
+?>
+
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
 <div
     id="pw-tab-panel-<?php echo esc_attr($atts["slug"] ?? ""); ?>"
@@ -17,6 +24,7 @@ defined("ABSPATH") || exit(); ?>
     data-pw-tab-panel="<?php echo esc_attr($atts["slug"] ?? ""); ?>"
     class="pw-bui-tab-panel <?php echo esc_attr($atts["class"] ?? ""); ?>"
     <?php echo empty($atts["active"]) ? 'hidden aria-hidden="true"' : ""; ?>
+    <?php echo $data_attrs; ?>
 >
     <?php if (is_callable($atts["content"] ?? null)) {
     	call_user_func($atts["content"]);

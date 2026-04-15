@@ -14,12 +14,16 @@ $items          = $atts["items"] ?? [];
 $allow_multiple = !empty($atts["allow_multiple"]);
 $extra_class    = $atts["class"] ?? "";
 $uid_base = wp_unique_id("pw-acc-");
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 if (empty($items)) {
 	return;
 }
 ?>
-<div class="pw-bui-accordion <?php echo esc_attr($extra_class); ?>" data-pw-accordion<?php echo $allow_multiple ? " data-pw-accordion-multiple" : ""; ?>>
+<div class="pw-bui-accordion <?php echo esc_attr($extra_class); ?>" data-pw-accordion<?php echo $allow_multiple ? " data-pw-accordion-multiple" : ""; ?><?php echo $data_attrs; ?>>
 	<?php foreach ($items as $i => $item) :
 		$is_open     = !empty($item["open"]);
 		$is_disabled = !empty($item["disabled"]);

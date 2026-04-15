@@ -9,8 +9,15 @@
 
 defined("ABSPATH") || exit(); ?>
 
+<?php
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
+?>
+
 <?php if (!empty($atts["wrapper_class"])): ?><div class="<?php echo esc_attr($atts["wrapper_class"]); ?>"><?php endif; ?>
-<div class="pw-bui-card <?php echo esc_attr($atts["class"] ?? ""); ?>">
+<div class="pw-bui-card <?php echo esc_attr($atts["class"] ?? ""); ?>"<?php echo $data_attrs; ?>>
 
     <?php if (!empty($atts["title"]) || !empty($atts["description"])): ?>
         <div class="pw-bui-card__header">

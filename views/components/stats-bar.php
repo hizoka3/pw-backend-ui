@@ -11,6 +11,10 @@ $items = $atts["items"] ?? [];
 if (!is_array($items) || $items === []) {
 	return;
 }
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 
 $wrap_cls = trim("pw-bui-stats-bar " . ($atts["class"] ?? ""));
 ?>
@@ -19,7 +23,7 @@ $wrap_cls = trim("pw-bui-stats-bar " . ($atts["class"] ?? ""));
 <div class="<?php echo esc_attr($atts["wrapper_class"]); ?>">
 <?php endif; ?>
 
-<div class="<?php echo esc_attr($wrap_cls); ?>">
+<div class="<?php echo esc_attr($wrap_cls); ?>"<?php echo $data_attrs; ?>>
 <?php foreach ($items as $item): ?>
     <?php
     if (!is_array($item)) {

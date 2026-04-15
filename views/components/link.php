@@ -10,6 +10,10 @@
 defined("ABSPATH") || exit();
 
 $variant = $atts["variant"] ?? "default";
+$data_attrs = "";
+foreach ((array) ($atts["data_attrs"] ?? []) as $key => $val) {
+	$data_attrs .= " data-" . esc_attr($key) . '="' . esc_attr($val) . '"';
+}
 $classes = implode(
 	" ",
 	array_filter([
@@ -27,6 +31,7 @@ $classes = implode(
     <?php echo ($atts["target"] ?? "") === "_blank"
     	? 'rel="noopener noreferrer"'
     	: ""; ?>
+    <?php echo $data_attrs; ?>
 >
     <?php echo esc_html($atts["label"] ?? ""); ?>
 </a>
