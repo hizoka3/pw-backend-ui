@@ -419,10 +419,40 @@ $ui->notice([
 ```php
 $ui->badge([
     'label'   => 'Active',
-    'variant' => 'success',              // 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
+    'variant' => 'success',              // see list below
     'size'    => 'md',                   // 'sm' | 'md'
 ]);
 ```
+
+**Variants**
+
+| `variant` | Role |
+|-----------|------|
+| `default` | Neutral outline |
+| `primary` | Accent / brand emphasis (solid) |
+| `success`, `warning`, `danger`, `info` | Semantic status |
+| `featured` | Highlighted / editorial emphasis (orange-brown solid) |
+| `orange` | Flat orange tint (legacy / simple emphasis) |
+| `muted` | De-emphasized |
+| **`promo`** | **Marketing / upsell** (e.g. “PRO”, “New”, plan upsell). Orange **gradient**, white label, inset highlight — visually separate from **primary** (red), **warning** (amber status), and **danger**. |
+
+Use **`promo`** (not `pro`) so docs do not imply “product edition”.
+
+```php
+// Marketing pill; drop local CSS hacks on .pw-bui-badge — use the API + optional wrapper for layout only.
+$ui->badge(['label' => 'PRO', 'variant' => 'promo', 'size' => 'sm']);
+```
+
+**Theming & contrast**
+
+`promo` uses design tokens (override per theme on `#pw-backend-ui-app` or `[data-pw-theme]`):
+
+- `--pw-color-badge-promo-text`
+- `--pw-color-badge-promo-border`
+- `--pw-color-badge-promo-grad-from` / `--pw-color-badge-promo-grad-to`
+- `--pw-color-badge-promo-highlight` (inset top gloss)
+
+Defaults target **WCAG 2.1 contrast ≥ 4.5:1** for white text on both gradient stops at **8px / `sm`** badge sizes. If you use **larger** custom typography on the same modifier, you may safely shift the gradient toward brighter oranges (e.g. consumer reference `#fb923c` → `#ea580c`) by overriding those variables.
 
 ### spinner
 

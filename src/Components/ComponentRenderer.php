@@ -396,7 +396,7 @@ class ComponentRenderer
 	 *
 	 * @param array $atts {
 	 *     @type string $label   Badge text.
-	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'. Default: 'default'.
+	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'featured' | 'danger' | 'info' | 'orange' | 'muted' | 'promo'. Default: 'default'. Use 'promo' for marketing/upsell labels (distinct from primary red and warning).
 	 *     @type string $size    'sm' | 'md'. Default: 'md'.
 	 *     @type string $class   Additional CSS classes.
 	 * }
@@ -411,6 +411,8 @@ class ComponentRenderer
 			"wrapper_class" => "",
 			"data_attrs" => [],
 		]);
+		$variant = preg_replace("/[^a-z0-9_-]/i", "", (string) $atts["variant"]);
+		$atts["variant"] = $variant !== "" ? $variant : "default";
 		include __DIR__ . "/../../views/components/badge.php";
 	}
 

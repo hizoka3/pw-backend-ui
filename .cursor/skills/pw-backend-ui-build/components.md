@@ -134,7 +134,7 @@ $ui->badge([
     'label' => '', 'variant' => 'default', 'size' => 'md',
 ]);
 ```
-Variants: `default`, `primary`, `success`, `warning`, `danger`, `info`.
+Variants: `default`, `primary`, `success`, `warning`, `featured`, `danger`, `info`, `orange`, `muted`, `promo` (marketing / upsell — orange gradient; use instead of overloading `pro` in docs).
 
 **separator**
 ```php

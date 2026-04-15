@@ -131,7 +131,7 @@ Acceso: `BackendUI::init()->ui()->{componente}([...])`.
 |--------|-------------|
 | `card()` | Contenedor con header, body y footer |
 | `notice()` | Alerta/banner: `info`, `success`, `warning`, `danger` |
-| `badge()` | Badge/tag: `default`, `primary`, `success`, `warning`, `danger`, `info` |
+| `badge()` | Badge/tag: `default`, `primary`, `success`, `warning`, `featured`, `danger`, `info`, `orange`, `muted`, **`promo`** (marketing / upsell gradient) |
 | `separator()` | Línea divisoria |
 
 ### Tipografía

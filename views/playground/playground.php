@@ -87,16 +87,16 @@ $ui->tab_panel([
 		pw_pg_section("Badges / Labels");
 		pw_pg_row("Tamaño md");
 		foreach (
-			["default", "primary", "success", "warning", "danger", "info"]
+			["default", "primary", "success", "warning", "danger", "info", "promo"]
 			as $v
 		) {
-			$ui->badge(["label" => ucfirst($v), "variant" => $v]);
+			$ui->badge(["label" => $v === "promo" ? "PRO" : ucfirst($v), "variant" => $v]);
 		}
 		pw_pg_row_end();
 		pw_pg_row("Tamaño sm");
-		foreach (["default", "success", "danger", "info"] as $v) {
+		foreach (["default", "success", "danger", "info", "promo"] as $v) {
 			$ui->badge([
-				"label" => ucfirst($v),
+				"label" => $v === "promo" ? "PRO" : ucfirst($v),
 				"variant" => $v,
 				"size" => "sm",
 			]);
@@ -1672,6 +1672,7 @@ $ui->tab_panel([
 		$badges = [
 			["label" => "default",  "class" => ""],
 			["label" => "orange",   "class" => " pw-bui-badge--orange"],
+			["label" => "promo",    "class" => " pw-bui-badge--promo"],
 			["label" => "warning",  "class" => " pw-bui-badge--warning"],
 			["label" => "success",  "class" => " pw-bui-badge--success"],
 			["label" => "info",     "class" => " pw-bui-badge--info"],

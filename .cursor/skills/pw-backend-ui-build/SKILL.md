@@ -62,7 +62,7 @@ For full `$atts` and usage examples, see [components.md](components.md).
 | `button()` | Variants: `primary`, `secondary`, `outline`, `ghost`, `danger`, `invisible`. With `href` renders `<a>`. |
 | `card()` | Container with title, content closure, optional footer closure. `padded => false` for flush content. |
 | `notice()` | Alert: `info`, `success`, `warning`, `danger`. Optional `dismissible`. |
-| `badge()` | Label tag: `default`, `primary`, `success`, `warning`, `danger`, `info` |
+| `badge()` | Label tag: `default`, `primary`, `success`, `warning`, `featured`, `danger`, `info`, `orange`, `muted`, `promo` (marketing / upsell) |
 | `separator()` | Horizontal rule |
 | `heading()` | h1-h6, or `variant => 'eyebrow'` for small caps `<p>` |
 | `section_label()` | Small caps section divider |

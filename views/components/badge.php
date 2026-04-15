@@ -5,6 +5,7 @@
  * Badge / Label component — PW Design System.
  *
  * @var array $atts  Badge attributes from ComponentRenderer::badge().
+ *                    variant: alphanumeric + hyphen/underscore only (sanitized in ComponentRenderer).
  */
 
 defined("ABSPATH") || exit();
