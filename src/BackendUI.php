@@ -31,6 +31,8 @@ class BackendUI
 			"bridge_screens" => null,
 			"brand" => [
 				"name" => "",
+				"plugin_name" => "",
+				"version" => "",
 				"logo_url" => "",
 			],
 		]);
