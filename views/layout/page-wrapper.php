@@ -29,16 +29,18 @@ $has_sidenav = !empty($page["sidenav"]);
             <div class="pw-bui-header__meta">
                 <div class="pw-bui-logo">
                     <?php
-                    $display_name = $brand["plugin_name"] ?? $brand["name"] ?? "";
-                    $display_version = $brand["version"] ?? "";
+                    $display_name    = $brand["plugin_name"] ?? $brand["name"] ?? "";
+                    $display_version = $brand["version"] ?? $bui->config("version") ?? "";
                     ?>
                     <?php if (!empty($display_name)): ?>
                         <span class="pw-bui-logo__name"><?php echo esc_html($display_name); ?></span>
                     <?php endif; ?>
-                    <?php if (!empty($display_version)): ?>
-                        <span class="pw-bui-logo__version">v.<?php echo esc_html($display_version); ?></span>
-                    <?php endif; ?>
-                    <span class="pw-bui-logo__mark" aria-hidden="true"></span>
+                    <div class="pw-bui-logo__sub">
+                        <span class="pw-bui-logo__mark" aria-hidden="true"></span>
+                        <?php if (!empty($display_version)): ?>
+                            <span class="pw-bui-logo__version">v.<?php echo esc_html($display_version); ?></span>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
 

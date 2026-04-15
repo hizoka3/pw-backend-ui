@@ -420,6 +420,12 @@
 	text-transform: uppercase;
 }
 
+.pw-bui-logo__sub {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
 .pw-bui-logo__version {
 	font-size: 10px;
 	font-weight: 400;
