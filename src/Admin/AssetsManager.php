@@ -88,7 +88,18 @@ class AssetsManager
 	 */
 	public function enqueue(string $hook_suffix): void
 	{
-		if (!$this->should_load($hook_suffix)) {
+		/**
+		 * Override automatic screen matching (optional).
+		 *
+		 * @param null|bool $decision null = use built-in rules; true = enqueue; false = skip.
+		 * @param string    $hook_suffix Argument from admin_enqueue_scripts.
+		 * @param array     $config      Merged BackendUI config (screens, assets_url, …).
+		 */
+		$override = apply_filters('pw_bui/should_enqueue', null, $hook_suffix, $this->config);
+		if ($override === false) {
+			return;
+		}
+		if ($override !== true && !$this->should_load($hook_suffix)) {
 			return;
 		}
 

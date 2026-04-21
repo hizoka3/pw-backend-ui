@@ -87,6 +87,7 @@ Tras actualizar a **1.2+**, si usabas un loader externo que hacía `dequeue` de 
 | Filtro | Descripción |
 |--------|-------------|
 | `pw_bui/merged_config` | Recibe `array $merged` y `array $fragments` tras fusionar. |
+| `pw_bui/should_enqueue` | `(null\|bool $decision, string $hook_suffix, array $config)` — devuelve `true` para forzar CSS/JS del core, `false` para bloquear, `null` para regla por defecto (screens / `?page=`). Útil si el `screen_id` de WP no coincide con tu lista. |
 
 ### `render_page()` — keys disponibles
 
