@@ -272,7 +272,7 @@ For a complete before/after example, see [examples.md](examples.md).
 5. **No jQuery** — vanilla JS. Use `data-pw-*` attributes and `pw-bui:*` events.
 6. **Package does NOT persist data** — only renders UI. `get_option`/`update_option` in the consuming plugin.
 7. **Package does NOT register admin pages** — use `add_menu_page`/`add_submenu_page` yourself.
-8. **`screens => []` recommended** — let consuming plugin handle asset enqueue (see `wp-backend-ui-integration`).
+8. **`screens` en `BackendUI::init()`** — lista los `screen_id` de tus pantallas; el paquete encola en `pw-bui-core-*` (ver `wp-backend-ui-integration`).
 9. **Escaping** — `esc_html()` for text, `esc_attr()` for attributes, `wp_kses_post()` for trusted HTML.
 10. **BEM naming** — `pw-bui-{block}`, `pw-bui-{block}__{element}`, `pw-bui-{block}--{modifier}`.
 11. **Data attributes** prefix: `data-pw-*`. JS events prefix: `pw-bui:*`.

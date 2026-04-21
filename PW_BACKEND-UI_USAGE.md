@@ -1,7 +1,7 @@
 # pw/backend-ui — Usage Guide
 
-**v1.4.0** · Design system for WordPress admin plugin pages.
-Stack: PHP 8.0+, WordPress 6.0+, Tailwind CSS CDN, vanilla JS.
+**v1.2.0** · Design system for WordPress admin plugin pages.
+Stack: PHP 8.0+, WordPress 6.0+, compiled `backend-ui.css` / `backend-ui.js`.
 
 Tokens and component chrome follow **Pezweb Work OS**: Roboto, dark gray surfaces (`#1a1a1a`–`#3a3a3a`), **blue focus** on text fields (`#5ba4e5`), brand red **accent** (`#dd0000`), square corners on fields. Optional **`admin_bridge`** restyles native WP list/edit screens when you add the same screen IDs to `screens` (or `bridge_screens`).
 
@@ -32,7 +32,9 @@ composer require pw/backend-ui
 
 ## Bootstrap
 
-Call `BackendUI::init()` once inside `plugins_loaded`. Pass **`screens`** with the WP admin screen IDs where assets should load (leaving it empty means nothing loads).
+Call `BackendUI::init()` from each plugin that uses the design system (typically `plugins_loaded`). Every call registers a **config fragment**; fragments are **merged** into one singleton — load order between plugins does not require custom hook priorities.
+
+Pass **`screens`** with the WP admin screen IDs where assets should load (empty = no auto-enqueue on any screen).
 
 ```php
 use PW\BackendUI\BackendUI;
@@ -40,19 +42,20 @@ use PW\BackendUI\BackendUI;
 add_action('plugins_loaded', function () {
     BackendUI::init([
         'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'version'    => '1.4.0',
-        'slug'       => 'my-plugin',          // unique handle for CSS/JS
+        'version'    => '1.2.0',
         'screens'    => [
-            'toplevel_page_my-plugin',         // add your admin screen IDs here
+            'toplevel_page_my-plugin',
             'my-plugin_page_my-plugin-settings',
         ],
         'brand' => [
-            'name'     => 'My Plugin',
-            'logo_url' => plugin_dir_url(__FILE__) . 'assets/logo.svg',
+            'plugin_name' => 'My Plugin',
+            'logo_url'    => plugin_dir_url(__FILE__) . 'assets/logo.svg',
         ],
     ]);
 });
 ```
+
+**Handles de cola (estables):** `pw-bui-core-styles`, `pw-bui-core-scripts`, y opcionalmente `pw-bui-core-admin-bridge`. El campo `slug` ya **no** define handles; puedes omitirlo. Para CSS propio del plugin, declara dependencia de `\PW\BackendUI\BackendUI::CORE_STYLE_HANDLE` (o la cadena `pw-bui-core-styles`).
 
 > **How to find your screen ID:** In WordPress admin, open the page and check the URL. The `page=` param maps to a screen ID like `toplevel_page_{page_slug}` or `{parent}_page_{page_slug}`. You can also use `get_current_screen()->id` in a hook.
 
@@ -60,9 +63,13 @@ add_action('plugins_loaded', function () {
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `screens` | string[] | Screen IDs where `backend-ui.css` / `backend-ui.js` load. Empty = no assets. |
-| `admin_bridge` | bool | If `true`, also loads `backend-ui-admin-bridge.css` and adds body class `pw-bui-admin` on the matching screens (see below). |
-| `bridge_screens` | string[]\|null | Optional. Screen IDs for the bridge only; defaults to `screens` when `null`. |
+| `assets_url` | string | URL base del directorio `assets/` del paquete (primer valor no vacío entre fragmentos si hay varios plugins). |
+| `version` | string | Versión para `?ver=`; se usa la **mayor** entre fragmentos (`version_compare`). |
+| `screens` | string[] | Screen IDs where `backend-ui.css` / `backend-ui.js` load. Empty = no assets. Union of all fragments. |
+| `brand` | array | Campos de cabecera. Si el fragmento incluye `screens`, el `brand` de ese fragmento se aplica solo en esos IDs (`effective_brand()`). |
+| `admin_bridge` | bool | If `true`, also loads `backend-ui-admin-bridge.css` and adds body class `pw-bui-admin` on the matching screens (see below). OR entre fragmentos. |
+| `bridge_screens` | string[]\|null | Optional. Screen IDs for the bridge only; defaults to `screens` when `null`. Union entre fragmentos. |
+| `slug` | string | Obsoleto para registro de assets; ignorado para handles. |
 
 ### Admin bridge (native WordPress UI)
 
@@ -75,8 +82,7 @@ Use this when your plugin registers custom post types or other **core** admin sc
 ```php
 BackendUI::init([
     'assets_url'    => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-    'version'       => '1.4.0',
-    'slug'          => 'my-plugin',
+    'version'       => '1.2.0',
     'screens'       => [
         'toplevel_page_my-plugin',
         'edit-my_cpt',
@@ -84,7 +90,7 @@ BackendUI::init([
         'post-new-my_cpt',
     ],
     'admin_bridge'  => true,
-    'brand'         => [ 'name' => 'My Plugin' ],
+    'brand'         => [ 'plugin_name' => 'My Plugin' ],
 ]);
 ```
 
@@ -599,6 +605,7 @@ This registers a "PW Playground" top-level menu page at position 99.
 | Hook | Type | Description |
 |------|------|-------------|
 | `pw_bui/page_config` | filter | Modify the page config array before rendering |
+| `pw_bui/merged_config` | filter | `(array $merged, array $fragments)` — merged config after combining plugin fragments |
 | `pw_bui/enqueue_assets` | action | `($hook_suffix, $assets_url, $version)` — fired after assets are enqueued |
 
 ---
@@ -618,8 +625,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 add_action('plugins_loaded', function () {
     BackendUI::init([
         'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
-        'version'    => '1.4.0',
-        'slug'       => 'my-plugin',
+        'version'    => '1.2.0',
         'screens'    => ['toplevel_page_my-plugin'],
     ]);
 });

@@ -11,7 +11,7 @@
 
 defined("ABSPATH") || exit();
 
-$brand = $bui->config("brand");
+$brand = $bui->effective_brand();
 $has_sidebar = !empty($page["sidebar"]);
 $has_sidenav = !empty($page["sidenav"]);
 ?>

@@ -19,6 +19,11 @@ class ComponentRenderer
 		$this->config = $config;
 	}
 
+	public function update_config(array $config): void
+	{
+		$this->config = $config;
+	}
+
 	// =========================================================================
 	// BUTTONS
 	// =========================================================================

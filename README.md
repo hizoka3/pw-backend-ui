@@ -2,16 +2,16 @@
 
 Sistema de diseño compartido para el admin de WordPress. Proporciona un layout completo (header, tabs, body, sidebar, footer) y componentes reutilizables listos para usar en plugins del ecosistema PW.
 
-**Versión:** 1.4.0 (dev-main)
+**Versión:** 1.2.0
 **Requiere:** PHP 8.0+ · WordPress 6.0+
-**Repositorio:** https://github.com/pez-web/backend-ui
+**Repositorio:** https://github.com/Pezweb-Design-Studio/pw-backend-ui
 
 ---
 
 ## Instalación
 
 ```json
-"require": { "pw/backend-ui": "dev-main" }
+"require": { "pw/backend-ui": "^1.2" }
 ```
 
 ```bash
@@ -25,13 +25,12 @@ composer install
 ```php
 use PW\BackendUI\BackendUI;
 
-// 1. Inicializar en plugins_loaded
+// 1. Inicializar (p. ej. en plugins_loaded; sin pelear por prioridad entre plugins)
 BackendUI::init([
     'assets_url' => plugin_dir_url(__FILE__) . 'vendor/pw/backend-ui/assets/',
     'screens'    => ['toplevel_page_mi-plugin'],  // screen IDs de WP Admin
-    'version'    => '1.4.0',
-    'slug'       => 'mi-plugin',
-    'brand'      => ['name' => 'Mi Plugin', 'logo_url' => ''],
+    'version'    => '1.2.0',
+    'brand'      => ['plugin_name' => 'Mi Plugin', 'logo_url' => ''],
 ]);
 
 // 2. Registrar la página de admin
@@ -57,6 +56,16 @@ function mi_plugin_render() {
 
 > `screens` vacío = assets **no** se cargan en ninguna pantalla (opt-in explícito).
 
+### Varios plugins a la vez
+
+Cada plugin puede llamar `BackendUI::init([...])` con su propia lista de `screens` y su `brand`. Las configuraciones se **fusionan**: misma instancia, pantallas en unión, **una sola cola** de CSS/JS en handles fijos (`pw-bui-core-styles`, `pw-bui-core-scripts`). El header usa `effective_brand()`: marca global (fragmentos sin `screens` o campos base) + datos por `screen_id` cuando el fragmento declara `screens`.
+
+- **`assets_url`:** se usa el **primer** valor no vacío entre fragmentos; si hay más de uno distinto y `WP_DEBUG` está activo, se emite un aviso.
+- **`version`:** se toma la **mayor** entre fragmentos (cache bust coherente).
+- **`slug`:** obsoleto para colas; se ignora a efectos de handles (compatibilidad hacia atrás).
+
+Tras actualizar a **1.2+**, si usabas un loader externo que hacía `dequeue` de estilos por slug antiguo, retíralo para no interferir con los handles nuevos.
+
 ---
 
 ## API pública
@@ -65,12 +74,19 @@ function mi_plugin_render() {
 
 | Método | Descripción |
 |--------|-------------|
-| `init(array $config)` | Inicializa el design system. Llamadas posteriores retornan la misma instancia. |
+| `init(array $config)` | Registra un fragmento de config y devuelve la instancia única (reconfigura al fusionar). |
+| `effective_brand()` | Marca para la pantalla admin actual (cabecera del layout). |
 | `ui()` | Retorna el `ComponentRenderer` |
-| `config(?string $key)` | Retorna toda la config o un valor específico |
+| `config(?string $key)` | Retorna toda la config fusionada o un valor específico |
 | `render_page(array $page)` | Renderiza página completa con layout |
 | `playground(array $opts)` | Registra página de dev con todos los componentes |
-| `reset()` | Resetea el singleton (para testing) |
+| `reset()` | Resetea la instancia y los fragmentos (para testing) |
+
+### Filtros
+
+| Filtro | Descripción |
+|--------|-------------|
+| `pw_bui/merged_config` | Recibe `array $merged` y `array $fragments` tras fusionar. |
 
 ### `render_page()` — keys disponibles
 
@@ -287,13 +303,12 @@ document.addEventListener('pw-bui:theme-changed', function(e) {
 
 ---
 
-## Tailwind CSS
+## Estilos y utilidades
 
-El package carga Tailwind CDN automáticamente en las screens configuradas. Disponible para el package y para los plugins consumidores.
+El paquete distribuye **`assets/css/backend-ui.css`** (tokens `--pw-*` y componentes). No inyecta Tailwind CDN en admin.
 
-- Usar clases estándar (`flex`, `gap-4`, `mt-2`, etc.)
-- `@apply` **no disponible** — requiere build process, no aplica con CDN
-- No se carga en el frontend público
+- Los componentes del design system no dependen de utilidades Tailwind en runtime.
+- Si tu plugin compila Tailwind para vistas admin, encola ese CSS **después** de `pw-bui-core-styles`.
 
 ---
 
