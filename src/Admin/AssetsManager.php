@@ -126,15 +126,7 @@ class AssetsManager
 	{
 		$screens = $this->config['screens'] ?? [];
 
-		if (empty($screens)) {
-			return false;
-		}
-
-		$current_screen = get_current_screen();
-		$screen_id = $current_screen ? $current_screen->id : $hook_suffix;
-
-		return in_array($screen_id, $screens, true) ||
-			in_array($hook_suffix, $screens, true);
+		return $this->matches_screen_list($hook_suffix, $screens);
 	}
 
 	private function should_apply_admin_bridge(string $hook_suffix): bool
@@ -144,14 +136,56 @@ class AssetsManager
 		}
 
 		$screens = $this->config['bridge_screens'] ?? $this->config['screens'] ?? [];
-		if (empty($screens)) {
+
+		return $this->matches_screen_list($hook_suffix, $screens);
+	}
+
+	/**
+	 * Whether the current admin request matches any configured screen ID.
+	 *
+	 * WordPress passes $hook_suffix to admin_enqueue_scripts as either the full
+	 * hook (e.g. mobysuite_page_mobypress-settings) or, when get_plugin_page_hook()
+	 * returns null, only the menu slug (e.g. mobypress-settings). We also match
+	 * admin.php?page=… against * _page_{slug} entries so plugins can list stable
+	 * WP_Screen IDs only.
+	 *
+	 * @param list<string>|array<int, string> $screens
+	 */
+	private function matches_screen_list(string $hook_suffix, array $screens): bool
+	{
+		if ($screens === []) {
 			return false;
 		}
 
 		$current_screen = get_current_screen();
 		$screen_id = $current_screen ? $current_screen->id : $hook_suffix;
 
-		return in_array($screen_id, $screens, true) ||
-			in_array($hook_suffix, $screens, true);
+		if (in_array($screen_id, $screens, true) || in_array($hook_suffix, $screens, true)) {
+			return true;
+		}
+
+		if (!isset($_GET['page']) || !is_string($_GET['page'])) {
+			return false;
+		}
+
+		$page = sanitize_key(wp_unslash($_GET['page']));
+		if ($page === '') {
+			return false;
+		}
+
+		foreach ($screens as $sid) {
+			if (!is_string($sid) || $sid === '') {
+				continue;
+			}
+			if ($sid === $page) {
+				return true;
+			}
+			$suffix = '_page_' . $page;
+			if (strlen($sid) >= strlen($suffix) && str_ends_with($sid, $suffix)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
