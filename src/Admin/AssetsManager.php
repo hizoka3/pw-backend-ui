@@ -115,9 +115,13 @@ class AssetsManager
 		wp_enqueue_script(self::CORE_SCRIPT_HANDLE);
 
 		if (!$this->inline_boot_script_added) {
+			/*
+			 * Fallback if markup is not from page-wrapper.php (no sync first-child script):
+			 * apply persisted theme once #pw-backend-ui-app exists when this runs in footer.
+			 */
 			wp_add_inline_script(
 				self::CORE_SCRIPT_HANDLE,
-				"try{var __pwt=localStorage.getItem('pw-bui-theme');if(__pwt==='light'||__pwt==='dark'){var __pwa=document.getElementById('pw-backend-ui-app');if(__pwa){__pwa.setAttribute('data-pw-theme',__pwt);}}}catch(e){}",
+				"try{var __pwa=document.getElementById('pw-backend-ui-app');if(__pwa){var __pwt=localStorage.getItem('pw-bui-theme');if(__pwt!=='light'&&__pwt!=='dark'){__pwt='dark';}__pwa.setAttribute('data-pw-theme',__pwt);}}catch(e){}",
 				'before',
 			);
 			$this->inline_boot_script_added = true;

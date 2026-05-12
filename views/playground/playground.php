@@ -87,14 +87,23 @@ $ui->tab_panel([
 		pw_pg_section("Badges / Labels");
 		pw_pg_row("Tamaño md");
 		foreach (
-			["default", "primary", "success", "warning", "danger", "info", "promo"]
+			[
+				"default",
+				"primary",
+				"success",
+				"warning",
+				"orange",
+				"danger",
+				"info",
+				"promo",
+			]
 			as $v
 		) {
 			$ui->badge(["label" => $v === "promo" ? "PRO" : ucfirst($v), "variant" => $v]);
 		}
 		pw_pg_row_end();
 		pw_pg_row("Tamaño sm");
-		foreach (["default", "success", "danger", "info", "promo"] as $v) {
+		foreach (["default", "success", "danger", "info", "orange", "promo"] as $v) {
 			$ui->badge([
 				"label" => $v === "promo" ? "PRO" : ucfirst($v),
 				"variant" => $v,
@@ -695,6 +704,63 @@ $ui->tab_panel([
 				["Estado", "Activo"],
 			],
 		]);
+		echo '<p class="pw-bui-section-label" style="margin-top:20px;margin-bottom:6px;">Metric grid + cards</p>';
+		echo '<p class="pw-bui-paragraph" style="font-size:12px;margin:0 0 12px;color:var(--pw-color-fg-muted);">Patrón oficial: <code>.pw-bui-metric-grid</code> + <code>.pw-bui-metric-grid__item</code> (<code>repeat(3, 1fr)</code> y <code>gap: var(--pw-layout-gap)</code>). Tarjetas con métrica y <code>pw-bui-action-grid</code> / <code>--orange</code>.</p>';
+		echo '<div class="pw-bui-metric-grid">';
+		$metric_cards = [
+			["Ingresos", "$48.200", "Ver detalle", "Exportar", false],
+			["Pedidos", "127", "Procesar", "Archivar", true],
+			["Usuarios", "1.340", "Nuevo", "Filtrar", false],
+		];
+		foreach ($metric_cards as $mc) {
+			list($mlabel, $mval, $a1, $a2, $use_orange) = $mc;
+			$btn2 = $use_orange
+				? "pw-bui-action-grid pw-bui-action-grid--orange"
+				: "pw-bui-action-grid";
+			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);overflow:hidden;display:flex;flex-direction:column;height:100%;">';
+			echo '<div style="position:absolute;top:0;right:0;width:7px;height:7px;border-left:1px solid var(--pw-color-border-default);border-bottom:1px solid var(--pw-color-border-default);"></div>';
+			echo '<div style="padding:8px 12px;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--pw-color-fg-subtle);border-bottom:1px solid var(--pw-color-border-muted);">' .
+				esc_html($mlabel) .
+				"</div>";
+			echo '<div style="flex:1;display:flex;align-items:center;padding:10px 12px;font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
+				esc_html($mval) .
+				"</div>";
+			echo '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pw-color-border-default);">';
+			echo '<button type="button" class="pw-bui-action-grid">' . esc_html($a1) . "</button>";
+			echo '<button type="button" class="' .
+				esc_attr($btn2) .
+				'" style="border-left:1px solid var(--pw-color-border-default);">' .
+				esc_html($a2) .
+				"</button>";
+			echo "</div></div></div>";
+		}
+		echo "</div>";
+		echo '<p class="pw-bui-section-label" style="margin-top:20px;margin-bottom:6px;">Metric grid + data_table</p>';
+		echo '<p class="pw-bui-paragraph" style="font-size:12px;margin:0 0 12px;color:var(--pw-color-fg-muted);">Misma rejilla; cada celda incluye un <code>data_table()</code> compacto (solo lectura).</p>';
+		echo '<div class="pw-bui-metric-grid">';
+		foreach (
+			[
+				["Métrica", "Valor"],
+				["Tasa de error", "0,2 %"],
+				["SLA", "99,1 %"],
+			]
+			as $idx => $tbl
+		) {
+			echo '<div class="pw-bui-metric-grid__item" style="border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);padding:10px;">';
+			$ui->heading([
+				"text" => $idx === 0 ? "Salud" : ($idx === 1 ? "Errores" : "Acuerdos"),
+				"level" => 5,
+			]);
+			$ui->data_table([
+				"headers" => ["KPI", "Dato"],
+				"rows" => [
+					[$tbl[0], $tbl[1]],
+					["Actualizado", "2026-05-12"],
+				],
+			]);
+			echo "</div>";
+		}
+		echo "</div>";
 		pw_pg_section_end();
 		pw_pg_section("Paragraphs");
 		$ui->paragraph([
@@ -1360,9 +1426,9 @@ $ui->tab_panel([
 		// ── 22. PANEL CON MÉTRICAS Y ACCIONES GRID ───────────────────────────────
 		pw_pg_section(
 			"Panel con métricas y botones de acción grid",
-			"Métricas con botones full-bleed integrados al pie del contenedor. Acciones visualmente unidas — sin separación de interfaz fuerte.",
+			"Clases oficiales: .pw-bui-metric-grid + .pw-bui-metric-grid__item. Métricas con botones full-bleed al pie; pw-bui-action-grid--orange para CTA cálido (--pw-color-warm-*).",
 		);
-		echo '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--pw-layout-gap);">';
+		echo '<div class="pw-bui-metric-grid">';
 		$action_panels = [
 			["Ingresos", "$48.200", "Ver detalle", "Exportar", ""],
 			["Pedidos", "127", "Procesar", "Archivar", "orange"],
@@ -1374,7 +1440,7 @@ $ui->tab_panel([
 				$variant === "orange"
 					? "pw-bui-action-grid pw-bui-action-grid--orange"
 					: "pw-bui-action-grid";
-			echo '<div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);overflow:hidden;display:flex;flex-direction:column;">';
+			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);overflow:hidden;display:flex;flex-direction:column;height:100%;">';
 			echo '<div style="position:absolute;top:0;right:0;width:7px;height:7px;border-left:1px solid var(--pw-color-border-default);border-bottom:1px solid var(--pw-color-border-default);"></div>';
 			echo '<div style="padding:8px 12px;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--pw-color-fg-subtle);border-bottom:1px solid var(--pw-color-border-muted);">' .
 				esc_html($label) .
@@ -1390,7 +1456,7 @@ $ui->tab_panel([
 				esc_html($act2) .
 				"</button>";
 			echo "</div>";
-			echo "</div>";
+			echo "</div></div>";
 		}
 		echo "</div>";
 		pw_pg_section_end();
@@ -1667,13 +1733,14 @@ $ui->tab_panel([
 		echo '<div style="display:flex;flex-direction:column;gap:24px;">';
 
 		echo "<div>";
-		echo '<p class="pw-bui-section-label" style="margin-bottom:10px;">Badge variants (md: default, primary, success, warning, danger, info, promo; sm omite primary y warning)</p>';
+		echo '<p class="pw-bui-section-label" style="margin-bottom:10px;">Badge variants (incl. <code>orange</code> acento cálido oficial, tokens <code>--pw-color-warm-*</code>)</p>';
 		echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
 		$badges = [
 			["label" => "default", "class" => ""],
 			["label" => "primary", "class" => " pw-bui-badge--primary"],
 			["label" => "success", "class" => " pw-bui-badge--success"],
 			["label" => "warning", "class" => " pw-bui-badge--warning"],
+			["label" => "orange", "class" => " pw-bui-badge--orange"],
 			["label" => "danger", "class" => " pw-bui-badge--danger"],
 			["label" => "info", "class" => " pw-bui-badge--info"],
 			["label" => "PRO", "class" => " pw-bui-badge--promo"],

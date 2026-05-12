@@ -17,7 +17,24 @@ $has_sidenav = !empty($page["sidenav"]);
 ?>
 
 
-<div id="pw-backend-ui-app" data-pw-theme="dark">
+<div id="pw-backend-ui-app">
+	<?php
+	/*
+	 * Sync theme before first paint: footer scripts run too late → light users saw a dark flash on full reload.
+	 * Reads localStorage `pw-bui-theme`; default `dark` if missing/invalid (matches backend-ui.js THEME_DEFAULT).
+	 */
+	?>
+	<script>
+	(function (root) {
+		try {
+			var t = localStorage.getItem("pw-bui-theme");
+			t = t === "light" || t === "dark" ? t : "dark";
+			root.setAttribute("data-pw-theme", t);
+		} catch (e) {
+			root.setAttribute("data-pw-theme", "dark");
+		}
+	})(document.currentScript.parentNode);
+	</script>
 
     <?php
 // ── HEADER ───────────────────────────────────────────────

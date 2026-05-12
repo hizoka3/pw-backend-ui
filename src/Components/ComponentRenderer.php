@@ -401,7 +401,7 @@ class ComponentRenderer
 	 *
 	 * @param array $atts {
 	 *     @type string $label   Badge text.
-	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'featured' | 'danger' | 'info' | 'promo' | 'orange' | 'muted'. Default: 'default'. Semantic tones are grey / transparent / red only (no blue-green-amber); 'promo' is PRO / marketing (red gradient). 'orange' and 'featured' are legacy aliases mapped to the grey “warning” scale.
+	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'orange' | 'featured' | 'danger' | 'info' | 'promo' | 'muted'. Default: 'default'. Grey / transparent / red scale except 'orange' (acento cálido oficial, --pw-color-warm-*) and 'promo' (PRO). 'featured' = legacy gris (misma escala que warning).
 	 *     @type string $size    'sm' | 'md'. Default: 'md'.
 	 *     @type string $class   Additional CSS classes.
 	 * }
@@ -619,6 +619,7 @@ class ComponentRenderer
 
 	/**
 	 * Horizontal stats / metrics bar (Work OS .pw-workos-stats-bar).
+	 * Para tarjetas de métricas en rejilla, combina con .pw-bui-metric-grid y .pw-bui-metric-grid__item (véase playground: Layout y Contenedores).
 	 *
 	 * @param array $atts {
 	 *     @type array  $items Each: [ 'label' => string, 'value' => string, 'breakdown' => optional HTML string ]
@@ -639,6 +640,7 @@ class ComponentRenderer
 
 	/**
 	 * Data table for app content (Work OS .pw-workos-table), not wp-list-table.
+	 * En dashboards, suele anidarse dentro de .pw-bui-metric-grid__item (véase playground Layout).
 	 *
 	 * @param array $atts {
 	 *     @type string[]     $headers            Column headers.

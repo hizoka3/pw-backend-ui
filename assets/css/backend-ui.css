@@ -96,6 +96,15 @@
 	--pw-color-badge-promo-grad-to: #7a0000;
 	--pw-color-badge-promo-highlight: rgba(255, 255, 255, 0.18);
 
+	/* Acento ámbar/naranja (badges, pw-bui-action--orange, action-grid) — oficial */
+	--pw-color-warm-fg: #e07020;
+	--pw-color-warm-fg-hover: #ff9a45;
+	--pw-color-warm-border: #6b3a12;
+	--pw-color-warm-border-muted: #4a2800;
+	--pw-color-warm-bg: rgba(224, 112, 32, 0.14);
+	--pw-color-warm-bg-deep: #3a2208;
+	--pw-color-warm-bg-pressed: rgba(224, 112, 32, 0.24);
+
 	/* Neutral scale (0=lightest, 9=darkest) */
 	--pw-color-neutral-0: #ffffff;
 	--pw-color-neutral-1: #e5e5e5;
@@ -154,7 +163,8 @@
 	--pw-color-bg-default: #ffffff;
 	--pw-color-bg-subtle: #f6f8fa;
 	--pw-color-bg-inset: #f0f2f5;
-	--pw-color-bg-overlay: #ffffff;
+	/* Sutil gris: hovers (.button, filas tabla) sobre #fff; no usar blanco puro */
+	--pw-color-bg-overlay: #eaeef2;
 	--pw-color-bg-emphasis: #e6e9ed;
 
 	/* Borders */
@@ -209,6 +219,15 @@
 	--pw-color-badge-promo-grad-from: #dd0000;
 	--pw-color-badge-promo-grad-to: #b80000;
 	--pw-color-badge-promo-highlight: rgba(255, 255, 255, 0.22);
+
+	/* Acento ámbar/naranja — tema claro */
+	--pw-color-warm-fg: #c2410c;
+	--pw-color-warm-fg-hover: #9a3412;
+	--pw-color-warm-border: #ea580c;
+	--pw-color-warm-border-muted: #fdba74;
+	--pw-color-warm-bg: rgba(234, 88, 12, 0.1);
+	--pw-color-warm-bg-deep: #fff7ed;
+	--pw-color-warm-bg-pressed: rgba(234, 88, 12, 0.18);
 
 	/* Neutral scale */
 	--pw-color-neutral-0: #000000;
@@ -503,6 +522,10 @@ ul#adminmenu > li.current > a.current:after {
 	color: #ffffff !important;
 	line-height: 1;
 	text-transform: uppercase;
+}
+
+[data-pw-theme="light"] .pw-bui-logo__name {
+	color: var(--pw-color-fg-default) !important;
 }
 
 .pw-bui-logo__sub {
@@ -965,6 +988,16 @@ ul#adminmenu > li.current > a.current:after {
 	background: transparent;
 	color: #ffffff;
 	border-color: #ffffff;
+}
+
+[data-pw-theme="light"] .pw-bui-btn--ghost {
+	border-color: var(--pw-color-border-emphasis);
+	color: var(--pw-color-fg-muted);
+}
+[data-pw-theme="light"] .pw-bui-btn--ghost:hover {
+	background: var(--pw-color-bg-inset);
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-border-default);
 }
 
 .pw-bui-btn--danger {
@@ -1679,12 +1712,6 @@ ul#adminmenu > li.current > a.current:after {
 	border-color: var(--pw-color-fg-subtle);
 }
 
-.pw-bui-badge--featured {
-	color: var(--pw-color-fg-default);
-	background: rgba(255, 255, 255, 0.08);
-	border-color: var(--pw-color-fg-subtle);
-}
-
 .pw-bui-badge--danger {
 	color: var(--pw-color-danger-fg);
 	background: var(--pw-color-danger-subtle);
@@ -1697,12 +1724,19 @@ ul#adminmenu > li.current > a.current:after {
 	border-color: var(--pw-color-border-muted);
 }
 
-/* Legacy alias — mismo lenguaje que warning (gris). */
 .pw-bui-badge--orange {
+	color: var(--pw-color-warm-fg-hover);
+	background: var(--pw-color-warm-bg-deep);
+	border-color: var(--pw-color-warm-border);
+}
+
+/* Legacy — misma escala gris que warning (destacado layout). */
+.pw-bui-badge--featured {
 	color: var(--pw-color-fg-default);
 	background: rgba(255, 255, 255, 0.08);
 	border-color: var(--pw-color-fg-subtle);
 }
+
 .pw-bui-badge--muted {
 	color: var(--pw-color-fg-subtle);
 	background: var(--pw-color-bg-inset);
@@ -1713,8 +1747,7 @@ ul#adminmenu > li.current > a.current:after {
 	background: rgba(0, 0, 0, 0.04);
 }
 [data-pw-theme="light"] .pw-bui-badge--warning,
-[data-pw-theme="light"] .pw-bui-badge--featured,
-[data-pw-theme="light"] .pw-bui-badge--orange {
+[data-pw-theme="light"] .pw-bui-badge--featured {
 	background: rgba(0, 0, 0, 0.06);
 }
 
@@ -1765,22 +1798,18 @@ ul#adminmenu > li.current > a.current:after {
 	color: var(--pw-color-fg-default);
 }
 
-/* Orange accent variant */
+/* Acento cálido — tokens --pw-color-warm-* (badges, métricas, CTAs secundarios) */
 .pw-bui-action--orange {
-	color: #c05a00;
-	border-color: #4a2500;
-}
-[data-pw-theme="dark"] .pw-bui-action--orange {
-	color: #e07020;
-	border-color: #5a3000;
+	color: var(--pw-color-warm-fg);
+	border-color: var(--pw-color-warm-border);
 }
 .pw-bui-action--orange:hover {
-	color: #ff8c30;
-	border-color: #e07020;
-	background: rgba(224, 112, 32, 0.1);
+	color: var(--pw-color-warm-fg-hover);
+	border-color: var(--pw-color-warm-fg);
+	background: var(--pw-color-warm-bg);
 }
 .pw-bui-action--orange:active {
-	background: rgba(224, 112, 32, 0.18);
+	background: var(--pw-color-warm-bg-pressed);
 }
 
 /* Danger variant */
@@ -1823,20 +1852,17 @@ ul#adminmenu > li.current > a.current:after {
 	background: var(--pw-color-bg-overlay);
 	color: var(--pw-color-fg-default);
 }
-/* Orange accent variant */
+/* Acento cálido — alineado con pw-bui-action--orange */
 .pw-bui-action-grid--orange {
-	color: #c05a00;
-}
-[data-pw-theme="dark"] .pw-bui-action-grid--orange {
-	color: #e07020;
+	color: var(--pw-color-warm-fg);
 }
 .pw-bui-action-grid--orange:hover {
-	color: #ff8c30;
-	background: rgba(224, 112, 32, 0.08);
+	color: var(--pw-color-warm-fg-hover);
+	background: var(--pw-color-warm-bg);
 }
 .pw-bui-action-grid--orange:active {
-	background: rgba(224, 112, 32, 0.15);
-	color: #ff8c30;
+	background: var(--pw-color-warm-bg-pressed);
+	color: var(--pw-color-warm-fg-hover);
 }
 
 /* ── NOTICE / BANNER ── */
@@ -2117,6 +2143,30 @@ ul#adminmenu > li.current > a.current:after {
 .pw-bui-stat__breakdown strong {
 	font-weight: 500;
 	color: var(--pw-color-fg-muted);
+}
+
+/* ── METRIC GRID — tarjetas de métricas (3 cols + gap oficial) ─────────────
+   Uso: contenedor .pw-bui-metric-grid + .pw-bui-metric-grid__item por celda
+   (cards con stats_bar, data_table, pw-bui-action-grid, --orange, etc.).
+   ─────────────────────────────────────────────────────────────────────────── */
+.pw-bui-metric-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--pw-layout-gap);
+	min-width: 0;
+	align-items: stretch;
+}
+
+@media (max-width: 900px) {
+	.pw-bui-metric-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.pw-bui-metric-grid__item {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 /* ── DATA TABLE (metabox / app — no wp-list-table) ── */
@@ -2868,8 +2918,17 @@ ul#adminmenu > li.current > a.current:after {
 	font-family: var(--pw-font-sans);
 }
 
+[data-pw-theme="light"] #pw-backend-ui-app .wp-list-table .column-title a,
+[data-pw-theme="light"] #pw-backend-ui-app .wp-list-table .row-title {
+	color: var(--pw-color-fg-default);
+}
+
 #pw-backend-ui-app .wp-list-table .column-title a:hover {
 	color: var(--pw-color-fg-muted);
+}
+
+[data-pw-theme="light"] #pw-backend-ui-app .wp-list-table .column-title a:hover {
+	color: var(--pw-color-accent-fg);
 }
 
 #pw-backend-ui-app table,
