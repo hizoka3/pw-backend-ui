@@ -284,6 +284,26 @@
 #wpbody-content {
 	background: #1a1a1a !important;
 }
+
+/* Core admin-menu: ::after del ítem activo usa border-right-color #f0f0f1 (body claro).
+   Alinear con #wpbody oscuro para evitar la franja clara junto al menú. */
+ul#adminmenu a.wp-has-current-submenu:after,
+ul#adminmenu > li.current > a.current:after {
+	border-right-color: #1a1a1a !important;
+}
+
+.folded ul#adminmenu a.wp-has-current-submenu:after,
+.folded ul#adminmenu > li a.current:after {
+	border-right-color: #1a1a1a !important;
+}
+
+@media only screen and (max-width: 960px) {
+	.auto-fold ul#adminmenu a.wp-has-current-submenu:after,
+	.auto-fold ul#adminmenu > li a.current:after {
+		border-right-color: #1a1a1a !important;
+	}
+}
+
 #wpfooter {
 	background: #1a1a1a !important;
 	border-top: 1px solid #262626 !important;
