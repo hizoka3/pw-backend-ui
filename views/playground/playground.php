@@ -717,15 +717,15 @@ $ui->tab_panel([
 			$btn2 = $use_orange
 				? "pw-bui-action-grid pw-bui-action-grid--orange"
 				: "pw-bui-action-grid";
-			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);overflow:hidden;display:flex;flex-direction:column;height:100%;">';
+			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);display:flex;flex-direction:column;flex:1;min-height:0;width:100%;overflow:visible;">';
 			echo '<div style="position:absolute;top:0;right:0;width:7px;height:7px;border-left:1px solid var(--pw-color-border-default);border-bottom:1px solid var(--pw-color-border-default);"></div>';
 			echo '<div style="padding:8px 12px;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--pw-color-fg-subtle);border-bottom:1px solid var(--pw-color-border-muted);">' .
 				esc_html($mlabel) .
 				"</div>";
-			echo '<div style="flex:1;display:flex;align-items:center;padding:10px 12px;font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
+			echo '<div style="flex:1;min-height:0;display:flex;align-items:center;padding:10px 12px;font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
 				esc_html($mval) .
 				"</div>";
-			echo '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pw-color-border-default);">';
+			echo '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pw-color-border-default);flex-shrink:0;">';
 			echo '<button type="button" class="pw-bui-action-grid">' . esc_html($a1) . "</button>";
 			echo '<button type="button" class="' .
 				esc_attr($btn2) .
@@ -747,6 +747,7 @@ $ui->tab_panel([
 			as $idx => $tbl
 		) {
 			echo '<div class="pw-bui-metric-grid__item" style="border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);padding:10px;">';
+			echo '<div class="pw-bui-metric-grid__stack">';
 			$ui->heading([
 				"text" => $idx === 0 ? "Salud" : ($idx === 1 ? "Errores" : "Acuerdos"),
 				"level" => 5,
@@ -758,7 +759,7 @@ $ui->tab_panel([
 					["Actualizado", "2026-05-12"],
 				],
 			]);
-			echo "</div>";
+			echo "</div></div>";
 		}
 		echo "</div>";
 		pw_pg_section_end();
@@ -1440,15 +1441,15 @@ $ui->tab_panel([
 				$variant === "orange"
 					? "pw-bui-action-grid pw-bui-action-grid--orange"
 					: "pw-bui-action-grid";
-			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);overflow:hidden;display:flex;flex-direction:column;height:100%;">';
+			echo '<div class="pw-bui-metric-grid__item"><div style="position:relative;border:1px solid var(--pw-color-border-default);background:var(--pw-color-bg-subtle);display:flex;flex-direction:column;flex:1;min-height:0;width:100%;overflow:visible;">';
 			echo '<div style="position:absolute;top:0;right:0;width:7px;height:7px;border-left:1px solid var(--pw-color-border-default);border-bottom:1px solid var(--pw-color-border-default);"></div>';
 			echo '<div style="padding:8px 12px;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--pw-color-fg-subtle);border-bottom:1px solid var(--pw-color-border-muted);">' .
 				esc_html($label) .
 				"</div>";
-			echo '<div style="flex:1;display:flex;align-items:center;padding:10px 12px;font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
+			echo '<div style="flex:1;min-height:0;display:flex;align-items:center;padding:10px 12px;font-size:22px;font-weight:300;color:var(--pw-color-fg-muted);line-height:1;">' .
 				esc_html($value) .
 				"</div>";
-			echo '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pw-color-border-default);">';
+			echo '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pw-color-border-default);flex-shrink:0;">';
 			echo '<button type="button" class="pw-bui-action-grid">' . esc_html($act1) . "</button>";
 			echo '<button type="button" class="' .
 				esc_attr($btn2_class) .

@@ -373,61 +373,6 @@ class BackendUI
 			'content' => function (BackendUI $bui) {
 				include __DIR__ . '/../views/playground/playground.php';
 			},
-			'sidebar' => [
-				'title' => 'Componentes',
-				'content' => function (BackendUI $bui) {
-					$ui = $bui->ui();
-					$ui->card([
-						'content' => function () use ($ui) {
-							$components = [
-								'button',
-								'badge',
-								'input',
-								'textarea',
-								'select',
-								'checkbox',
-								'toggle',
-								'radio',
-								'radio_group',
-								'date_input',
-								'segmented_control',
-								'card',
-								'notice',
-								'spinner',
-								'progress_bar',
-								'breadcrumbs',
-								'pagination',
-								'tooltip',
-								'skeleton',
-								'heading',
-								'section_label',
-								'stats_bar',
-								'data_table',
-								'paragraph',
-								'link',
-								'separator',
-								'tabs',
-								'tab_panel',
-								'side_nav',
-								'stepper',
-								'switch',
-							];
-							echo '<div style="display:flex;flex-direction:column;gap:4px;">';
-							foreach ($components as $c) {
-								echo '<code style="font-size:11px;color:var(--pw-color-fg-muted);">' .
-									esc_html($c) .
-									'()</code>';
-							}
-							echo '</div>';
-						},
-					]);
-					$ui->separator();
-					$ui->paragraph([
-						'text' => 'pw/backend-ui v1.2.0',
-						'variant' => 'muted',
-					]);
-				},
-			],
 		];
 
 		$page = apply_filters('pw_bui/page_config', $page);
