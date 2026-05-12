@@ -66,10 +66,16 @@ class AssetsManager
 		$url = trailingslashit((string) ($this->config['assets_url'] ?? ''));
 		$version = (string) ($this->config['version'] ?? '1.0.0');
 
+		/*
+		 * Depend on `colors` (admin color scheme) so backend-ui.css prints *after* it.
+		 * Otherwise scheme rules can override our shell / menu-notch fixes in the cascade.
+		 */
+		$core_style_deps = wp_style_is('colors', 'registered') ? ['colors'] : ['wp-admin'];
+
 		wp_register_style(
 			self::CORE_STYLE_HANDLE,
 			$url . 'css/backend-ui.css',
-			[],
+			$core_style_deps,
 			$version,
 		);
 		wp_register_script(

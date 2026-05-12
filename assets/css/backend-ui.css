@@ -259,7 +259,7 @@
 
 #pw-backend-ui-app {
 	/*
-     * WP admin inyecta padding-left:20px en #wpbody-content.
+     * Core: #wpcontent tiene padding-left:20px (no #wpbody-content).
      * Compensamos tirando el wrapper 20px a la izquierda y
      * agregando esos 20px al ancho para que llegue al borde derecho.
      */
@@ -290,6 +290,15 @@
 #wpbody,
 #wpbody-content {
 	background: #1a1a1a !important;
+}
+
+/*
+ * #wpcontent: core usa height:100% + padding-left:20px con box-sizing content-box (por defecto).
+ * La altura “útil” queda como 100% del padre + padding fuera → desborde sutil / franja clara
+ * al pie junto al menú. border-box incluye el padding dentro del 100% — se mantiene el gutter.
+ */
+#wpcontent {
+	box-sizing: border-box !important;
 }
 
 /* Admin menu — “notch” del ítem activo (::after). LTR: border-right-color; RTL: border-left-color (admin-menu-rtl.css). */

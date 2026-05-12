@@ -140,7 +140,11 @@ class BackendUI
 			return;
 		}
 		self::$hooks_attached = true;
-		add_action('admin_enqueue_scripts', [$instance->assets, 'enqueue']);
+		/*
+		 * Priority > default so wp_enqueue_style runs after core/theme hooks that
+		 * register the admin color scheme (`colors`). Stylesheet deps also pin us after `colors`.
+		 */
+		add_action('admin_enqueue_scripts', [$instance->assets, 'enqueue'], 100);
 		add_filter('admin_body_class', [$instance, 'filter_admin_body_class']);
 	}
 
