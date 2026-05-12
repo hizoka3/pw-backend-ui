@@ -88,15 +88,13 @@
 	--pw-color-info-muted: #0d2244;
 
 	/*
-	 * Badge — promo (marketing / upsell, e.g. “PRO”, “New”).
-	 * Gradient stops chosen so #fff meets ~4.5:1 on both ends at badge font sizes (8px / sm).
-	 * Override in your theme to tune hue; keep contrast if changing --pw-color-badge-promo-text.
+	 * Badge — promo (PRO / marketing). Rojo marca; gradiente legible con texto blanco en sm/md.
 	 */
 	--pw-color-badge-promo-text: #ffffff;
-	--pw-color-badge-promo-border: #7c2d12;
-	--pw-color-badge-promo-grad-from: #c2410c;
-	--pw-color-badge-promo-grad-to: #9a3412;
-	--pw-color-badge-promo-highlight: rgba(255, 255, 255, 0.2);
+	--pw-color-badge-promo-border: #5c1010;
+	--pw-color-badge-promo-grad-from: #b80000;
+	--pw-color-badge-promo-grad-to: #7a0000;
+	--pw-color-badge-promo-highlight: rgba(255, 255, 255, 0.18);
 
 	/* Neutral scale (0=lightest, 9=darkest) */
 	--pw-color-neutral-0: #ffffff;
@@ -205,11 +203,11 @@
 	--pw-color-info-subtle: #ddf4ff;
 	--pw-color-info-muted: #b6e3ff;
 
-	/* Badge — promo (marketing); slightly brighter on light UI, still WCAG-safe with white label */
+	/* Badge — promo (PRO) — rojo marca en tema claro */
 	--pw-color-badge-promo-text: #ffffff;
-	--pw-color-badge-promo-border: #c2410c;
-	--pw-color-badge-promo-grad-from: #c2410c;
-	--pw-color-badge-promo-grad-to: #9a3412;
+	--pw-color-badge-promo-border: #b80000;
+	--pw-color-badge-promo-grad-from: #dd0000;
+	--pw-color-badge-promo-grad-to: #b80000;
 	--pw-color-badge-promo-highlight: rgba(255, 255, 255, 0.22);
 
 	/* Neutral scale */
@@ -1656,6 +1654,7 @@ ul#adminmenu > li.current > a.current:after {
 	outline-offset: 2px;
 }
 
+/* Badges: default = neutro; resto = escala gris / transparente o rojo (danger, promo). Sin azul/verde/ámbar. */
 .pw-bui-badge--default {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
@@ -1663,53 +1662,63 @@ ul#adminmenu > li.current > a.current:after {
 }
 
 .pw-bui-badge--primary {
-	color: #7ec8f0;
-	background: #0a2236;
-	border-color: transparent;
+	color: var(--pw-color-fg-default);
+	background: var(--pw-color-bg-emphasis);
+	border-color: var(--pw-color-border-emphasis);
 }
 
 .pw-bui-badge--success {
-	color: #5ed49a;
-	background: #0f3322;
-	border-color: transparent;
+	color: var(--pw-color-fg-muted);
+	background: rgba(255, 255, 255, 0.04);
+	border-color: var(--pw-color-border-default);
 }
 
 .pw-bui-badge--warning {
-	color: #f0b030;
-	background: #3a2500;
-	border-color: transparent;
+	color: var(--pw-color-fg-default);
+	background: rgba(255, 255, 255, 0.08);
+	border-color: var(--pw-color-fg-subtle);
 }
 
 .pw-bui-badge--featured {
-	color: #e87830;
-	background: #3a2000;
-	border-color: transparent;
+	color: var(--pw-color-fg-default);
+	background: rgba(255, 255, 255, 0.08);
+	border-color: var(--pw-color-fg-subtle);
 }
 
 .pw-bui-badge--danger {
-	color: #e85555;
-	background: #3a0f0f;
-	border-color: transparent;
+	color: var(--pw-color-danger-fg);
+	background: var(--pw-color-danger-subtle);
+	border-color: var(--pw-color-danger-muted);
 }
 
 .pw-bui-badge--info {
-	color: #68b5f0;
-	background: #0d2b42;
-	border-color: transparent;
+	color: var(--pw-color-fg-subtle);
+	background: transparent;
+	border-color: var(--pw-color-border-muted);
 }
 
+/* Legacy alias — mismo lenguaje que warning (gris). */
 .pw-bui-badge--orange {
-	color: #f09040;
-	background: #4a2800;
-	border-color: transparent;
+	color: var(--pw-color-fg-default);
+	background: rgba(255, 255, 255, 0.08);
+	border-color: var(--pw-color-fg-subtle);
 }
 .pw-bui-badge--muted {
-	color: #666668;
-	background: #1e1e20;
-	border-color: #2a2a2c;
+	color: var(--pw-color-fg-subtle);
+	background: var(--pw-color-bg-inset);
+	border-color: var(--pw-color-border-default);
 }
 
-/* Marketing / upsell — distinct from primary (red), warning (amber), danger (red), flat --orange */
+[data-pw-theme="light"] .pw-bui-badge--success {
+	background: rgba(0, 0, 0, 0.04);
+}
+[data-pw-theme="light"] .pw-bui-badge--warning,
+[data-pw-theme="light"] .pw-bui-badge--featured,
+[data-pw-theme="light"] .pw-bui-badge--orange {
+	background: rgba(0, 0, 0, 0.06);
+}
+
+/* Marketing / upsell (PRO) — gradiente rojo (--pw-color-badge-promo-*). */
 .pw-bui-badge--promo {
 	color: var(--pw-color-badge-promo-text);
 	border: 1px solid var(--pw-color-badge-promo-border);
@@ -1888,13 +1897,13 @@ ul#adminmenu > li.current > a.current:after {
 	opacity: 1;
 }
 .pw-bui-notice--info .pw-bui-notice__dismiss {
-	color: var(--pw-color-info-fg);
+	color: var(--pw-color-fg-subtle);
 }
 .pw-bui-notice--success .pw-bui-notice__dismiss {
-	color: var(--pw-color-success-fg);
+	color: var(--pw-color-fg-muted);
 }
 .pw-bui-notice--warning .pw-bui-notice__dismiss {
-	color: var(--pw-color-warning-fg);
+	color: var(--pw-color-fg-default);
 }
 .pw-bui-notice--danger .pw-bui-notice__dismiss {
 	color: var(--pw-color-danger-fg);
@@ -1903,22 +1912,22 @@ ul#adminmenu > li.current > a.current:after {
 .pw-bui-notice--info {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
-	border-color: var(--pw-color-info-fg);
+	border-color: var(--pw-color-border-muted);
 }
 .pw-bui-notice--success {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
-	border-color: var(--pw-color-success-fg);
+	border-color: var(--pw-color-border-default);
 }
 .pw-bui-notice--warning {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
-	border-color: var(--pw-color-warning-fg);
+	border-color: var(--pw-color-border-emphasis);
 }
 .pw-bui-notice--danger {
 	color: var(--pw-color-fg-muted);
 	background: transparent;
-	border-color: var(--pw-color-danger-fg);
+	border-color: var(--pw-color-danger-emphasis);
 }
 
 /* ── SEPARATOR ── */
@@ -3278,40 +3287,49 @@ ul#adminmenu > li.current > a.current:after {
 	line-height: 18px;
 }
 .pw-bui-action--success {
-	color: #3a9a6e;
-	border-color: #1e4a36;
+	color: var(--pw-color-fg-muted);
+	border-color: var(--pw-color-border-default);
 }
 [data-pw-theme="light"] .pw-bui-action--success {
-	color: #1a7a50;
-	border-color: #3a9a6e;
+	color: var(--pw-color-fg-muted);
+	border-color: var(--pw-color-border-default);
 }
 .pw-bui-action--success:hover {
-	background: rgba(58, 154, 110, 0.1);
-	border-color: #3a9a6e;
+	background: rgba(255, 255, 255, 0.06);
+	border-color: var(--pw-color-border-emphasis);
+}
+[data-pw-theme="light"] .pw-bui-action--success:hover {
+	background: rgba(0, 0, 0, 0.05);
 }
 .pw-bui-action--warning {
-	color: #c08020;
-	border-color: #4a3200;
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-fg-subtle);
 }
 [data-pw-theme="light"] .pw-bui-action--warning {
-	color: #a06010;
-	border-color: #c08020;
+	color: var(--pw-color-fg-default);
+	border-color: var(--pw-color-fg-subtle);
 }
 .pw-bui-action--warning:hover {
-	background: rgba(192, 128, 32, 0.1);
-	border-color: #c08020;
+	background: rgba(255, 255, 255, 0.08);
+	border-color: var(--pw-color-border-emphasis);
+}
+[data-pw-theme="light"] .pw-bui-action--warning:hover {
+	background: rgba(0, 0, 0, 0.06);
 }
 .pw-bui-action--info {
-	color: #5ba4e5;
-	border-color: #1a3a5c;
+	color: var(--pw-color-fg-subtle);
+	border-color: var(--pw-color-border-muted);
 }
 [data-pw-theme="light"] .pw-bui-action--info {
-	color: #1e6ab0;
-	border-color: #5ba4e5;
+	color: var(--pw-color-fg-subtle);
+	border-color: var(--pw-color-border-muted);
 }
 .pw-bui-action--info:hover {
-	background: rgba(91, 164, 229, 0.1);
-	border-color: #5ba4e5;
+	background: rgba(255, 255, 255, 0.05);
+	border-color: var(--pw-color-border-default);
+}
+[data-pw-theme="light"] .pw-bui-action--info:hover {
+	background: rgba(0, 0, 0, 0.04);
 }
 .pw-bui-action--muted {
 	color: var(--pw-color-fg-subtle);
@@ -3324,16 +3342,16 @@ ul#adminmenu > li.current > a.current:after {
 }
 
 .pw-bui-action-panel--success {
-	border-color: #1e4a36;
+	border-color: var(--pw-color-border-default);
 }
 [data-pw-theme="light"] .pw-bui-action-panel--success {
-	border-color: #3a9a6e;
+	border-color: var(--pw-color-border-default);
 }
 .pw-bui-action-panel--warning {
-	border-color: #4a3200;
+	border-color: var(--pw-color-border-emphasis);
 }
 [data-pw-theme="light"] .pw-bui-action-panel--warning {
-	border-color: #c08020;
+	border-color: var(--pw-color-border-emphasis);
 }
 .pw-bui-action-panel--muted {
 	border-color: var(--pw-color-border-muted);

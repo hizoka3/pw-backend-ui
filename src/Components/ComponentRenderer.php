@@ -401,7 +401,7 @@ class ComponentRenderer
 	 *
 	 * @param array $atts {
 	 *     @type string $label   Badge text.
-	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'featured' | 'danger' | 'info' | 'orange' | 'muted' | 'promo'. Default: 'default'. Use 'promo' for marketing/upsell labels (distinct from primary red and warning).
+	 *     @type string $variant 'default' | 'primary' | 'success' | 'warning' | 'featured' | 'danger' | 'info' | 'promo' | 'orange' | 'muted'. Default: 'default'. Semantic tones are grey / transparent / red only (no blue-green-amber); 'promo' is PRO / marketing (red gradient). 'orange' and 'featured' are legacy aliases mapped to the grey “warning” scale.
 	 *     @type string $size    'sm' | 'md'. Default: 'md'.
 	 *     @type string $class   Additional CSS classes.
 	 * }

@@ -1667,17 +1667,17 @@ $ui->tab_panel([
 		echo '<div style="display:flex;flex-direction:column;gap:24px;">';
 
 		echo "<div>";
-		echo '<p class="pw-bui-section-label" style="margin-bottom:10px;">Badge variants</p>';
+		echo '<p class="pw-bui-section-label" style="margin-bottom:10px;">Badge variants (md: default, primary, success, warning, danger, info, promo; sm omite primary y warning)</p>';
 		echo '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
 		$badges = [
-			["label" => "default",  "class" => ""],
-			["label" => "orange",   "class" => " pw-bui-badge--orange"],
-			["label" => "promo",    "class" => " pw-bui-badge--promo"],
-			["label" => "warning",  "class" => " pw-bui-badge--warning"],
-			["label" => "success",  "class" => " pw-bui-badge--success"],
-			["label" => "info",     "class" => " pw-bui-badge--info"],
-			["label" => "danger",   "class" => " pw-bui-badge--danger"],
-			["label" => "muted",    "class" => " pw-bui-badge--muted"],
+			["label" => "default", "class" => ""],
+			["label" => "primary", "class" => " pw-bui-badge--primary"],
+			["label" => "success", "class" => " pw-bui-badge--success"],
+			["label" => "warning", "class" => " pw-bui-badge--warning"],
+			["label" => "danger", "class" => " pw-bui-badge--danger"],
+			["label" => "info", "class" => " pw-bui-badge--info"],
+			["label" => "PRO", "class" => " pw-bui-badge--promo"],
+			["label" => "muted", "class" => " pw-bui-badge--muted"],
 		];
 		foreach ($badges as $b) {
 			echo '<span class="pw-bui-badge' . esc_attr($b["class"]) . '">' . esc_html($b["label"]) . "</span>";
